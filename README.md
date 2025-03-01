@@ -1,2 +1,3 @@
 # physicsSim
-pnysics sim/game thing
+physics sim/game thing
+
