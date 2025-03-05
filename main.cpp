@@ -1,7 +1,5 @@
 /*
  * TO DO:
- *  -Add textures
- *  -add triggers(visible with debug on)
  *  -add reading info from file to create scene(with physics objects still on screen as well);
  *  -after all object types are added, create an editor
 */
@@ -10,12 +8,12 @@
 #include <cmath>
 #include <limits>
 #include <SFML/Graphics.hpp>
-const int W = 720;
-const int H = 420;
-const int objectCount = 14;
+const int W = 1366;
+const int H = 768;
+const int objectCount = 15;
 const float baseUnit = (W/128+H/72)/2;
 
-bool debug = false;
+bool debug =    true;
 
 bool physics = true;
 
@@ -45,6 +43,14 @@ struct SATout{
     returnXY point2;
 };
 
+struct triggerProperties{
+    std::string id = "default";
+    std::string event = "none";
+    //for event "destroy"
+    bool destroyO2 = false;
+    int typeReq = 1;
+};
+
 struct object{
     float X = 0;
     float Y = 0;
@@ -61,6 +67,7 @@ struct object{
     float sizeModifier=2;
 
     int objectType = 0;
+    //-4 is nothing :3
     //-3 is trigger
     //-2 is camera
     //-1 is the mouse pointer
@@ -84,13 +91,16 @@ struct object{
     returnXY pointProjected;
     returnXY pointProjected2;
     float coefficentOfFriction = 0.5;
+    triggerProperties trigger = {};
+    std::string loc= "blank.png";
+    sf::Texture texture;
 
 };
 //objects
 //TO DO: import objects from file to pointer!
 object objects[objectCount] = {
     {W/2,H/2,0,0,0,0,0,0,-2,false,false,false},
-    {W/2,H-baseUnit,0,0,0,0,0,0,2,false,false,true,std::numeric_limits<float>::infinity(),0xaaaaaaff,4*W/baseUnit,5,0,{},false,false,false,{},{},1},
+    {W/2,H-baseUnit,0,0,0,0,0,0,2,false,false,true,std::numeric_limits<float>::infinity(),0xaaaaaaff,4*W/baseUnit,5,0,{},false,false,false,{},{},1,{"test"},"kona.png"},
     {W/4,H/2+20*baseUnit,0,0,500,0,0,2,2,true,true,true,10,0xaafefeff,80,2,0,{},false,false,false,{},{},1},
     {W/4,H/2,0,0,500,0,0,2,2,true,true,true,10,0x00ffffff,30,2},
     {W/2,H/2,0,0,0,45,4,2,1,true,true,true,10,0xff00ffff,0,0,0,{},false,false,false,{},{},1},//
@@ -102,7 +112,8 @@ object objects[objectCount] = {
     {W-baseUnit*10,H/2,0,0,200,0,100,4,0,true,true,true,50,0xafbfcfff,0,0,0,{},false,false,false,{},{},1},//
     {W-baseUnit,H/2,0,0,0,0,100,2,0,true,true,true,100},//
     {0,0,0,0,0,0,0,0,-1},
-    {W/2,0,0,0,0,45,4,10,0,true,true,true,50,0xffff00ff}
+    {W/2,0,0,0,0,45,4,10,0,true,true,true,50,0xffff00ff},
+    {-100,0,0,0,0,0,0,2,-3,false,false,false,100,0x00ffffff,100,100,0,{},false,false,false,{},{},0,{"test","destroy",false,1}}
 
 
 };//must include entire scene
@@ -145,7 +156,10 @@ class game{
 
                     //std::cout<<"Yc: "<<objects[i].pointList[iP*2+1]<<"\n\n";
                 }
-
+                if (!objects[i].texture.loadFromFile(objects[i].loc)){
+                    10/0;
+                    //I'm too lazy to throw an error here
+                }
             }
 
 
@@ -260,7 +274,23 @@ class game{
         }
 
     private:
-        //jump countdown
+        void trigger(int o1,int o2){
+
+            if(objects[o1].trigger.event=="destroy"){
+                if(objects[o1].trigger.typeReq==objects[o2].objectType){
+                    for(int i=0;i<objectCount;i++){
+                        if(objects[o1].trigger.id==objects[i].trigger.id){
+                            objects[i].objectType=-4;
+                            objects[i].mass=0;
+                            objects[i].gravity=false;
+                            objects[i].airRes=false;
+                            objects[i].solid=false;
+                        }
+                    }
+                }
+            }
+
+        }
         void jumpDown(float timediff){
             if(jumpCountDown>=0){
                 jumpCountDown-=1/timediff/20;
@@ -343,9 +373,10 @@ class game{
                         shape.setFillColor(sf::Color(0xff0000ff));
                         objects[i].collidedSAT=false;
                     }
+                    shape.setTexture(&objects[i].texture);
 
                     window.draw(shape);
-                }else if(rectShapePoly(i)){
+                }else if(rectShapePoly(i)&&objects[i].objectType!=-3){
                     sf::RectangleShape shape(sf::Vector2f(objects[i].width*baseUnit, objects[i].height*baseUnit));
 
                     shape.setOrigin({objects[i].width*baseUnit/2, objects[i].height*baseUnit/2});
@@ -361,6 +392,7 @@ class game{
                         shape.setFillColor(sf::Color(0xff0000ff));
                         objects[i].collidedSAT=false;
                     }
+                    shape.setTexture(&objects[i].texture);
 
                     window.draw(shape);
                 }else if(convexShapePoly(i)){
@@ -384,6 +416,7 @@ class game{
                         shape.setFillColor(sf::Color(0xff0000ff));
                         objects[i].collidedSAT=false;
                     }
+                    shape.setTexture(&objects[i].texture);
 
                     window.draw(shape);
 
@@ -458,24 +491,29 @@ class game{
                         YMaxCh = getMaxY(iP);
                         YMinCh = getMinY(iP);
                         //std::cout<<"top Y 1: "<<YMin<<"\ntop Y 2: "<<YMinCh<<"\nbottom Y 1: "<<YMax<<"\nbottom Y 2: "<<YMaxCh<<"\n\n";
-                        if(!(XMin>XMaxCh||XMax<XMinCh||YMin>YMaxCh||YMax<YMinCh)&&objects[i].solid&&objects[iP].solid){
+                        if(!(XMin>XMaxCh||XMax<XMinCh||YMin>YMaxCh||YMax<YMinCh)){
+                            if(objects[i].solid&&objects[iP].solid){
+                                if(debug==true){
+                                    //std::cout<<i<<" ("<<objects[i].X<<", "<<objects[i].Y<<") intersects with "<<iP<<" ("<<objects[iP].X<<", "<<objects[iP].Y<<") !(bounding box)\n";
+                                }
 
-                            if(debug==true){
-                                //std::cout<<i<<" ("<<objects[i].X<<", "<<objects[i].Y<<") intersects with "<<iP<<" ("<<objects[iP].X<<", "<<objects[iP].Y<<") !(bounding box)\n";
+                                objects[i].collidedbox=true;
+                                objects[iP].collidedbox=true;
+                                output = SAT(i,iP);//unfinished
+                                if(output.difference<0-1){
+                                    objects[i].collidedSAT=true;
+                                    objects[iP].collidedSAT=true;
+                                    collisionResponse(i,iP,output,timediff);
+                                    if(debug==true){
+                                        std::cout<<i<<" ("<<objects[i].X<<", "<<objects[i].Y<<") intersects with "<<iP<<" ("<<objects[iP].X<<", "<<objects[iP].Y<<") !(SAT)\n";
+                                    }
+                                }
+
+                            }else if(objects[i].objectType==-3){
+                                trigger(i,iP);
+                            }if(objects[iP].objectType==-3){
+                                trigger(iP,i);
                             }
-
-                            objects[i].collidedbox=true;
-                            objects[iP].collidedbox=true;
-                            output = SAT(i,iP);//unfinished
-                            if(output.difference<0-1){
-                             objects[i].collidedSAT=true;
-                             objects[iP].collidedSAT=true;
-                             collisionResponse(i,iP,output,timediff);
-                             if(debug==true){
-                                 std::cout<<i<<" ("<<objects[i].X<<", "<<objects[i].Y<<") intersects with "<<iP<<" ("<<objects[iP].X<<", "<<objects[iP].Y<<") !(SAT)\n";
-                             }
-                            }
-
                         }
                     }
 
@@ -1187,6 +1225,7 @@ class game{
 
                 objects[o2].Y-=(-input.difference*input.normal.y)*massDiff2;
 
+
                 if(objects[o1].objectType==1&&(-input.difference*input.normal.y)<0){
                     canJump=1;
                     jumpCountDown=1;
@@ -1274,7 +1313,7 @@ class game{
         }
         //returns if object is type rectangle
         bool rectShapePoly(int object){
-            if(objects[object].objectType==2){
+            if(objects[object].objectType==2||objects[object].objectType==-3){
                 return true;
             }else{
                 return false;
