@@ -3,6 +3,8 @@
  *  -add reading info from file to create scene(with physics objects still on screen as well);
  *  -after all object types are added, create an editor
 */
+#include <nlohmann/json.hpp>
+#include <fstream>
 #include <iostream>
 #include <chrono>
 #include <cmath>
@@ -13,7 +15,7 @@ const int H = 768;
 const int objectCount = 15;
 const float baseUnit = (W/128+H/72)/2;
 
-bool debug =    true;
+bool debug =    false;
 
 bool physics = true;
 
@@ -98,32 +100,34 @@ struct object{
 };
 //objects
 //TO DO: import objects from file to pointer!
-object objects[objectCount] = {
-    {W/2,H/2,0,0,0,0,0,0,-2,false,false,false},
-    {W/2,H-baseUnit,0,0,0,0,0,0,2,false,false,true,std::numeric_limits<float>::infinity(),0xaaaaaaff,4*W/baseUnit,5,0,{},false,false,false,{},{},1,{"test"},"kona.png"},
-    {W/4,H/2+20*baseUnit,0,0,500,0,0,2,2,true,true,true,10,0xaafefeff,80,2,0,{},false,false,false,{},{},1},
-    {W/4,H/2,0,0,500,0,0,2,2,true,true,true,10,0x00ffffff,30,2},
-    {W/2,H/2,0,0,0,45,4,2,1,true,true,true,10,0xff00ffff,0,0,0,{},false,false,false,{},{},1},//
-    {2*baseUnit,10*baseUnit,0,60,0,0,3,2,0,true,true},//
-    {W/baseUnit,H/baseUnit,0,0,1500,3,5,3,0,true,true,true,20},
-    {W/2+baseUnit,H/2,0,0,1000,3,100,3,0,true,true,true,40},//
-    {W/2,H/2,0,0,500,60,3,4,0,true,true},//
-    {W/2+baseUnit*30,H/2,0,0,-400,0,0,2,3,false,true,true,20,0xff00ff,0,0,7,{/*1*/2,4,/*2*/2.8,-0.3,/*3*/2.3,-1.92,/*4*/-0.48,-4,/*5*/-1.55,-3,/*6*/-2.42,-0.28,/*7*/-1.91,1.66 }},
-    {W-baseUnit*10,H/2,0,0,200,0,100,4,0,true,true,true,50,0xafbfcfff,0,0,0,{},false,false,false,{},{},1},//
-    {W-baseUnit,H/2,0,0,0,0,100,2,0,true,true,true,100},//
-    {0,0,0,0,0,0,0,0,-1},
-    {W/2,0,0,0,0,45,4,10,0,true,true,true,50,0xffff00ff},
-    {-100,0,0,0,0,0,0,2,-3,false,false,false,100,0x00ffffff,100,100,0,{},false,false,false,{},{},0,{"test","destroy",false,1}}
-
-
-};//must include entire scene
-
+// object objects[objectCount] = {
+//     {W/2,H/2,0,0,0,0,0,0,-2,false,false,false},
+//     {W/2,H-baseUnit,0,0,0,0,0,0,2,false,false,true,std::numeric_limits<float>::infinity(),0xaaaaaaff,4*W/baseUnit,5,0,{},false,false,false,{},{},1,{"ground"}},
+//     {W/4,H/2+20*baseUnit,0,0,500,0,0,2,2,true,true,true,10,0xaafefeff,80,2,0,{},false,false,false,{},{},1},
+//     {W/4,H/2,0,0,500,0,0,2,2,true,true,true,10,0x00ffffff,30,2},
+//     {W/2,H/2,0,0,0,45,4,2,1,true,true,true,10,0xff00ffff,0,0,0,{},false,false,false,{},{},1},//
+//     {2*baseUnit,10*baseUnit,0,60,0,0,3,2,0,true,true},//
+//     {W/baseUnit,H/baseUnit,0,0,1500,3,5,3,0,true,true,true,20},
+//     {W/2+baseUnit,H/2,0,0,1000,3,100,3,0,true,true,true,40},//
+//     {W/2,H/2,0,0,500,60,3,4,0,true,true},//
+//     {W/2+baseUnit*30,H/2,0,0,-400,0,0,2,3,false,true,true,20,0x00ff00ff,0,0,7,{/*1*/2,4,/*2*/2.8,-0.3,/*3*/2.3,-1.92,/*4*/-0.48,-4,/*5*/-1.55,-3,/*6*/-2.42,-0.28,/*7*/-1.91,1.66 }},
+//     {W-baseUnit*10,H/2,0,0,200,0,100,4,0,true,true,true,50,0xafbfcfff,0,0,0,{},false,false,false,{},{},1},//
+//     {W-baseUnit,H/2,0,0,0,0,100,2,0,true,true,true,100},//
+//     {0,0,0,0,0,0,0,0,-1},
+//     {W/2,0,0,0,0,45,4,10,0,true,true,true,50,0xffffffff,0,0,0,{},false,false,false,{},{},1,{},"KDE.png"},
+//     {-100,0,0,0,0,0,0,2,-3,false,false,false,100,0x00ffffff,100,100,0,{},false,false,false,{},{},0,{"test","destroy",false,1}}
+//
+//
+// };//must include entire scene
+std::vector<object> objects;
 
 class game{
     public:
         //runs program :3
         void run(){
+
             returnXY p;
+            loadObjectsJSON(objects,"save.json");
 
             using std::chrono::duration_cast;
             using std::chrono::nanoseconds;
@@ -141,6 +145,9 @@ class game{
             for(int i = 0;i<objectCount;i++){
                 float X=0;
                 float Y=0;
+                if(objects[i].mass<=0){
+                    objects[i].mass=std::numeric_limits<float>::infinity();
+                }
                 for(int iP=0;iP<objects[i].points;iP++){
                     X += objects[i].pointList[iP*2];
                     Y += objects[i].pointList[iP*2+1];
@@ -157,7 +164,7 @@ class game{
                     //std::cout<<"Yc: "<<objects[i].pointList[iP*2+1]<<"\n\n";
                 }
                 if (!objects[i].texture.loadFromFile(objects[i].loc)){
-                    10/0;
+                    //10/0;
                     //I'm too lazy to throw an error here
                 }
             }
@@ -274,6 +281,56 @@ class game{
         }
 
     private:
+        void loadObjectsJSON(std::vector<object>& objectsVect, const std::string& filename) {
+            std::ifstream file(filename);
+            if (!file) {
+                std::cerr << "Error opening JSON file!\n";
+                return;
+            }
+
+            nlohmann::json j;
+            file >> j;
+            file.close();
+
+            objectsVect.clear();
+            for (const auto& item : j) {
+                object obj;
+                obj.X = item["X"];
+                obj.Y = item["Y"];
+                obj.velX = item["velX"];
+                obj.velY = item["velY"];
+                obj.velRot = item["velRot"];
+                obj.rotation = item["rotation"];
+                obj.sides = item["sides"];
+                obj.sizeModifier = item["sizeModifier"];
+                obj.objectType = item["objectType"];
+                obj.gravity = item["gravity"];
+                obj.airRes = item["airRes"];
+                obj.solid = item["solid"];
+                obj.mass = item["mass"];
+                obj.color = item["color"];
+                obj.width = item["width"];
+                obj.height = item["height"];
+                obj.points = item["points"];
+                obj.coefficentOfFriction = item["coefficentOfFriction"];
+                obj.loc = item["loc"];
+                auto pointList = item["pointList"].get<std::vector<float>>();
+                std::copy(pointList.begin(), pointList.end(), obj.pointList);
+
+                obj.trigger.id = item["trigger"]["id"];
+                obj.trigger.event = item["trigger"]["event"];
+                obj.trigger.destroyO2 = item["trigger"]["destroyO2"];
+                obj.trigger.typeReq = item["trigger"]["typeReq"];
+
+                if (!obj.texture.loadFromFile(obj.loc)) {
+                    std::cerr << "Failed to load texture: " << obj.loc << '\n';
+                }
+
+                objectsVect.push_back(obj);
+            }
+
+
+        }
         void trigger(int o1,int o2){
 
             if(objects[o1].trigger.event=="destroy"){
