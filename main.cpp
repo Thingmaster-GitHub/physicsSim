@@ -109,19 +109,13 @@ class game{
             returnXY p;
             loadObjectsJSON(objects,"save.json");
 
-            using std::chrono::duration_cast;
-            using std::chrono::nanoseconds;
-            typedef std::chrono::high_resolution_clock clock;
-
-            float timediff=20;
-
 
 
             sf::ContextSettings settings;
-            settings.antiAliasingLevel = 8.0;
+            settings.antiAliasingLevel = 16.0;
             sf::RenderWindow window(sf::VideoMode({W, H}), "game"/*, sf::Style::Close, settings*/);
 
-            //recenters convex polygons
+            //recenters convex polygons+other things ran on start
             for(int i = 0;i<objectCount;i++){
                 float X=0;
                 float Y=0;
@@ -153,7 +147,6 @@ class game{
 
             while (window.isOpen())
             {
-                auto start = clock::now();
 
                 while (const std::optional event = window.pollEvent())
                 {
@@ -163,7 +156,7 @@ class game{
                 }
 
                 window.clear(sf::Color::Black);
-                p = Camera(p.x,p.y,timediff);
+                p = Camera(p.x,p.y);
 
                 //draws all shapes+transformations
                 for(int i = 0; i<objectCount;i++){
@@ -175,10 +168,6 @@ class game{
 
                     if(objects[i].objectType==-1){
                         sf::Vector2i position = sf::Mouse::getPosition(window);
-
-
-
-
                         objects[i].X = position.x-camOffsetX;
                         objects[i].Y = position.y-camOffsetY;
                         mouseObject=i;
@@ -190,10 +179,8 @@ class game{
                             objects[i].Y=objects[mouseObject].Y;
                         }
                     }else{
-
                         objects[i].grabbed=false;
                     }
-
                 }
                 baseCollision();
                 //testingLayoutInf(window);
@@ -253,51 +240,8 @@ class game{
 
 
         }
-        void trigger(int o1,int o2){
-
-            if(objects[o1].trigger.event=="destroy"){
-                if(objects[o1].trigger.typeReq==objects[o2].objectType){
-                    for(int i=0;i<objectCount;i++){
-                        if(objects[o1].trigger.id==objects[i].trigger.id){
-                            objects[i].objectType=-4;
-                            objects[i].mass=0;
-                            objects[i].gravity=false;
-                            objects[i].airRes=false;
-                            objects[i].solid=false;
-                        }
-                    }
-                }
-            }
-
-        }
-        //controls inputs
-        void inputs(int Object,float timediff){
-            float mal=1;
-            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LShift)&&objects[Object].objectType==1){
-                mal=2;
-            }
-
-            if(canJump==0){
-                mal/=4;
-            }
-
-            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::Space)&&objects[Object].objectType==1&&canJump!=0){
-                objects[Object].velY=-1000;
-                canJump=0;
-            }
-            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::A)&&objects[Object].objectType==1){
-                if(objects[Object].velX>-200*mal){
-                    objects[Object].velX-=50*mal/timediff;
-                }
-            }
-            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::D)&&objects[Object].objectType==1){
-                if(objects[Object].velX<200*mal){
-                    objects[Object].velX+=50*mal/timediff;
-                }
-            }
-        }
         //controls camera
-        returnXY Camera(float PX,float PY,float timediff){
+        returnXY Camera(float PX,float PY){
             for(int i = 0; i<objectCount;i++){
                 if(centerCamera==true&&objects[i].objectType==1){
                     PX=objects[i].X;
@@ -306,8 +250,8 @@ class game{
             }
             for(int i = 0; i<objectCount;i++){
                 if(centerCamera==true&&objects[i].objectType==-2){
-                    objects[i].X=(((objects[i].X)*(timediff*10-1)+(objects[mouseObject].X+PX)/2)/(timediff*10));
-                    objects[i].Y=(((objects[i].Y)*(timediff*1-1)+(objects[mouseObject].Y+PY)/2)/(timediff*1));
+                    objects[i].X=((objects[mouseObject].X+PX)/2);
+                    objects[i].Y=((objects[mouseObject].Y+PY)/2);
                     camOffsetX=-objects[i].X+W/2;
                     camOffsetY=-objects[i].Y+H/2;
                     if(objects[i].Y==std::numeric_limits<float>::infinity()||objects[i].X==std::numeric_limits<float>::infinity()){
@@ -441,11 +385,6 @@ class game{
                                         std::cout<<i<<" ("<<objects[i].X<<", "<<objects[i].Y<<") intersects with "<<iP<<" ("<<objects[iP].X<<", "<<objects[iP].Y<<") !(SAT)\n";
                                     }
                                 }
-
-                            }else if(objects[i].objectType==-3){
-                                trigger(i,iP);
-                            }if(objects[iP].objectType==-3){
-                                trigger(iP,i);
                             }
                         }
                     }
@@ -1153,9 +1092,7 @@ class game{
 
         //don't input an obect besides ones for this calculated SAT input
         //calculated projected offset of shape for rotation
-        float distance(returnXY point1,returnXY point2){
-            return sqrt(square(point1.x-point2.x)+square(point1.y-point2.y));
-        }
+
 
         void debuger(sf::RenderTarget& window,int i){
             sf::CircleShape pointNotButter(4,20);
