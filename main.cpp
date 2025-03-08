@@ -187,9 +187,42 @@ class game{
                 window.display();
 
             }
+            for(int i=0;i<objectCount;i++){
+                if(objects[i].mass==std::numeric_limits<float>::infinity()){
+                    objects[i].mass=-1;
+                }
+            }
+            saveObjectsJSON(objects,"save.json");
         }
 
     private:
+        //saves objects to json files
+        void saveObjectsJSON(const std::vector<object>& objects, const std::string& filename) {
+            nlohmann::json j;
+
+            for (size_t i = 0; i < objectCount; ++i) {
+                const auto& obj = objects[i];
+                j.push_back({
+                    {"X", obj.X}, {"Y", obj.Y}, {"velX", obj.velX}, {"velY", obj.velY},{"velRot", obj.velRot},
+                    {"rotation", obj.rotation}, {"sides", obj.sides}, {"sizeModifier", obj.sizeModifier},
+                    {"objectType", obj.objectType}, {"gravity", obj.gravity},{"airRes", obj.airRes},{"solid",obj.solid}, {"mass", obj.mass},
+                    {"color", obj.color}, {"width", obj.width}, {"height", obj.height},
+                    {"points", obj.points}, {"pointList", std::vector<float>(obj.pointList, obj.pointList + 30)},{"coefficentOfFriction",obj.coefficentOfFriction},
+                            {"loc", obj.loc},
+                            {"trigger", {
+                                {"id", obj.trigger.id},
+                                {"event", obj.trigger.event},
+                                {"destroyO2", obj.trigger.destroyO2},
+                                {"typeReq", obj.trigger.typeReq}
+                            }}
+                });
+            }
+
+            std::ofstream file(filename);
+            file << j.dump(4); // Pretty-print with indent of 4 spaces
+            file.close();
+        }
+        //loads objects from json file
         void loadObjectsJSON(std::vector<object>& objectsVect, const std::string& filename) {
             std::ifstream file(filename);
             if (!file) {
@@ -241,6 +274,7 @@ class game{
 
         }
         //controls camera
+        //calculated projected offset of shape for rotation
         returnXY Camera(float PX,float PY){
             for(int i = 0; i<objectCount;i++){
                 if(centerCamera==true&&objects[i].objectType==1){
@@ -369,7 +403,7 @@ class game{
                         YMinCh = getMinY(iP);
                         //std::cout<<"top Y 1: "<<YMin<<"\ntop Y 2: "<<YMinCh<<"\nbottom Y 1: "<<YMax<<"\nbottom Y 2: "<<YMaxCh<<"\n\n";
                         if(!(XMin>XMaxCh||XMax<XMinCh||YMin>YMaxCh||YMax<YMinCh)){
-                            if(objects[i].solid&&objects[iP].solid){
+                            if(objects[i].objectType==-1||objects[iP].objectType==-1){
                                 if(debug==true){
                                     //std::cout<<i<<" ("<<objects[i].X<<", "<<objects[i].Y<<") intersects with "<<iP<<" ("<<objects[iP].X<<", "<<objects[iP].Y<<") !(bounding box)\n";
                                 }
@@ -402,28 +436,7 @@ class game{
             float min1;
             float max2;
             float min2;
-            if(objects[o1].sides>10&&objects[o2].sides>10&&sqrt(square(objects[o1].X-objects[o2].X)+square(objects[o1].Y-objects[o2].Y))>(baseUnit*objects[o1].sizeModifier*2+baseUnit*objects[o2].sizeModifier*2)){
-                output.difference=1;
-                return output;
-            }else if(objects[o1].sides>10&&objects[o2].sides>10){
-                returnXY point1;
-                returnXY point2;
-                point1.x=objects[o1].X;
-                point1.y=objects[o1].Y;
-                point2.x=objects[o2].X;
-                point2.y=objects[o2].Y;
-                output.normal = getNormal(point1,point2);
-                float tmpX = output.normal.x;
-                float tmpY = output.normal.y;
-                output.normal.x=tmpY;
-                output.normal.y=-tmpX;
-                output.difference=sqrt(square(objects[o1].X-objects[o2].X)+square(objects[o1].Y-objects[o2].Y))-(baseUnit*objects[o1].sizeModifier*2+baseUnit*objects[o2].sizeModifier*2);
-                output.point1.x=objects[o1].X;
-                output.point1.y=objects[o1].Y;
-                output.point2.x=objects[o2].X;
-                output.point2.y=objects[o2].Y;
-                return output;
-            }else if((objects[o1].sides>10||objects[o2].sides>10)&&((objects[o1].objectType==-1)||(objects[o2].objectType==-1))){
+            if((objects[o1].sides>10||objects[o2].sides>10)&&((objects[o1].objectType==-1)||(objects[o2].objectType==-1))){
 
                 returnXY point1;
                 returnXY point2;
@@ -1089,10 +1102,6 @@ class game{
             output.y=-normal.x;
             return output;
         }
-
-        //don't input an obect besides ones for this calculated SAT input
-        //calculated projected offset of shape for rotation
-
 
         void debuger(sf::RenderTarget& window,int i){
             sf::CircleShape pointNotButter(4,20);
