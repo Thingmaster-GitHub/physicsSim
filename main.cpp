@@ -98,27 +98,7 @@ struct object{
     sf::Texture texture;
 
 };
-//objects
-//TO DO: import objects from file to pointer!
-// object objects[objectCount] = {
-//     {W/2,H/2,0,0,0,0,0,0,-2,false,false,false},
-//     {W/2,H-baseUnit,0,0,0,0,0,0,2,false,false,true,std::numeric_limits<float>::infinity(),0xaaaaaaff,4*W/baseUnit,5,0,{},false,false,false,{},{},1,{"ground"}},
-//     {W/4,H/2+20*baseUnit,0,0,500,0,0,2,2,true,true,true,10,0xaafefeff,80,2,0,{},false,false,false,{},{},1},
-//     {W/4,H/2,0,0,500,0,0,2,2,true,true,true,10,0x00ffffff,30,2},
-//     {W/2,H/2,0,0,0,45,4,2,1,true,true,true,10,0xff00ffff,0,0,0,{},false,false,false,{},{},1},//
-//     {2*baseUnit,10*baseUnit,0,60,0,0,3,2,0,true,true},//
-//     {W/baseUnit,H/baseUnit,0,0,1500,3,5,3,0,true,true,true,20},
-//     {W/2+baseUnit,H/2,0,0,1000,3,100,3,0,true,true,true,40},//
-//     {W/2,H/2,0,0,500,60,3,4,0,true,true},//
-//     {W/2+baseUnit*30,H/2,0,0,-400,0,0,2,3,false,true,true,20,0x00ff00ff,0,0,7,{/*1*/2,4,/*2*/2.8,-0.3,/*3*/2.3,-1.92,/*4*/-0.48,-4,/*5*/-1.55,-3,/*6*/-2.42,-0.28,/*7*/-1.91,1.66 }},
-//     {W-baseUnit*10,H/2,0,0,200,0,100,4,0,true,true,true,50,0xafbfcfff,0,0,0,{},false,false,false,{},{},1},//
-//     {W-baseUnit,H/2,0,0,0,0,100,2,0,true,true,true,100},//
-//     {0,0,0,0,0,0,0,0,-1},
-//     {W/2,0,0,0,0,45,4,10,0,true,true,true,50,0xffffffff,0,0,0,{},false,false,false,{},{},1,{},"KDE.png"},
-//     {-100,0,0,0,0,0,0,2,-3,false,false,false,100,0x00ffffff,100,100,0,{},false,false,false,{},{},0,{"test","destroy",false,1}}
-//
-//
-// };//must include entire scene
+
 std::vector<object> objects;
 
 class game{
@@ -193,31 +173,14 @@ class game{
                         debuger(window,i);
                     }
 
-
-                    if(physics==true){
-                        transform(i,timediff+1);
-                    }
-
                     if(objects[i].objectType==-1){
                         sf::Vector2i position = sf::Mouse::getPosition(window);
 
 
-                        objects[i].velX=((objects[i].velX*(1))+(-(objects[i].X)+(position.x-camOffsetX)));
-                        objects[i].velY=((objects[i].velY*(1))+(-(objects[i].Y)+(position.y-camOffsetY)));
+
 
                         objects[i].X = position.x-camOffsetX;
                         objects[i].Y = position.y-camOffsetY;
-                        if(objects[i].Y==std::numeric_limits<float>::infinity()||objects[i].X==std::numeric_limits<float>::infinity()){
-                            objects[i].X=0;
-                            objects[i].Y=0;
-                            camOffsetX=0;
-                            camOffsetY=0;
-                        }
-
-                        if(debug==true){
-                            std::cout<<"vel:("<<(objects[i].velX)<<", "<<(objects[i].velY)<<")\n";
-                            std::cout<<"pos:("<<objects[i].X<<", "<<objects[i].Y<<")\n";
-                        }
                         mouseObject=i;
                     }
 
@@ -225,57 +188,16 @@ class game{
                         if(objects[i].grabbed==true){
                             objects[i].X=objects[mouseObject].X;
                             objects[i].Y=objects[mouseObject].Y;
-                            //std::cout<<"VELWHX:"<<objects[mouseObject].velX<<"VELWHY: "<<objects[mouseObject].velY<<"\n";
-                            objects[i].velX=objects[mouseObject].velX;
-                            objects[i].velY=objects[mouseObject].velY;
-                            //std::cout<<objects[i].velY<<","<<objects[i].velX<<"hmm...\n";
                         }
                     }else{
 
                         objects[i].grabbed=false;
                     }
 
-                    while(objects[i].velRot>360){
-                        if(debug==true){
-                            std::cout<<"TOO FAR: "<<objects[i].velRot<<" > "<<objects[i].velRot-360<<"\n";
-                        }
-                        objects[i].velRot-=360;
-
-                    }
-                    while(objects[i].velRot<-360){
-                        objects[i].velRot+=360;
-
-                    }
-                    if(objects[i].velRot==std::numeric_limits<float>::infinity()||objects[i].velRot==-std::numeric_limits<float>::infinity()){
-                        objects[i].velRot=0;
-                    }
-                    if(objects[i].objectType==1){
-                        inputs(i,timediff);
-                    }
-                    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::Escape)){
-                        if(physics==true){
-                            physics=false;
-                        }else{
-                            physics=true;
-                        }
-                    }
-                    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::C)){
-                        if(debug==true){
-                            debug=false;
-                        }else{
-                            debug=true;
-                        }
-                    }
-
                 }
-                baseCollision(timediff);
+                baseCollision();
                 //testingLayoutInf(window);
                 window.display();
-                auto end = clock::now();
-                std::cout <<1000000000/duration_cast<nanoseconds>(end-start).count() << "\n";//fps
-                timediff=1000000000/duration_cast<nanoseconds>(end-start).count()/60;
-
-                jumpDown(timediff);
 
             }
         }
@@ -347,14 +269,6 @@ class game{
                 }
             }
 
-        }
-        void jumpDown(float timediff){
-            if(jumpCountDown>=0){
-                jumpCountDown-=1/timediff/20;
-            }
-            if(jumpCountDown<0){
-                canJump=0;
-            }
         }
         //controls inputs
         void inputs(int Object,float timediff){
@@ -485,46 +399,8 @@ class game{
             }
         }
 
-
-        //transforms objects by velocity, gravity, and air resistance.
-        void transform(int i,float timediff){
-            objects[i].X+=objects[i].velX/timediff*baseUnit/500;
-            objects[i].Y+=objects[i].velY/timediff*baseUnit/500;
-            objects[i].rotation+=objects[i].velRot/timediff/500;
-            if(wrap==true){
-                if(objects[i].X>W){
-                    objects[i].X-=W;
-                }else if(objects[i].X<0){
-                    objects[i].X+=W;
-                }
-                if(objects[i].Y>H){
-
-                    objects[i].Y-=H;
-                    //objects[i].Y=H;
-                }else if(objects[i].Y<0){
-                    objects[i].Y+=H;
-                }
-            }
-
-            //objects[i].velX = don't know what to do for these yet
-            //std::cout<<"timediff: "<<timediff<<"\noutput: "<<10/timediff<<"\n";
-            if(objects[i].gravity==true){
-                //gravity
-                objects[i].velY+=(25/timediff);
-
-            }
-            if(objects[i].airRes==true){
-                objects[i].velY-=(objects[i].velY/timediff/500/objects[i].mass);
-                objects[i].velX-=(objects[i].velX/timediff/500/objects[i].mass);
-                objects[i].velRot-=(objects[i].velRot/timediff/100/objects[i].mass);
-            }
-
-            //std::cout<<objects[i].velY<<"\n";
-
-        }
-
         //checks bounding box collisions and runs SAT if intersects
-        void baseCollision(float timediff){
+        void baseCollision(){
             float XMax;
             float XMin;
             float YMax;
@@ -560,7 +436,7 @@ class game{
                                 if(output.difference<0-1){
                                     objects[i].collidedSAT=true;
                                     objects[iP].collidedSAT=true;
-                                    collisionResponse(i,iP,output,timediff);
+                                    collisionResponse(i,iP);
                                     if(debug==true){
                                         std::cout<<i<<" ("<<objects[i].X<<", "<<objects[i].Y<<") intersects with "<<iP<<" ("<<objects[iP].X<<", "<<objects[iP].Y<<") !(SAT)\n";
                                     }
@@ -1229,136 +1105,18 @@ class game{
             return point.x * normal.x + point.y * normal.y;
         }
         //respone to collision
-        void collisionResponse(int o1,int o2,SATout input,float timediff){
-
-            float massDiff1=1,massDiff2=1;
-            //if(objects[o1].sides>10&&objects[o2].sides>10){
-                //object 1
-            if(objects[o1].mass!=std::numeric_limits<float>::infinity()&&objects[o2].mass!=std::numeric_limits<float>::infinity()){
-                float massTotal = objects[o1].mass+objects[o2].mass;
-
-                 massDiff1=((massTotal-objects[o1].mass)/massTotal);
-                 massDiff2=((massTotal-objects[o2].mass)/massTotal);
-            }else if(objects[o1].mass==std::numeric_limits<float>::infinity()&&objects[o2].mass!=std::numeric_limits<float>::infinity()){
-                 massDiff1=0;
-                 massDiff2=1;
-            }else if(objects[o2].mass==std::numeric_limits<float>::infinity()&&objects[o1].mass!=std::numeric_limits<float>::infinity()){
-                 massDiff1=1;
-                 massDiff2=0;
-            }else{
-                 massDiff1=0;
-                 massDiff2=0;
-            }
-
-            if((objects[o1].X - objects[o2].X)*input.normal.x+(objects[o1].Y - objects[o2].Y)*input.normal.y<0){
-                input.normal.x=-input.normal.x;
-                input.normal.y=-input.normal.y;
-            }
+        void collisionResponse(int o1,int o2){
 
             //mouse pointer
             if(objects[o1].objectType==-1||objects[o2].objectType==-1){
                 if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
                     if(objects[o1].objectType==-1){
                         objects[o2].grabbed=true;
-                        objects[o2].velX+=objects[mouseObject].velX;
-                        objects[o2].velY+=objects[mouseObject].velY;
                     }else{
                         objects[o1].grabbed=true;
-                        objects[o1].velX+=objects[mouseObject].velX;
-                        objects[o1].velY+=objects[mouseObject].velY;
                     }
                 }
-            }else/*literally everything else*/{
-
-
-                //removes intersection.
-                objects[o1].X+=(-input.difference*input.normal.x)*massDiff1;
-
-                objects[o1].Y+=(-input.difference*input.normal.y)*massDiff1;
-
-
-
-                objects[o2].X-=(-input.difference*input.normal.x)*massDiff2;
-
-                objects[o2].Y-=(-input.difference*input.normal.y)*massDiff2;
-
-
-                if(objects[o1].objectType==1&&(-input.difference*input.normal.y)<0){
-                    canJump=1;
-                    jumpCountDown=1;
-                }else if(objects[o2].objectType==1&&-(-input.difference*input.normal.y)<0){
-                    canJump=1;
-                    jumpCountDown=1;
-                }
-                float direction =(-input.difference)/abs(input.difference);
-
-
-
-
-                float Vel;
-                float velX1;
-                float velY1;
-                float velX2;
-                float velY2;
-                float rot1;
-                float rot2;
-
-
-                //really need to redo this
-                //violates laws of thermodynamics
-                if(massDiff1!=0&&massDiff2!=0){
-                    Vel= abs(((objects[o1].velX)*objects[o1].mass+abs(objects[o2].velX)*objects[o2].mass)*input.normal.x+((objects[o1].velY)*objects[o1].mass+(objects[o2].velY)*objects[o2].mass)*input.normal.y);
-                    velX1=Vel*input.normal.x;
-                    velY1=Vel*input.normal.y;
-
-                    velX2=Vel*input.normal.x;
-                    velY2=Vel*input.normal.y;
-
-                    rot1=VelRotCalc(o1,o2,input,direction);
-                    rot2=VelRotCalc(o2,o1,input,direction);
-                }else if(massDiff2!=0){
-                    Vel= abs(((objects[o2].velX)*objects[o2].mass)*input.normal.x+((objects[o2].velY)*objects[o2].mass)*input.normal.y);
-                    velX2=Vel*input.normal.x;
-                    velY2=Vel*input.normal.y;
-
-                    rot2=VelRotCalc(o2,o1,input,direction);
-                }else if(massDiff1!=0){
-                    Vel= abs(((objects[o1].velX)*objects[o1].mass)*input.normal.x+((objects[o1].velY)*objects[o1].mass)*input.normal.y);
-                    velX1=Vel*input.normal.x;
-                    velY1=Vel*input.normal.y;
-
-                    rot1=VelRotCalc(o1,o2,input,direction);
-                }
-
-                if(massDiff1!=0){
-                    if(debug==true){
-                        std::cout<<"rotation: "<<o1<<" "<<rot1<<"\n";
-
-                    }
-                //Vel-=abs(rot1*Vel/objects[o2].mass*500);
-                objects[o1].velRot+=rot1*coefficientOfRestitution*Vel/objects[o1].mass*massDiff1;
-                objects[o1].velX+=direction*velX1/objects[o1].mass*coefficientOfRestitution/baseUnit*massDiff1;
-
-                objects[o1].velY+=direction*velY1/objects[o1].mass*coefficientOfRestitution/baseUnit*massDiff1;
-
-                }
-                if(massDiff2!=0){
-                    if(debug==true){
-
-                        std::cout<<"rotation: "<<o2<<" "<<rot2<<"\n";
-                    }
-                //Vel-=abs(rot2*Vel/objects[o2].mass*500);
-                objects[o2].velRot+=rot2*coefficientOfRestitution*Vel/objects[o2].mass*massDiff2;
-                objects[o2].velX+=-direction*velX2/objects[o2].mass*coefficientOfRestitution/baseUnit*massDiff2;
-
-                objects[o2].velY+=-direction*velY2/objects[o2].mass*coefficientOfRestitution/baseUnit*massDiff2;
-                }
-
             }
-            friction(o1,o2,input.normal,timediff);
-            friction(o2,o1,input.normal,timediff);
-
-
         }
         //returns if object is of type regular polygon(sf::circleShape)
         bool circleShapePoly(int object){
@@ -1395,91 +1153,10 @@ class game{
 
         //don't input an obect besides ones for this calculated SAT input
         //calculated projected offset of shape for rotation
-        float VelRotCalc(int o1,int o2,SATout input,int direction){
-            //choses point
-            float Xaverage = (objects[o1].X+objects[o2].X)/2;
-            float Yaverage = (objects[o1].Y+objects[o2].Y)/2;
-            returnXY pointAverage = {Xaverage,Yaverage};
-            returnXY inPoint;
-            if(distance(input.point1,pointAverage)<distance(input.point2,pointAverage)){
-                inPoint = input.point1;
-            }else{
-                inPoint = input.point2;
-
-            }
-            if(debug==true){
-                objects[o1].pointProjected2=input.point2;
-                objects[o1].pointProjected=input.point1;
-            }
-            returnXY normal = invertNormal(input.normal);
-
-            float projectedOffset = projectPointOntoNormal(inPoint,normal);
-
-            returnXY center;
-            center.x=objects[o1].X;
-            center.y=objects[o1].Y;
-
-            float projectedCenter = projectPointOntoNormal(center,normal);
-
-            float polarityOffset = projectPointOntoNormal(inPoint,input.normal);
-            float polarityCenter = projectPointOntoNormal(center,input.normal);
-
-            float output = projectedCenter-projectedOffset;
-            //
-            if(polarityCenter-polarityOffset>0){
-              output*=-1;
-            }
-
-
-            //if(objects[o2].mass==std::numeric_limits<float>::infinity()&&objects[o1].mass!=std::numeric_limits<float>::infinity()){
-
-                //output*=-1;
-                //std::cout<<"polarityOffset: "<<polarityOffset<<"\npolarityCenter: "<<polarityCenter<<"\n";
-                /*if(objects[o1].sides%2==0&&objects[o1].sides!=0){
-                    output*=-1;
-                }*/
-            //}
-            if(output<0){
-                //std::cout<<pol<<"\n";
-                output=-1*sqrt(abs(output));
-            }else{
-                output=sqrt(abs(output));
-            }
-
-            return output;
-
-
-        }
         float distance(returnXY point1,returnXY point2){
             return sqrt(square(point1.x-point2.x)+square(point1.y-point2.y));
         }
-        void friction(int o1,int o2,returnXY normal,float timediff){
-            returnXY inverted = invertNormal(normal);
-            returnXY vel = {objects[o1].velX,objects[o1].velY};
-            returnXY velNormal = vel;
 
-            float len = sqrt(square(velNormal.x)+square(velNormal.y));
-            if(len!=0&&objects[o1].objectType!=-1&&objects[o2].objectType!=-1){
-
-
-
-
-            velNormal.x/=len;
-            velNormal.y/=len;
-
-            float frictDist = projectPointOntoNormal(vel,inverted);
-            frictDist = frictDist*(objects[o1].coefficentOfFriction+objects[o2].coefficentOfFriction)/2/timediff;
-            if(frictDist!=std::numeric_limits<float>::infinity()&&frictDist!=-std::numeric_limits<float>::infinity()){
-                objects[o1].velX-=frictDist*inverted.x;
-                objects[o1].velY-=frictDist*inverted.y;
-
-                objects[o1].velRot*=objects[o1].coefficentOfFriction;
-
-            }
-            }
-
-
-        }
         void debuger(sf::RenderTarget& window,int i){
             sf::CircleShape pointNotButter(4,20);
             pointNotButter.setOrigin({4, 1});
