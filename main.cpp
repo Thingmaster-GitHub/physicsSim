@@ -25,6 +25,11 @@ int canJump=0;
 const bool centerCamera = true;
 float camOffsetX=0;
 float camOffsetY=0;
+bool scrMove=false;
+float initXoff;
+float initYoff;
+float initMX;
+float initMY;
 
 const bool wrap = false;//don't enable with centered camera.
 
@@ -106,7 +111,6 @@ class game{
         //runs program :3
         void run(){
 
-            returnXY p;
             loadObjectsJSON(objects,"save.json");
 
 
@@ -156,7 +160,10 @@ class game{
                 }
 
                 window.clear(sf::Color::Black);
-                p = Camera(p.x,p.y);
+                //shouldn't write it like this
+                // I'm too lazy to make this better
+                sf::Vector2i pos = sf::Mouse::getPosition(window);
+                Camera(mouseObject,pos);
 
                 //draws all shapes+transformations
                 for(int i = 0; i<objectCount;i++){
@@ -187,6 +194,7 @@ class game{
                 window.display();
 
             }
+
             for(int i=0;i<objectCount;i++){
                 if(objects[i].mass==std::numeric_limits<float>::infinity()){
                     objects[i].mass=-1;
@@ -275,29 +283,26 @@ class game{
         }
         //controls camera
         //calculated projected offset of shape for rotation
-        returnXY Camera(float PX,float PY){
-            for(int i = 0; i<objectCount;i++){
-                if(centerCamera==true&&objects[i].objectType==1){
-                    PX=objects[i].X;
-                    PY=objects[i].Y;
+        void Camera(int mouseObject,sf::Vector2i position){
+            if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Right)){
+                if(scrMove==false){
+                    scrMove=true;
+                    initXoff=camOffsetX;
+                    initYoff=camOffsetY;
+
+                    initMX=position.x;
+                    initMY=position.y;
+                }else{
+
+                    camOffsetX=initXoff-initMX+position.x;
+                    camOffsetY=initYoff-initMY+position.y;
+                }
+            }else{
+                if(scrMove==true){
+                    scrMove=false;
+
                 }
             }
-            for(int i = 0; i<objectCount;i++){
-                if(centerCamera==true&&objects[i].objectType==-2){
-                    objects[i].X=((objects[mouseObject].X+PX)/2);
-                    objects[i].Y=((objects[mouseObject].Y+PY)/2);
-                    camOffsetX=-objects[i].X+W/2;
-                    camOffsetY=-objects[i].Y+H/2;
-                    if(objects[i].Y==std::numeric_limits<float>::infinity()||objects[i].X==std::numeric_limits<float>::infinity()){
-                        objects[i].X=0;
-                        objects[i].Y=0;
-                        camOffsetX=0;
-                        camOffsetY=0;
-                    }
-                }
-            }
-            returnXY output {PX,PY};
-            return output;
         }
         //draws shapes
         void drawShape(sf::RenderTarget& window,int i){
