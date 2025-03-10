@@ -118,8 +118,8 @@
         "width": 546.4000244140625
     },
     {
-        "X": 908.0,
-        "Y": 550.0,
+        "X": 586.0,
+        "Y": 453.0,
         "airRes": true,
         "coefficentOfFriction": 1.0,
         "color": 2868838143,
@@ -177,8 +177,8 @@
         "width": 80.0
     },
     {
-        "X": 841.0,
-        "Y": 465.0,
+        "X": 842.0,
+        "Y": 514.0,
         "airRes": true,
         "coefficentOfFriction": 0.5,
         "color": 16777215,
@@ -236,8 +236,8 @@
         "width": 30.0
     },
     {
-        "X": 426.0,
-        "Y": 441.0,
+        "X": 246.0,
+        "Y": 157.0,
         "airRes": true,
         "coefficentOfFriction": 1.0,
         "color": 4278255615,
@@ -295,8 +295,8 @@
         "width": 0.0
     },
     {
-        "X": 548.0,
-        "Y": 462.0,
+        "X": 1096.0,
+        "Y": 479.0,
         "airRes": true,
         "coefficentOfFriction": 0.5,
         "color": 4294967295,
@@ -354,8 +354,8 @@
         "width": 0.0
     },
     {
-        "X": 676.0,
-        "Y": 163.0,
+        "X": 356.0,
+        "Y": 143.0,
         "airRes": true,
         "coefficentOfFriction": 0.5,
         "color": 4294967295,
@@ -413,8 +413,8 @@
         "width": 0.0
     },
     {
-        "X": 660.0,
-        "Y": 273.0,
+        "X": 304.0,
+        "Y": 303.0,
         "airRes": true,
         "coefficentOfFriction": 0.5,
         "color": 4294967295,
@@ -472,8 +472,8 @@
         "width": 0.0
     },
     {
-        "X": 793.0,
-        "Y": 227.0,
+        "X": 800.0,
+        "Y": 177.0,
         "airRes": true,
         "coefficentOfFriction": 0.5,
         "color": 4294967295,
@@ -531,8 +531,8 @@
         "width": 0.0
     },
     {
-        "X": 1158.0,
-        "Y": 441.0,
+        "X": 444.0,
+        "Y": 298.0,
         "airRes": true,
         "coefficentOfFriction": 0.5,
         "color": 16711935,
@@ -548,7 +548,7 @@
             0.2485712170600891,
             2.1942856311798096,
             -1.3714287281036377,
-            -0.5857136249542236,
+            -0.5857136845588684,
             -3.4514284133911133,
             -1.6557143926620483,
             -2.4514284133911133,
@@ -590,8 +590,8 @@
         "width": 0.0
     },
     {
-        "X": 428.0,
-        "Y": 239.0,
+        "X": 544.0,
+        "Y": 166.0,
         "airRes": true,
         "coefficentOfFriction": 1.0,
         "color": 2948583423,
@@ -649,8 +649,8 @@
         "width": 0.0
     },
     {
-        "X": 431.0,
-        "Y": 562.0,
+        "X": 672.0,
+        "Y": 190.0,
         "airRes": true,
         "coefficentOfFriction": 0.5,
         "color": 4294967295,
@@ -708,8 +708,8 @@
         "width": 0.0
     },
     {
-        "X": 327.0,
-        "Y": -5.0,
+        "X": -2069.0,
+        "Y": -989.0,
         "airRes": true,
         "coefficentOfFriction": 0.5,
         "color": 4294967295,
@@ -767,8 +767,8 @@
         "width": 0.0
     },
     {
-        "X": 1062.0,
-        "Y": 200.0,
+        "X": 1050.0,
+        "Y": 193.0,
         "airRes": true,
         "coefficentOfFriction": 1.0,
         "color": 4294967295,
@@ -826,11 +826,11 @@
         "width": 0.0
     },
     {
-        "X": 1036.0,
-        "Y": 469.0,
+        "X": -658.0,
+        "Y": 596.0,
         "airRes": false,
         "coefficentOfFriction": 0.0,
-        "color": 16777215,
+        "color": 16777130,
         "gravity": false,
         "height": 100.0,
         "loc": "blank.png",

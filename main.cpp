@@ -13,11 +13,13 @@
 const int W = 1366;
 const int H = 768;
 const int objectCount = 15;
-const float baseUnit = (W/128+H/72)/2;
+float baseUnit = (W/128+H/72)/2;
 
 bool debug =    false;
 
 bool physics = true;
+
+float zoomAMT=1;
 
 float jumpCountDown = 1;
 int canJump=0;
@@ -155,9 +157,16 @@ class game{
                 while (const std::optional event = window.pollEvent())
                 {
                     // "close requested" event: we close the window
-                    if (event->is<sf::Event::Closed>())
+                    if (event->is<sf::Event::Closed>()){
                         window.close();
+                    } else if (const auto* mouseWheelScrolled = event->getIf<sf::Event::MouseWheelScrolled>())
+                    {
+                        zoom(mouseWheelScrolled->delta);
+                    }
+
+
                 }
+
 
                 window.clear(sf::Color::Black);
                 //shouldn't write it like this
@@ -182,8 +191,12 @@ class game{
 
                     if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
                         if(objects[i].grabbed==true){
-                            objects[i].X=objects[mouseObject].X;
-                            objects[i].Y=objects[mouseObject].Y;
+
+                                objects[i].X=objects[mouseObject].X;
+                                objects[i].Y=objects[mouseObject].Y;
+                                drawOutline(window,i);
+
+
                         }
                     }else{
                         objects[i].grabbed=false;
@@ -204,6 +217,25 @@ class game{
         }
 
     private:
+        void zoom(float ammount){
+            if(ammount>0){
+                zoomAMT*=(ammount/10)+1;
+            }else{
+                zoomAMT/=(-1*ammount/10)+1;
+            }
+            std::cout<<zoomAMT<<"\n";
+        }
+        void drawOutline(sf::RenderTarget& window,int i){
+            sf::VertexArray outline(sf::PrimitiveType::LineStrip,5);
+
+            outline[0].position = sf::Vector2f(getMaxX(i)+camOffsetX,getMaxY(i)+camOffsetY);
+            outline[1].position = sf::Vector2f(getMinX(i)+camOffsetX,getMaxY(i)+camOffsetY);
+            outline[2].position = sf::Vector2f(getMinX(i)+camOffsetX,getMinY(i)+camOffsetY);
+            outline[3].position = sf::Vector2f(getMaxX(i)+camOffsetX,getMinY(i)+camOffsetY);
+            outline[4].position = sf::Vector2f(getMaxX(i)+camOffsetX,getMaxY(i)+camOffsetY);
+
+            window.draw(outline);
+        }
         //saves objects to json files
         void saveObjectsJSON(const std::vector<object>& objects, const std::string& filename) {
             nlohmann::json j;
@@ -307,20 +339,20 @@ class game{
         //draws shapes
         void drawShape(sf::RenderTarget& window,int i){
             //object culling
-            if(!(getMinX(i)>-camOffsetX+W||getMaxX(i)<-camOffsetX)||getMinY(i)>-camOffsetY+H||getMaxY(i)<-camOffsetY){
+
                 if(circleShapePoly(i)){
 
 
-                    sf::CircleShape shape(baseUnit*objects[i].sizeModifier*2,objects[i].sides);
+                    sf::CircleShape shape((baseUnit*objects[i].sizeModifier*2)/zoomAMT,objects[i].sides);
 
-                    shape.setOrigin({baseUnit*objects[i].sizeModifier*2, baseUnit*objects[i].sizeModifier*2});
+                    shape.setOrigin({(baseUnit*objects[i].sizeModifier*2)/zoomAMT, (baseUnit*objects[i].sizeModifier*2)/zoomAMT});
 
                     shape.setFillColor(sf::Color(objects[i].color));
 
                     sf::Angle angle = sf::degrees(objects[i].rotation);
                     shape.setRotation(angle);
 
-                    shape.setPosition({objects[i].X+camOffsetX, objects[i].Y+camOffsetY});
+                    shape.setPosition({(objects[i].X+camOffsetX)/zoomAMT, (objects[i].Y+camOffsetY)/zoomAMT});
 
 
                     if(objects[i].collidedSAT==true&&debug==true){
@@ -330,17 +362,17 @@ class game{
                     shape.setTexture(&objects[i].texture);
 
                     window.draw(shape);
-                }else if(rectShapePoly(i)&&objects[i].objectType!=-3){
-                    sf::RectangleShape shape(sf::Vector2f(objects[i].width*baseUnit, objects[i].height*baseUnit));
+                }else if(rectShapePoly(i)){
+                    sf::RectangleShape shape(sf::Vector2f((objects[i].width*baseUnit)/zoomAMT, (objects[i].height*baseUnit)/zoomAMT));
 
-                    shape.setOrigin({objects[i].width*baseUnit/2, objects[i].height*baseUnit/2});
+                    shape.setOrigin({(objects[i].width*baseUnit/2)/zoomAMT, (objects[i].height*baseUnit/2)/zoomAMT});
 
                     shape.setFillColor(sf::Color(objects[i].color));
 
                     sf::Angle angle = sf::degrees(objects[i].rotation);
                     shape.setRotation(angle);
 
-                    shape.setPosition({objects[i].X+camOffsetX, objects[i].Y+camOffsetY});
+                    shape.setPosition({(objects[i].X+camOffsetX)/zoomAMT, (objects[i].Y+camOffsetY)/zoomAMT});
 
                     if(objects[i].collidedSAT==true&&debug==true){
                         shape.setFillColor(sf::Color(0xff0000ff));
@@ -354,12 +386,12 @@ class game{
                     shape.setPointCount(objects[i].points);
 
                     for(int iP = 0; iP<objects[i].points;iP++){
-                        shape.setPoint(iP, sf::Vector2f(objects[i].pointList[iP*2]*baseUnit*objects[i].sizeModifier, objects[i].pointList[iP*2+1]*baseUnit*objects[i].sizeModifier));
+                        shape.setPoint(iP, sf::Vector2f((objects[i].pointList[iP*2]*baseUnit*objects[i].sizeModifier)/zoomAMT, (objects[i].pointList[iP*2+1]*baseUnit*objects[i].sizeModifier)/zoomAMT));
                         //std::cout<<"x: "<<objects[i].pointList[iP*2]<<"\ny: "<<objects[i].pointList[iP*2+1]<<"\n";
                     }
 
 
-                    shape.setPosition({objects[i].X+camOffsetX, objects[i].Y+camOffsetY});
+                    shape.setPosition({(objects[i].X+camOffsetX)/zoomAMT, (objects[i].Y+camOffsetY)/zoomAMT});
 
                     sf::Angle angle = sf::degrees(objects[i].rotation);
                     shape.setRotation(angle);
@@ -379,7 +411,7 @@ class game{
                     std::cout<<"DRAWN!: "<<i<<"\n";
                 }
 
-            }
+
         }
 
         //checks bounding box collisions and runs SAT if intersects
