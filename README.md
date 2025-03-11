@@ -11,6 +11,10 @@ physics sim/game thing
 -handle inputs fron event into function instead of using other checks.
 
 # Features:
+-improve code legibility(split up large functions)
+
+-add more descriptive comments
+
 -zoom control(implimented in editor)
 
 -texture offset & rotation
