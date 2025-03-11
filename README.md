@@ -8,7 +8,7 @@ this progam is used to edit levels, they currently are save upon progam exit
 -click and drag, move objects
 
 # TODO
-#controls
+# controls:
 -scroll wheel, rotate objects
 
 -shift + left click, multi select
