@@ -34,3 +34,7 @@ physics sim/game thing
 -possibly redo physics code to work better
 
 -improve texture caching to reduce repeated texture loads (same texture loaded multiple times)
+
+-load trigger
+
+-expload trigger
