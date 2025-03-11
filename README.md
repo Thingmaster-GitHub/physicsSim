@@ -1,10 +1,12 @@
 # physicsSim
 EDITOR
 
-this progam is used to edit levels, they currently are save upon progam exit
+this progam is used to edit levels, they are currently saved upon progam exit.
 # controls:
 -right click, pan around the screen
+
 -control + scroll wheel, zoom in/out
+
 -click and drag, move objects
 
 # TODO
