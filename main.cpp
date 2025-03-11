@@ -1,8 +1,4 @@
-/*
- * TO DO:
- *  -add reading info from file to create scene(with physics objects still on screen as well);
- *  -after all object types are added, create an editor
-*/
+
 #include <nlohmann/json.hpp>
 #include <fstream>
 #include <iostream>
@@ -98,27 +94,6 @@ struct object{
     sf::Texture texture;
 
 };
-//objects
-//TO DO: import objects from file to pointer!
-// object objects[objectCount] = {
-//     {W/2,H/2,0,0,0,0,0,0,-2,false,false,false},
-//     {W/2,H-baseUnit,0,0,0,0,0,0,2,false,false,true,std::numeric_limits<float>::infinity(),0xaaaaaaff,4*W/baseUnit,5,0,{},false,false,false,{},{},1,{"ground"}},
-//     {W/4,H/2+20*baseUnit,0,0,500,0,0,2,2,true,true,true,10,0xaafefeff,80,2,0,{},false,false,false,{},{},1},
-//     {W/4,H/2,0,0,500,0,0,2,2,true,true,true,10,0x00ffffff,30,2},
-//     {W/2,H/2,0,0,0,45,4,2,1,true,true,true,10,0xff00ffff,0,0,0,{},false,false,false,{},{},1},//
-//     {2*baseUnit,10*baseUnit,0,60,0,0,3,2,0,true,true},//
-//     {W/baseUnit,H/baseUnit,0,0,1500,3,5,3,0,true,true,true,20},
-//     {W/2+baseUnit,H/2,0,0,1000,3,100,3,0,true,true,true,40},//
-//     {W/2,H/2,0,0,500,60,3,4,0,true,true},//
-//     {W/2+baseUnit*30,H/2,0,0,-400,0,0,2,3,false,true,true,20,0x00ff00ff,0,0,7,{/*1*/2,4,/*2*/2.8,-0.3,/*3*/2.3,-1.92,/*4*/-0.48,-4,/*5*/-1.55,-3,/*6*/-2.42,-0.28,/*7*/-1.91,1.66 }},
-//     {W-baseUnit*10,H/2,0,0,200,0,100,4,0,true,true,true,50,0xafbfcfff,0,0,0,{},false,false,false,{},{},1},//
-//     {W-baseUnit,H/2,0,0,0,0,100,2,0,true,true,true,100},//
-//     {0,0,0,0,0,0,0,0,-1},
-//     {W/2,0,0,0,0,45,4,10,0,true,true,true,50,0xffffffff,0,0,0,{},false,false,false,{},{},1,{},"KDE.png"},
-//     {-100,0,0,0,0,0,0,2,-3,false,false,false,100,0x00ffffff,100,100,0,{},false,false,false,{},{},0,{"test","destroy",false,1}}
-//
-//
-// };//must include entire scene
 std::vector<object> objects;
 
 class game{
