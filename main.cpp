@@ -15,7 +15,7 @@ const int H = 768;
 const int objectCount = 15;
 float baseUnit = (W/128+H/72)/2;
 
-bool debug =    false;
+bool debug = true;
 
 bool physics = true;
 
@@ -184,8 +184,9 @@ class game{
 
                     if(objects[i].objectType==-1){
                         sf::Vector2i position = sf::Mouse::getPosition(window);
-                        objects[i].X = position.x-camOffsetX;
-                        objects[i].Y = position.y-camOffsetY;
+
+                        objects[i].X = (position.x*zoomAMT-camOffsetX-W/2*zoomAMT);
+                        objects[i].Y = (position.y*zoomAMT-camOffsetY-H/2*zoomAMT);
                         mouseObject=i;
                     }
 
@@ -228,11 +229,11 @@ class game{
         void drawOutline(sf::RenderTarget& window,int i){
             sf::VertexArray outline(sf::PrimitiveType::LineStrip,5);
 
-            outline[0].position = sf::Vector2f(getMaxX(i)+camOffsetX,getMaxY(i)+camOffsetY);
-            outline[1].position = sf::Vector2f(getMinX(i)+camOffsetX,getMaxY(i)+camOffsetY);
-            outline[2].position = sf::Vector2f(getMinX(i)+camOffsetX,getMinY(i)+camOffsetY);
-            outline[3].position = sf::Vector2f(getMaxX(i)+camOffsetX,getMinY(i)+camOffsetY);
-            outline[4].position = sf::Vector2f(getMaxX(i)+camOffsetX,getMaxY(i)+camOffsetY);
+            outline[0].position = sf::Vector2f((getMaxX(i)+camOffsetX)/zoomAMT+W/2,(getMaxY(i)+camOffsetY)/zoomAMT+H/2);
+            outline[1].position = sf::Vector2f((getMinX(i)+camOffsetX)/zoomAMT+W/2,(getMaxY(i)+camOffsetY)/zoomAMT+H/2);
+            outline[2].position = sf::Vector2f((getMinX(i)+camOffsetX)/zoomAMT+W/2,(getMinY(i)+camOffsetY)/zoomAMT+H/2);
+            outline[3].position = sf::Vector2f((getMaxX(i)+camOffsetX)/zoomAMT+W/2,(getMinY(i)+camOffsetY)/zoomAMT+H/2);
+            outline[4].position = sf::Vector2f((getMaxX(i)+camOffsetX)/zoomAMT+W/2,(getMaxY(i)+camOffsetY)/zoomAMT+H/2);
 
             window.draw(outline);
         }
@@ -317,17 +318,18 @@ class game{
         //calculated projected offset of shape for rotation
         void Camera(int mouseObject,sf::Vector2i position){
             if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Right)){
+                std::cout<<"x: "<<camOffsetX<<" \ny: "<<camOffsetY<<"\n";
                 if(scrMove==false){
                     scrMove=true;
                     initXoff=camOffsetX;
                     initYoff=camOffsetY;
 
-                    initMX=position.x;
-                    initMY=position.y;
+                    initMX=position.x*zoomAMT;
+                    initMY=position.y*zoomAMT;
                 }else{
 
-                    camOffsetX=initXoff-initMX+position.x;
-                    camOffsetY=initYoff-initMY+position.y;
+                    camOffsetX=initXoff-initMX+position.x*zoomAMT;
+                    camOffsetY=initYoff-initMY+position.y*zoomAMT;
                 }
             }else{
                 if(scrMove==true){
@@ -352,7 +354,7 @@ class game{
                     sf::Angle angle = sf::degrees(objects[i].rotation);
                     shape.setRotation(angle);
 
-                    shape.setPosition({(objects[i].X+camOffsetX)/zoomAMT, (objects[i].Y+camOffsetY)/zoomAMT});
+                    shape.setPosition({(objects[i].X+camOffsetX)/zoomAMT+W/2, (objects[i].Y+camOffsetY)/zoomAMT+H/2});
 
 
                     if(objects[i].collidedSAT==true&&debug==true){
@@ -372,7 +374,7 @@ class game{
                     sf::Angle angle = sf::degrees(objects[i].rotation);
                     shape.setRotation(angle);
 
-                    shape.setPosition({(objects[i].X+camOffsetX)/zoomAMT, (objects[i].Y+camOffsetY)/zoomAMT});
+                    shape.setPosition({(objects[i].X+camOffsetX)/zoomAMT+W/2, (objects[i].Y+camOffsetY)/zoomAMT+H/2});
 
                     if(objects[i].collidedSAT==true&&debug==true){
                         shape.setFillColor(sf::Color(0xff0000ff));
@@ -391,7 +393,7 @@ class game{
                     }
 
 
-                    shape.setPosition({(objects[i].X+camOffsetX)/zoomAMT, (objects[i].Y+camOffsetY)/zoomAMT});
+                    shape.setPosition({(objects[i].X+camOffsetX)/zoomAMT+W/2, (objects[i].Y+camOffsetY)/zoomAMT+H/2});
 
                     sf::Angle angle = sf::degrees(objects[i].rotation);
                     shape.setRotation(angle);
@@ -1146,11 +1148,11 @@ class game{
 
             sf::VertexArray outline(sf::PrimitiveType::LineStrip,5);
 
-            outline[0].position = sf::Vector2f(getMaxX(i)+camOffsetX,getMaxY(i)+camOffsetY);
-            outline[1].position = sf::Vector2f(getMinX(i)+camOffsetX,getMaxY(i)+camOffsetY);
-            outline[2].position = sf::Vector2f(getMinX(i)+camOffsetX,getMinY(i)+camOffsetY);
-            outline[3].position = sf::Vector2f(getMaxX(i)+camOffsetX,getMinY(i)+camOffsetY);
-            outline[4].position = sf::Vector2f(getMaxX(i)+camOffsetX,getMaxY(i)+camOffsetY);
+            outline[0].position = sf::Vector2f((getMaxX(i)+camOffsetX)/zoomAMT+W/2,(getMaxY(i)+camOffsetY)/zoomAMT+H/2);
+            outline[1].position = sf::Vector2f((getMinX(i)+camOffsetX)/zoomAMT+W/2,(getMaxY(i)+camOffsetY)/zoomAMT+H/2);
+            outline[2].position = sf::Vector2f((getMinX(i)+camOffsetX)/zoomAMT+W/2,(getMinY(i)+camOffsetY)/zoomAMT+H/2);
+            outline[3].position = sf::Vector2f((getMaxX(i)+camOffsetX)/zoomAMT+W/2,(getMinY(i)+camOffsetY)/zoomAMT+H/2);
+            outline[4].position = sf::Vector2f((getMaxX(i)+camOffsetX)/zoomAMT+W/2,(getMaxY(i)+camOffsetY)/zoomAMT+H/2);
 
 
             if(objects[i].collidedbox==true){
@@ -1167,43 +1169,43 @@ class game{
             if((objects[i].objectType==0||objects[i].objectType==1)&&objects[i].sides<=10){
 
                 for(int iP=0;iP<objects[i].sides;iP++){
-                    sf::CircleShape pointNotButter(10,20);
-                    pointNotButter.setOrigin({10, 10});
+                    sf::CircleShape pointNotButter(10/zoomAMT,20);
+                    pointNotButter.setOrigin({10/zoomAMT, 10/zoomAMT});
                     returnXY point = angleOffset(i,iP);
 
-                    pointNotButter.setPosition({point.x+objects[i].X+camOffsetX, point.y+objects[i].Y+camOffsetY});
+                    pointNotButter.setPosition({(point.x+objects[i].X+camOffsetX)/zoomAMT+W/2, (point.y+objects[i].Y+camOffsetY)/zoomAMT+H/2});
                     pointNotButter.setFillColor(sf::Color(255-iP*30,0,0));
 
                     window.draw(pointNotButter);
                 }
             }else if(objects[i].objectType==2){
                 for(int iP=0;iP<4;iP++){
-                    sf::CircleShape pointNotButter(10,20);
-                    pointNotButter.setOrigin({10, 10});
+                    sf::CircleShape pointNotButter(10/zoomAMT,20);
+                    pointNotButter.setOrigin({10/zoomAMT, 10/zoomAMT});
                     returnXY point = angleOffset(i,iP);
 
-                    pointNotButter.setPosition({point.x+objects[i].X+camOffsetX, point.y+objects[i].Y+camOffsetY});
+                    pointNotButter.setPosition({(point.x+objects[i].X+camOffsetX)/zoomAMT+W/2, (point.y+objects[i].Y+camOffsetY)/zoomAMT+H/2});
                     pointNotButter.setFillColor(sf::Color(255-iP*30,0,0));
 
                     window.draw(pointNotButter);
                 }
             }else if(objects[i].objectType==3){
                 for(int iP=0;iP<objects[i].points;iP++){
-                    sf::CircleShape pointNotButter(10,20);
-                    pointNotButter.setOrigin({10, 10});
+                    sf::CircleShape pointNotButter(10/zoomAMT,20);
+                    pointNotButter.setOrigin({10/zoomAMT, 10/zoomAMT});
                     returnXY point = angleOffset(i,iP);
 
-                    pointNotButter.setPosition({point.x+objects[i].X+camOffsetX, point.y+objects[i].Y+camOffsetY});
+                    pointNotButter.setPosition({(point.x+objects[i].X+camOffsetX)/zoomAMT+W/2, (point.y+objects[i].Y+camOffsetY)/zoomAMT+H/2});
                     pointNotButter.setFillColor(sf::Color(255-iP*30,0,0));
 
                     window.draw(pointNotButter);
                 }
             }else if(objects[i].objectType==-1||objects[i].objectType==-2){
-                sf::CircleShape pointNotButter(10,20);
-                pointNotButter.setOrigin({10, 10});
+                sf::CircleShape pointNotButter(10/zoomAMT,20);
+                pointNotButter.setOrigin({10/zoomAMT, 10/zoomAMT});
 
 
-                pointNotButter.setPosition({objects[i].X+camOffsetX, objects[i].Y+camOffsetY});
+                pointNotButter.setPosition({(objects[i].X+camOffsetX)/zoomAMT+W/2, (objects[i].Y+camOffsetY)/zoomAMT+H/2});
                 pointNotButter.setFillColor(sf::Color(255,0,0));
 
                 window.draw(pointNotButter);
@@ -1225,10 +1227,10 @@ class game{
                 window.draw(pointNotButter);
             }
             pointNotButter.setFillColor(sf::Color(0x00ff00ff));
-            pointNotButter.setPosition({objects[i].pointProjected.x+camOffsetX,objects[i].pointProjected.y+camOffsetY});
+            pointNotButter.setPosition({objects[i].pointProjected.x+camOffsetX+W/2,objects[i].pointProjected.y+camOffsetY+H/2});
 
             window.draw(pointNotButter);
-            pointNotButter.setPosition({objects[i].pointProjected2.x+camOffsetX,objects[i].pointProjected2.y+camOffsetY});
+            pointNotButter.setPosition({objects[i].pointProjected2.x+camOffsetX+W/2,objects[i].pointProjected2.y+camOffsetY+H/2});
 
             window.draw(pointNotButter);
 
