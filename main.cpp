@@ -1,8 +1,4 @@
-/*
- * TO DO:
- *  -add reading info from file to create scene(with physics objects still on screen as well);
- *  -after all object types are added, create an editor
-*/
+
 #include <nlohmann/json.hpp>
 #include <fstream>
 #include <iostream>
