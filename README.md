@@ -14,8 +14,14 @@ this progam is used to edit levels, they are currently saved upon progam exit.
 -scroll wheel, rotate objects
 
 -shift + left click, multi select
+
+-shift + scroll + mouse hold, quick rotate
+
+-alt + scroll + mouse hold, fine rotate
 # features
--move selected objects selected objects relitve to mouse cursor
+-object layers
+
+-move selected objects selected objects relative to mouse cursor
 
 -more advanced object selection
 

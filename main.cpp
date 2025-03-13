@@ -11,7 +11,7 @@ const int H = 768;
 const int objectCount = 15;
 float baseUnit = (W/128+H/72)/2;
 
-bool debug = true;
+bool debug = false;
 
 bool physics = true;
 
@@ -110,40 +110,14 @@ class game{
         void run(){
 
             loadObjectsJSON(objects,"save.json");
-
+            initialize();
 
 
             sf::ContextSettings settings;
             settings.antiAliasingLevel = 16.0;
             sf::RenderWindow window(sf::VideoMode({W, H}), "game"/*, sf::Style::Close, settings*/);
 
-            //recenters convex polygons+other things ran on start
-            for(int i = 0;i<objectCount;i++){
-                float X=0;
-                float Y=0;
-                if(objects[i].mass<=0){
-                    objects[i].mass=std::numeric_limits<float>::infinity();
-                }
-                for(int iP=0;iP<objects[i].points;iP++){
-                    X += objects[i].pointList[iP*2];
-                    Y += objects[i].pointList[iP*2+1];
-                //std::cout<<"iP: "<<iP<<"\npoints: "<<objects[i].points<<"\nX: "<<objects[i].pointList[iP*2+1]<<"\nY: "<<objects[i].pointList[iP*2]<<"\n";
-                }
-                X/=objects[i].points;
-                Y/=objects[i].points;
 
-                for(int iP=0;iP<objects[i].points;iP++){
-                    //std::cout<<"Y: "<<objects[i].pointList[iP*2+1]<<"\n";
-                    objects[i].pointList[iP*2]-=X;
-                    objects[i].pointList[iP*2+1]-=Y;
-
-                    //std::cout<<"Yc: "<<objects[i].pointList[iP*2+1]<<"\n\n";
-                }
-                if (!objects[i].texture.loadFromFile(objects[i].loc)){
-                    //10/0;
-                    //I'm too lazy to throw an error here
-                }
-            }
 
 
 
@@ -214,6 +188,34 @@ class game{
         }
 
     private:
+        void initialize(){
+            for(int i = 0;i<objectCount;i++){
+                float X=0;
+                float Y=0;
+                if(objects[i].mass<=0){
+                    objects[i].mass=std::numeric_limits<float>::infinity();
+                }
+                for(int iP=0;iP<objects[i].points;iP++){
+                    X += objects[i].pointList[iP*2];
+                    Y += objects[i].pointList[iP*2+1];
+                    //std::cout<<"iP: "<<iP<<"\npoints: "<<objects[i].points<<"\nX: "<<objects[i].pointList[iP*2+1]<<"\nY: "<<objects[i].pointList[iP*2]<<"\n";
+                }
+                X/=objects[i].points;
+                Y/=objects[i].points;
+
+                for(int iP=0;iP<objects[i].points;iP++){
+                    //std::cout<<"Y: "<<objects[i].pointList[iP*2+1]<<"\n";
+                    objects[i].pointList[iP*2]-=X;
+                    objects[i].pointList[iP*2+1]-=Y;
+
+                    //std::cout<<"Yc: "<<objects[i].pointList[iP*2+1]<<"\n\n";
+                }
+                if (!objects[i].texture.loadFromFile(objects[i].loc)){
+                    //10/0;
+                    //I'm too lazy to throw an error here
+                }
+            }
+        }
         void zoom(float ammount){
             if(ammount>0){
                 zoomAMT*=(ammount/10)+1;
@@ -412,6 +414,11 @@ class game{
 
         }
 
+        //should check in reverse order and only return the first collided if the mouse is clicking or dragging, if it if neither, this shouldn't run.
+        //FINISH THIS
+        //this is TODO
+        //searched in reverse do to draw call order.
+        //probably need to change how draw calls are handled, like specifing layers somehow, I'll do that later
         //checks bounding box collisions and runs SAT if intersects
         void baseCollision(){
             float XMax;
