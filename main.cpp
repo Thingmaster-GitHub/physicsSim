@@ -114,8 +114,8 @@ class game{
 
 
             sf::ContextSettings settings;
-            settings.antiAliasingLevel = 16.0;
-            sf::RenderWindow window(sf::VideoMode({W, H}), "game"/*, sf::Style::Close, settings*/);
+            settings.antiAliasingLevel = 8.0;
+            sf::RenderWindow window(sf::VideoMode({W, H}), "game"/*, sf::Style::default, settings*/);
 
 
 
@@ -126,7 +126,7 @@ class game{
 
                 while (const std::optional event = window.pollEvent())
                 {
-                    // "close requested" event: we close the window
+
                     if (event->is<sf::Event::Closed>()){
                         window.close();
                     } else if (const auto* mouseWheelScrolled = event->getIf<sf::Event::MouseWheelScrolled>())
@@ -198,21 +198,19 @@ class game{
                 for(int iP=0;iP<objects[i].points;iP++){
                     X += objects[i].pointList[iP*2];
                     Y += objects[i].pointList[iP*2+1];
-                    //std::cout<<"iP: "<<iP<<"\npoints: "<<objects[i].points<<"\nX: "<<objects[i].pointList[iP*2+1]<<"\nY: "<<objects[i].pointList[iP*2]<<"\n";
+
                 }
                 X/=objects[i].points;
                 Y/=objects[i].points;
 
                 for(int iP=0;iP<objects[i].points;iP++){
-                    //std::cout<<"Y: "<<objects[i].pointList[iP*2+1]<<"\n";
+
                     objects[i].pointList[iP*2]-=X;
                     objects[i].pointList[iP*2+1]-=Y;
 
-                    //std::cout<<"Yc: "<<objects[i].pointList[iP*2+1]<<"\n\n";
                 }
                 if (!objects[i].texture.loadFromFile(objects[i].loc)){
-                    //10/0;
-                    //I'm too lazy to throw an error here
+                    10/2;//who needs to throw an error? your texture failed to load :3
                 }
             }
         }
