@@ -336,8 +336,7 @@ class game{
         }
         //draws shapes
         void drawShape(sf::RenderTarget& window,int i){
-            //object culling
-
+            if(!(getMinX(i)/zoomAMT > -camOffsetX/zoomAMT+W/2||getMaxX(i)/zoomAMT < -camOffsetX / zoomAMT-W/2)||getMinY(i)/zoomAMT > -camOffsetY/zoomAMT+H/2||getMaxY(i)/zoomAMT < -camOffsetY / zoomAMT-H/2){
                 if(circleShapePoly(i)){
 
 
@@ -408,7 +407,7 @@ class game{
                 if(debug==true){
                     std::cout<<"DRAWN!: "<<i<<"\n";
                 }
-
+            }
 
         }
 
