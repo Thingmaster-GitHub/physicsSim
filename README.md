@@ -9,6 +9,7 @@ this progam is used to edit levels, they are currently saved upon progam exit.
 
 -click and drag, move objects
 
+-alt + scroll + mouse hold, fine rotate
 # TODO
 # controls:
 -scroll wheel, rotate objects
@@ -17,7 +18,7 @@ this progam is used to edit levels, they are currently saved upon progam exit.
 
 -shift + scroll + mouse hold, quick rotate
 
--alt + scroll + mouse hold, fine rotate
+
 # features
 -object layers
 

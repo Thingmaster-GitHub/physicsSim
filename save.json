@@ -118,8 +118,8 @@
         "width": 546.4000244140625
     },
     {
-        "X": 336.0130615234375,
-        "Y": 398.28302001953125,
+        "X": 290.499267578125,
+        "Y": 394.24896240234375,
         "airRes": true,
         "coefficentOfFriction": 1.0,
         "color": 2868838143,
@@ -161,7 +161,7 @@
             0.0
         ],
         "points": 0,
-        "rotation": 0.0,
+        "rotation": 180.0,
         "sides": 0,
         "sizeModifier": 2.0,
         "solid": true,
@@ -354,8 +354,8 @@
         "width": 0.0
     },
     {
-        "X": 605.85888671875,
-        "Y": -272.6314697265625,
+        "X": 478.0,
+        "Y": -113.0,
         "airRes": true,
         "coefficentOfFriction": 0.5,
         "color": 4294967295,
@@ -397,7 +397,7 @@
             0.0
         ],
         "points": 0,
-        "rotation": 3.0,
+        "rotation": -147.0,
         "sides": 5,
         "sizeModifier": 3.0,
         "solid": true,
@@ -472,8 +472,8 @@
         "width": 0.0
     },
     {
-        "X": 333.655029296875,
-        "Y": 105.89752197265625,
+        "X": 313.8427734375,
+        "Y": 114.12469482421875,
         "airRes": true,
         "coefficentOfFriction": 0.5,
         "color": 4294967295,
@@ -515,7 +515,7 @@
             0.0
         ],
         "points": 0,
-        "rotation": 60.0,
+        "rotation": -60.0,
         "sides": 3,
         "sizeModifier": 4.0,
         "solid": true,
@@ -531,8 +531,8 @@
         "width": 0.0
     },
     {
-        "X": 914.181640625,
-        "Y": -242.3046875,
+        "X": 1049.9471435546875,
+        "Y": -142.6558837890625,
         "airRes": true,
         "coefficentOfFriction": 0.5,
         "color": 16711935,
@@ -574,7 +574,7 @@
             0.0
         ],
         "points": 7,
-        "rotation": 0.0,
+        "rotation": 80.0,
         "sides": 0,
         "sizeModifier": 2.0,
         "solid": true,
@@ -708,8 +708,8 @@
         "width": 0.0
     },
     {
-        "X": -1174.2578125,
-        "Y": -601.276611328125,
+        "X": -1257.9652099609375,
+        "Y": -674.3731079101563,
         "airRes": true,
         "coefficentOfFriction": 0.5,
         "color": 4294967295,
@@ -767,8 +767,8 @@
         "width": 0.0
     },
     {
-        "X": 1657.86669921875,
-        "Y": -5.054443359375,
+        "X": 1081.5908203125,
+        "Y": 202.31195068359375,
         "airRes": true,
         "coefficentOfFriction": 1.0,
         "color": 4294967295,
@@ -810,7 +810,7 @@
             0.0
         ],
         "points": 0,
-        "rotation": 45.0,
+        "rotation": 5.0,
         "sides": 4,
         "sizeModifier": 10.0,
         "solid": true,
@@ -826,8 +826,8 @@
         "width": 0.0
     },
     {
-        "X": -355.0,
-        "Y": 187.0,
+        "X": -785.904052734375,
+        "Y": -212.6868896484375,
         "airRes": false,
         "coefficentOfFriction": 0.0,
         "color": 16777130,
@@ -869,7 +869,7 @@
             0.0
         ],
         "points": 0,
-        "rotation": 0.0,
+        "rotation": 90.0,
         "sides": 0,
         "sizeModifier": 2.0,
         "solid": false,

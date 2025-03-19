@@ -131,7 +131,11 @@ class game{
                         window.close();
                     } else if (const auto* mouseWheelScrolled = event->getIf<sf::Event::MouseWheelScrolled>())
                     {
-                        zoom(mouseWheelScrolled->delta);
+                        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LControl)){
+                            zoom(mouseWheelScrolled->delta);
+                        }else{
+                            rotateObj(mouseWheelScrolled->delta);
+                        }
                     }
 
 
@@ -188,6 +192,20 @@ class game{
         }
 
     private:
+        void rotateObj(float ammount){
+            for(int i=0;i<objectCount;i++){
+                if(objects[i].grabbed==true){
+                    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LAlt)){
+                        objects[i].rotation+=ammount;
+                    }else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LShift)){
+                        objects[i].rotation+=ammount*20;
+                    }else{
+                        objects[i].rotation+=ammount*10;
+                    }
+                }
+            }
+        }
+        //initilizes program
         void initialize(){
             for(int i = 0;i<objectCount;i++){
                 float X=0;
