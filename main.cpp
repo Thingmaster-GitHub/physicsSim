@@ -11,7 +11,7 @@ const int H = 768;
 const int objectCount = 15;
 float baseUnit = (W/128+H/72)/2;
 
-bool debug = false;
+bool debug = true;
 
 bool physics = true;
 
@@ -159,8 +159,12 @@ class game{
                     if(objects[i].objectType==-1){
                         sf::Vector2i position = sf::Mouse::getPosition(window);
 
-                        objects[i].X = (position.x*zoomAMT-camOffsetX-W/2*zoomAMT);
-                        objects[i].Y = (position.y*zoomAMT-camOffsetY-H/2*zoomAMT);
+
+                        //inverse of draw call in debug
+                        //{(baseUnit*objects[i].X+camOffsetX)/zoomAMT+W/2, (baseUnit*objects[i].Y+camOffsetY)/zoomAMT+H/2}
+                        objects[i].X = ((position.x)*zoomAMT-camOffsetX-W/2*zoomAMT)/baseUnit;
+                        objects[i].Y = ((position.y)*zoomAMT-camOffsetY-H/2*zoomAMT)/baseUnit;
+                        std::cout<<"mouseposX: "<<(baseUnit*objects[i].X+camOffsetX)/zoomAMT+W/2<<"\nmouseposY: "<<(baseUnit*objects[i].Y+camOffsetY)/zoomAMT+H/2<<"\n";
                         mouseObject=i;
                     }
 
@@ -367,7 +371,7 @@ class game{
                     sf::Angle angle = sf::degrees(objects[i].rotation);
                     shape.setRotation(angle);
 
-                    shape.setPosition({(objects[i].X+camOffsetX)/zoomAMT+W/2, (objects[i].Y+camOffsetY)/zoomAMT+H/2});
+                    shape.setPosition({(baseUnit*objects[i].X+camOffsetX)/zoomAMT+W/2, (baseUnit*objects[i].Y+camOffsetY)/zoomAMT+H/2});
 
 
                     if(objects[i].collidedSAT==true&&debug==true){
@@ -387,7 +391,7 @@ class game{
                     sf::Angle angle = sf::degrees(objects[i].rotation);
                     shape.setRotation(angle);
 
-                    shape.setPosition({(objects[i].X+camOffsetX)/zoomAMT+W/2, (objects[i].Y+camOffsetY)/zoomAMT+H/2});
+                    shape.setPosition({(baseUnit*objects[i].X+camOffsetX)/zoomAMT+W/2, (baseUnit*objects[i].Y+camOffsetY)/zoomAMT+H/2});
 
                     if(objects[i].collidedSAT==true&&debug==true){
                         shape.setFillColor(sf::Color(0xff0000ff));
@@ -406,7 +410,7 @@ class game{
                     }
 
 
-                    shape.setPosition({(objects[i].X+camOffsetX)/zoomAMT+W/2, (objects[i].Y+camOffsetY)/zoomAMT+H/2});
+                    shape.setPosition({(baseUnit*objects[i].X+camOffsetX)/zoomAMT+W/2, (baseUnit*objects[i].Y+camOffsetY)/zoomAMT+H/2});
 
                     sf::Angle angle = sf::degrees(objects[i].rotation);
                     shape.setRotation(angle);
@@ -854,7 +858,7 @@ class game{
             }else{
                 pointOutput = -objects[object].sizeModifier*baseUnit*2;
             }
-            return pointOutput+objects[object].X;
+            return pointOutput+baseUnit*objects[object].X;
         }
         //gets minimum Y
         float getMinY(int object){
@@ -893,7 +897,7 @@ class game{
             }
 
 
-            return pointOutput+objects[object].Y;
+            return pointOutput+baseUnit*objects[object].Y;
         }
         //gets maximum X
         float getMaxX(int object){
@@ -930,7 +934,7 @@ class game{
             }else{
                 pointOutput = objects[object].sizeModifier*baseUnit*2;
             }
-            return pointOutput+objects[object].X;
+            return pointOutput+baseUnit*objects[object].X;
         }
         //gets maximum y
         float getMaxY(int object){
@@ -967,7 +971,7 @@ class game{
             }else{
                 pointOutput = objects[object].sizeModifier*baseUnit*2;
             }
-            return pointOutput+objects[object].Y;
+            return pointOutput+baseUnit*objects[object].Y;
         }
 
         //gets maximum normal of shape
@@ -978,9 +982,9 @@ class game{
             returnXY testPoint;
             //circle
             if(objects[object].sides>10){
-                output.maxMin = objects[object].X*normal.x+objects[object].Y*normal.y+baseUnit*objects[object].sizeModifier*2;
-                output.point.x=objects[object].X;
-                output.point.y=objects[object].Y;
+                output.maxMin = baseUnit*objects[object].X*normal.x+baseUnit*objects[object].Y*normal.y+baseUnit*objects[object].sizeModifier*2;
+                output.point.x=baseUnit*objects[object].X;
+                output.point.y=baseUnit*objects[object].Y;
                 return output;
             }
 
@@ -988,8 +992,8 @@ class game{
                 for(int i = 0;i<objects[object].sides;i++){
                     testPoint = angleOffset(object,i);
 
-                    testPoint.x+=objects[object].X;
-                    testPoint.y+=objects[object].Y;
+                    testPoint.x+=baseUnit*objects[object].X;
+                    testPoint.y+=baseUnit*objects[object].Y;
                     test = projectPointOntoNormal(testPoint,normal);
 
                     if(test>output.maxMin){
@@ -1001,8 +1005,8 @@ class game{
                 for(int i = 0;i<4;i++){
                     testPoint = angleOffset(object,i);
 
-                    testPoint.x+=objects[object].X;
-                    testPoint.y+=objects[object].Y;
+                    testPoint.x+=baseUnit*objects[object].X;
+                    testPoint.y+=baseUnit*objects[object].Y;
                     test = projectPointOntoNormal(testPoint,normal);
 
                     if(test>output.maxMin){
@@ -1014,8 +1018,8 @@ class game{
                 for(int i = 0;i<objects[object].points;i++){
                     testPoint = angleOffset(object,i);
 
-                    testPoint.x+=objects[object].X;
-                    testPoint.y+=objects[object].Y;
+                    testPoint.x+=baseUnit*objects[object].X;
+                    testPoint.y+=baseUnit*objects[object].Y;
                     test = projectPointOntoNormal(testPoint,normal);
 
                     if(test>output.maxMin){
@@ -1024,8 +1028,8 @@ class game{
                     }
                 }
             }else{
-                output.point.x=objects[object].X;
-                output.point.y=objects[object].Y;
+                output.point.x=baseUnit*objects[object].X;
+                output.point.y=baseUnit*objects[object].Y;
 
                 output.maxMin = projectPointOntoNormal(output.point,normal);
             }
@@ -1040,9 +1044,9 @@ class game{
             returnXY testPoint;
             //circle
             if(objects[object].sides>10){
-                output.maxMin = objects[object].X*normal.x+objects[object].Y*normal.y-baseUnit*objects[object].sizeModifier*2;
-                output.point.x=objects[object].X;
-                output.point.y=objects[object].Y;
+                output.maxMin = baseUnit*objects[object].X*normal.x+baseUnit*objects[object].Y*normal.y-baseUnit*objects[object].sizeModifier*2;
+                output.point.x=baseUnit*objects[object].X;
+                output.point.y=baseUnit*objects[object].Y;
                 return output;
             }
 
@@ -1050,8 +1054,8 @@ class game{
                 for(int i = 0;i<objects[object].sides;i++){
                     testPoint = angleOffset(object,i);
 
-                    testPoint.x+=objects[object].X;
-                    testPoint.y+=objects[object].Y;
+                    testPoint.x+=baseUnit*objects[object].X;
+                    testPoint.y+=baseUnit*objects[object].Y;
                     test = projectPointOntoNormal(testPoint,normal);
 
                     if(test<output.maxMin){
@@ -1063,8 +1067,8 @@ class game{
                 for(int i = 0;i<4;i++){
                     testPoint = angleOffset(object,i);
 
-                    testPoint.x+=objects[object].X;
-                    testPoint.y+=objects[object].Y;
+                    testPoint.x+=baseUnit*objects[object].X;
+                    testPoint.y+=baseUnit*objects[object].Y;
                     test = projectPointOntoNormal(testPoint,normal);
 
                     if(test<output.maxMin){
@@ -1076,8 +1080,8 @@ class game{
                 for(int i = 0;i<objects[object].points;i++){
                     testPoint = angleOffset(object,i);
 
-                    testPoint.x+=objects[object].X;
-                    testPoint.y+=objects[object].Y;
+                    testPoint.x+=baseUnit*objects[object].X;
+                    testPoint.y+=baseUnit*objects[object].Y;
                     test = projectPointOntoNormal(testPoint,normal);
 
                     if(test<output.maxMin){
@@ -1086,8 +1090,8 @@ class game{
                     }
                 }
             }else{
-                output.point.x=objects[object].X;
-                output.point.y=objects[object].Y;
+                output.point.x=baseUnit*objects[object].X;
+                output.point.y=baseUnit*objects[object].Y;
 
                 output.maxMin = projectPointOntoNormal(output.point,normal);
             }
@@ -1184,6 +1188,7 @@ class game{
 
             window.draw(outline);
 
+            //drawing points
             if((objects[i].objectType==0||objects[i].objectType==1)&&objects[i].sides<=10){
 
                 for(int iP=0;iP<objects[i].sides;iP++){
@@ -1191,7 +1196,7 @@ class game{
                     pointNotButter.setOrigin({10/zoomAMT, 10/zoomAMT});
                     returnXY point = angleOffset(i,iP);
 
-                    pointNotButter.setPosition({(point.x+objects[i].X+camOffsetX)/zoomAMT+W/2, (point.y+objects[i].Y+camOffsetY)/zoomAMT+H/2});
+                    pointNotButter.setPosition({(point.x+baseUnit*objects[i].X+camOffsetX)/zoomAMT+W/2, (point.y+baseUnit*objects[i].Y+camOffsetY)/zoomAMT+H/2});
                     pointNotButter.setFillColor(sf::Color(255-iP*30,0,0));
 
                     window.draw(pointNotButter);
@@ -1202,7 +1207,7 @@ class game{
                     pointNotButter.setOrigin({10/zoomAMT, 10/zoomAMT});
                     returnXY point = angleOffset(i,iP);
 
-                    pointNotButter.setPosition({(point.x+objects[i].X+camOffsetX)/zoomAMT+W/2, (point.y+objects[i].Y+camOffsetY)/zoomAMT+H/2});
+                    pointNotButter.setPosition({(point.x+baseUnit*objects[i].X+camOffsetX)/zoomAMT+W/2, (point.y+baseUnit*objects[i].Y+camOffsetY)/zoomAMT+H/2});
                     pointNotButter.setFillColor(sf::Color(255-iP*30,0,0));
 
                     window.draw(pointNotButter);
@@ -1213,7 +1218,7 @@ class game{
                     pointNotButter.setOrigin({10/zoomAMT, 10/zoomAMT});
                     returnXY point = angleOffset(i,iP);
 
-                    pointNotButter.setPosition({(point.x+objects[i].X+camOffsetX)/zoomAMT+W/2, (point.y+objects[i].Y+camOffsetY)/zoomAMT+H/2});
+                    pointNotButter.setPosition({(point.x+baseUnit*objects[i].X+camOffsetX)/zoomAMT+W/2, (point.y+baseUnit*objects[i].Y+camOffsetY)/zoomAMT+H/2});
                     pointNotButter.setFillColor(sf::Color(255-iP*30,0,0));
 
                     window.draw(pointNotButter);
@@ -1223,7 +1228,7 @@ class game{
                 pointNotButter.setOrigin({10/zoomAMT, 10/zoomAMT});
 
 
-                pointNotButter.setPosition({(objects[i].X+camOffsetX)/zoomAMT+W/2, (objects[i].Y+camOffsetY)/zoomAMT+H/2});
+                pointNotButter.setPosition({(baseUnit*objects[i].X+camOffsetX)/zoomAMT+W/2, (baseUnit*objects[i].Y+camOffsetY)/zoomAMT+H/2});
                 pointNotButter.setFillColor(sf::Color(255,0,0));
 
                 window.draw(pointNotButter);
