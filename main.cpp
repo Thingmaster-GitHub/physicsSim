@@ -233,10 +233,10 @@ class game{
             }
         }
         void zoom(float ammount){
-            if(ammount>0){
-                zoomAMT*=(ammount/10)+1;
+            if(ammount<0){
+                zoomAMT*=(-1*ammount/10)+1;
             }else{
-                zoomAMT/=(-1*ammount/10)+1;
+                zoomAMT/=(ammount/10)+1;
             }
             std::cout<<zoomAMT<<"\n";
         }
