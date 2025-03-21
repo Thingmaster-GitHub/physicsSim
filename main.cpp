@@ -300,7 +300,8 @@ private:
             if (!obj.texture.loadFromFile(obj.loc)) {
                 std::cerr << "Failed to load texture: " << obj.loc << '\n';
             }
-
+            obj.X*=baseUnit;
+            obj.Y*=baseUnit;
             objectsVect.push_back(obj);
         }
 
