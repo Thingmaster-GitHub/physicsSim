@@ -11,7 +11,7 @@ const int H = 768;
 const int objectCount = 15;
 float baseUnit = (W/128+H/72)/2;
 
-bool debug = true;
+bool debug = false;
 
 bool physics = true;
 
@@ -99,10 +99,13 @@ struct object{
     triggerProperties trigger = {};
     std::string loc= "blank.png";
     sf::Texture texture;
+    int layer=0;
 
 };
 
 std::vector<object> objects;
+
+std::vector<int> objectLoadOrder;
 
 class game{
     public:
@@ -150,7 +153,7 @@ class game{
 
                 //draws all shapes+transformations
                 for(int i = 0; i<objectCount;i++){
-                    drawShape(window,i);
+                    drawShape(window,objectLoadOrder[i]);
 
                     if(debug==true){
                         debuger(window,i);
@@ -164,7 +167,6 @@ class game{
                         //{(baseUnit*objects[i].X+camOffsetX)/zoomAMT+W/2, (baseUnit*objects[i].Y+camOffsetY)/zoomAMT+H/2}
                         objects[i].X = ((position.x)*zoomAMT-camOffsetX-W/2*zoomAMT)/baseUnit;
                         objects[i].Y = ((position.y)*zoomAMT-camOffsetY-H/2*zoomAMT)/baseUnit;
-                        std::cout<<"mouseposX: "<<(baseUnit*objects[i].X+camOffsetX)/zoomAMT+W/2<<"\nmouseposY: "<<(baseUnit*objects[i].Y+camOffsetY)/zoomAMT+H/2<<"\n";
                         mouseObject=i;
                     }
 
@@ -196,6 +198,28 @@ class game{
         }
 
     private:
+        //sets object load order for drawing
+        void LayerObjects(){
+            int maxLoaded=-std::numeric_limits<int>::infinity();
+            int minLoaded=std::numeric_limits<int>::infinity();
+            for(int i=0;i<objectCount;i++){
+                if(objects[i].layer>maxLoaded){
+                    maxLoaded=objects[i].layer;
+                }
+                if(objects[i].layer<minLoaded){
+                    minLoaded=objects[i].layer;
+                }
+            }
+
+            for(int i=minLoaded;i<=maxLoaded;i++){
+                for(int ip=0;ip<objectCount;ip++){
+                    if(objects[ip].layer==i){
+                        objectLoadOrder.push_back(ip);
+                    }
+                }
+            }
+        }
+        //rotates selected objects
         void rotateObj(float ammount){
             for(int i=0;i<objectCount;i++){
                 if(objects[i].grabbed==true){
@@ -235,6 +259,7 @@ class game{
                     10/2;//who needs to throw an error? your texture failed to load :3
                 }
             }
+            LayerObjects();
         }
         void zoom(float ammount){
             if(ammount<0){
@@ -244,6 +269,9 @@ class game{
             }
             std::cout<<zoomAMT<<"\n";
         }
+        //draws outline
+        //window RenderWindow
+        //i index of object
         void drawOutline(sf::RenderTarget& window,int i){
             sf::VertexArray outline(sf::PrimitiveType::LineStrip,5);
 
@@ -266,7 +294,7 @@ class game{
                     {"rotation", obj.rotation}, {"sides", obj.sides}, {"sizeModifier", obj.sizeModifier},
                     {"objectType", obj.objectType}, {"gravity", obj.gravity},{"airRes", obj.airRes},{"solid",obj.solid}, {"mass", obj.mass},
                     {"color", obj.color}, {"width", obj.width}, {"height", obj.height},
-                    {"points", obj.points}, {"pointList", std::vector<float>(obj.pointList, obj.pointList + 30)},{"coefficentOfFriction",obj.coefficentOfFriction},
+                    {"points", obj.points}, {"pointList", std::vector<float>(obj.pointList, obj.pointList + 30)},{"coefficentOfFriction",obj.coefficentOfFriction},{"layer",0},
                             {"loc", obj.loc},
                             {"trigger", {
                                 {"id", obj.trigger.id},
@@ -315,6 +343,7 @@ class game{
                 obj.points = item["points"];
                 obj.coefficentOfFriction = item["coefficentOfFriction"];
                 obj.loc = item["loc"];
+                obj.layer = item["layer"];
                 auto pointList = item["pointList"].get<std::vector<float>>();
                 std::copy(pointList.begin(), pointList.end(), obj.pointList);
 
@@ -336,7 +365,6 @@ class game{
         //calculated projected offset of shape for rotation
         void Camera(int mouseObject,sf::Vector2i position){
             if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Right)){
-                std::cout<<"x: "<<camOffsetX<<" \ny: "<<camOffsetY<<"\n";
                 if(scrMove==false){
                     scrMove=true;
                     initXoff=camOffsetX;
