@@ -11,6 +11,10 @@ physics sim/game thing
 -handle inputs fron event into function instead of using other checks.
 
 # Features:
+-only testing collision with solid objects
+
+-object layers
+
 -improve code legibility(split up large functions)
 
 -add more descriptive comments
@@ -37,4 +41,6 @@ physics sim/game thing
 
 -load trigger
 
--expload trigger
+-explode trigger
+
+
