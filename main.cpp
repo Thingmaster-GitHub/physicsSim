@@ -8,7 +8,7 @@
 #include <SFML/Graphics.hpp>
 const int W = 1366;
 const int H = 768;
-const int objectCount = 15;
+int objectCount =15;
 float baseUnit = (W/128+H/72)/2;
 
 bool debug = false;
@@ -104,6 +104,7 @@ struct object{
 };
 
 std::vector<object> objects;
+std::vector<object> UI;
 
 std::vector<int> objectLoadOrder;
 
@@ -111,8 +112,8 @@ class game{
     public:
         //runs program :3
         void run(){
-
-            loadObjectsJSON(objects,"save.json");
+            loadObjectsJSON(UI,"UI.json");
+            objectCount = loadObjectsJSON(objects,"save.json");
             initialize();
 
 
@@ -153,7 +154,8 @@ class game{
 
                 //draws all shapes+transformations
                 for(int i = 0; i<objectCount;i++){
-                    drawShape(window,objectLoadOrder[i]);
+                    drawShape(window,objectLoadOrder[i],objects);
+
 
                     if(debug==true){
                         debuger(window,i);
@@ -183,6 +185,9 @@ class game{
                         objects[i].grabbed=false;
                     }
                 }
+                for(int i = 0;i<0;i++){
+                    drawUI(window,objectLoadOrder[i],objects);
+                }
                 baseCollision();
                 //testingLayoutInf(window);
                 window.display();
@@ -195,11 +200,15 @@ class game{
                 }
             }
             saveObjectsJSON(objects,"save.json");
+            saveObjectsJSON(UI,"UI.json");
         }
 
     private:
+
         //sets object load order for drawing
         void LayerObjects(){
+            objectLoadOrder.clear();
+
             int maxLoaded=-std::numeric_limits<int>::infinity();
             int minLoaded=std::numeric_limits<int>::infinity();
             for(int i=0;i<objectCount;i++){
@@ -256,7 +265,7 @@ class game{
 
                 }
                 if (!objects[i].texture.loadFromFile(objects[i].loc)){
-                    10/2;//who needs to throw an error? your texture failed to load :3
+                    //throw error or something
                 }
             }
             LayerObjects();
@@ -310,11 +319,11 @@ class game{
             file.close();
         }
         //loads objects from json file
-        void loadObjectsJSON(std::vector<object>& objectsVect, const std::string& filename) {
+        int loadObjectsJSON(std::vector<object>& objectsVect, const std::string& filename) {
             std::ifstream file(filename);
             if (!file) {
                 std::cerr << "Error opening JSON file!\n";
-                return;
+                return 0;
             }
 
             nlohmann::json j;
@@ -358,6 +367,7 @@ class game{
 
                 objectsVect.push_back(obj);
             }
+            return objectsVect.size();
 
 
         }
@@ -384,70 +394,143 @@ class game{
                 }
             }
         }
-        //draws shapes
-        void drawShape(sf::RenderTarget& window,int i){
-            if(!(getMinX(i)/zoomAMT > -camOffsetX/zoomAMT+W/2||getMaxX(i)/zoomAMT < -camOffsetX / zoomAMT-W/2)||getMinY(i)/zoomAMT > -camOffsetY/zoomAMT+H/2||getMaxY(i)/zoomAMT < -camOffsetY / zoomAMT-H/2){
+        void drawUI(sf::RenderTarget& window,int i,std::vector<object>& scene){
                 if(circleShapePoly(i)){
 
 
-                    sf::CircleShape shape((baseUnit*objects[i].sizeModifier*2)/zoomAMT,objects[i].sides);
+                    sf::CircleShape shape((baseUnit*scene[i].sizeModifier*2),scene[i].sides);
 
-                    shape.setOrigin({(baseUnit*objects[i].sizeModifier*2)/zoomAMT, (baseUnit*objects[i].sizeModifier*2)/zoomAMT});
+                    shape.setOrigin({(baseUnit*scene[i].sizeModifier*2), (baseUnit*scene[i].sizeModifier*2)});
 
-                    shape.setFillColor(sf::Color(objects[i].color));
+                    shape.setFillColor(sf::Color(scene[i].color));
 
-                    sf::Angle angle = sf::degrees(objects[i].rotation);
+                    sf::Angle angle = sf::degrees(scene[i].rotation);
                     shape.setRotation(angle);
 
-                    shape.setPosition({(baseUnit*objects[i].X+camOffsetX)/zoomAMT+W/2, (baseUnit*objects[i].Y+camOffsetY)/zoomAMT+H/2});
+                    shape.setPosition({(baseUnit*scene[i].X)+W/2, (baseUnit*scene[i].Y)+H/2});
 
 
-                    if(objects[i].collidedSAT==true&&debug==true){
+                    if(scene[i].collidedSAT==true&&debug==true){
                         shape.setFillColor(sf::Color(0xff0000ff));
-                        objects[i].collidedSAT=false;
+                        scene[i].collidedSAT=false;
                     }
-                    shape.setTexture(&objects[i].texture);
+                    shape.setTexture(&scene[i].texture);
 
                     window.draw(shape);
                 }else if(rectShapePoly(i)){
-                    sf::RectangleShape shape(sf::Vector2f((objects[i].width*baseUnit)/zoomAMT, (objects[i].height*baseUnit)/zoomAMT));
+                    sf::RectangleShape shape(sf::Vector2f((scene[i].width*baseUnit), (scene[i].height*baseUnit)));
 
-                    shape.setOrigin({(objects[i].width*baseUnit/2)/zoomAMT, (objects[i].height*baseUnit/2)/zoomAMT});
+                    shape.setOrigin({(scene[i].width*baseUnit/2), (scene[i].height*baseUnit/2)});
 
-                    shape.setFillColor(sf::Color(objects[i].color));
+                    shape.setFillColor(sf::Color(scene[i].color));
 
-                    sf::Angle angle = sf::degrees(objects[i].rotation);
+                    sf::Angle angle = sf::degrees(scene[i].rotation);
                     shape.setRotation(angle);
 
-                    shape.setPosition({(baseUnit*objects[i].X+camOffsetX)/zoomAMT+W/2, (baseUnit*objects[i].Y+camOffsetY)/zoomAMT+H/2});
+                    shape.setPosition({(baseUnit*scene[i].X)+W/2, (baseUnit*scene[i].Y)+H/2});
 
-                    if(objects[i].collidedSAT==true&&debug==true){
+                    if(scene[i].collidedSAT==true&&debug==true){
                         shape.setFillColor(sf::Color(0xff0000ff));
-                        objects[i].collidedSAT=false;
+                        scene[i].collidedSAT=false;
                     }
-                    shape.setTexture(&objects[i].texture);
+                    shape.setTexture(&scene[i].texture);
 
                     window.draw(shape);
                 }else if(convexShapePoly(i)){
                     sf::ConvexShape shape;
-                    shape.setPointCount(objects[i].points);
+                    shape.setPointCount(scene[i].points);
 
-                    for(int iP = 0; iP<objects[i].points;iP++){
-                        shape.setPoint(iP, sf::Vector2f((objects[i].pointList[iP*2]*baseUnit*objects[i].sizeModifier)/zoomAMT, (objects[i].pointList[iP*2+1]*baseUnit*objects[i].sizeModifier)/zoomAMT));
+                    for(int iP = 0; iP<scene[i].points;iP++){
+                        shape.setPoint(iP, sf::Vector2f((scene[i].pointList[iP*2]*baseUnit*scene[i].sizeModifier), (scene[i].pointList[iP*2+1]*baseUnit*scene[i].sizeModifier)));
                         //std::cout<<"x: "<<objects[i].pointList[iP*2]<<"\ny: "<<objects[i].pointList[iP*2+1]<<"\n";
                     }
 
 
-                    shape.setPosition({(baseUnit*objects[i].X+camOffsetX)/zoomAMT+W/2, (baseUnit*objects[i].Y+camOffsetY)/zoomAMT+H/2});
+                    shape.setPosition({(baseUnit*scene[i].X)+W/2, (baseUnit*scene[i].Y+camOffsetY)+H/2});
 
-                    sf::Angle angle = sf::degrees(objects[i].rotation);
+                    sf::Angle angle = sf::degrees(scene[i].rotation);
                     shape.setRotation(angle);
 
-                    shape.setFillColor(sf::Color(objects[i].color));
+                    shape.setFillColor(sf::Color(scene[i].color));
 
-                    if(objects[i].collidedSAT==true&&debug==true){
+                    if(scene[i].collidedSAT==true&&debug==true){
                         shape.setFillColor(sf::Color(0xff0000ff));
-                        objects[i].collidedSAT=false;
+                        scene[i].collidedSAT=false;
+                    }
+                    shape.setTexture(&objects[i].texture);
+
+                    window.draw(shape);
+
+                }
+                if(debug==true){
+                    std::cout<<"DRAWN!: "<<i<<"\n";
+                }
+
+        }
+        //draws shapes
+        void drawShape(sf::RenderTarget& window,int i,std::vector<object>& scene){
+            if(!(getMinX(i)/zoomAMT > -camOffsetX/zoomAMT+W/2||getMaxX(i)/zoomAMT < -camOffsetX / zoomAMT-W/2)||getMinY(i)/zoomAMT > -camOffsetY/zoomAMT+H/2||getMaxY(i)/zoomAMT < -camOffsetY / zoomAMT-H/2){
+                if(circleShapePoly(i)){
+
+
+                    sf::CircleShape shape((baseUnit*scene[i].sizeModifier*2)/zoomAMT,scene[i].sides);
+
+                    shape.setOrigin({(baseUnit*scene[i].sizeModifier*2)/zoomAMT, (baseUnit*scene[i].sizeModifier*2)/zoomAMT});
+
+                    shape.setFillColor(sf::Color(scene[i].color));
+
+                    sf::Angle angle = sf::degrees(scene[i].rotation);
+                    shape.setRotation(angle);
+
+                    shape.setPosition({(baseUnit*scene[i].X+camOffsetX)/zoomAMT+W/2, (baseUnit*scene[i].Y+camOffsetY)/zoomAMT+H/2});
+
+
+                    if(scene[i].collidedSAT==true&&debug==true){
+                        shape.setFillColor(sf::Color(0xff0000ff));
+                        scene[i].collidedSAT=false;
+                    }
+                    shape.setTexture(&scene[i].texture);
+
+                    window.draw(shape);
+                }else if(rectShapePoly(i)){
+                    sf::RectangleShape shape(sf::Vector2f((scene[i].width*baseUnit)/zoomAMT, (scene[i].height*baseUnit)/zoomAMT));
+
+                    shape.setOrigin({(scene[i].width*baseUnit/2)/zoomAMT, (scene[i].height*baseUnit/2)/zoomAMT});
+
+                    shape.setFillColor(sf::Color(scene[i].color));
+
+                    sf::Angle angle = sf::degrees(scene[i].rotation);
+                    shape.setRotation(angle);
+
+                    shape.setPosition({(baseUnit*scene[i].X+camOffsetX)/zoomAMT+W/2, (baseUnit*scene[i].Y+camOffsetY)/zoomAMT+H/2});
+
+                    if(scene[i].collidedSAT==true&&debug==true){
+                        shape.setFillColor(sf::Color(0xff0000ff));
+                        scene[i].collidedSAT=false;
+                    }
+                    shape.setTexture(&scene[i].texture);
+
+                    window.draw(shape);
+                }else if(convexShapePoly(i)){
+                    sf::ConvexShape shape;
+                    shape.setPointCount(scene[i].points);
+
+                    for(int iP = 0; iP<scene[i].points;iP++){
+                        shape.setPoint(iP, sf::Vector2f((scene[i].pointList[iP*2]*baseUnit*scene[i].sizeModifier)/zoomAMT, (scene[i].pointList[iP*2+1]*baseUnit*scene[i].sizeModifier)/zoomAMT));
+                        //std::cout<<"x: "<<objects[i].pointList[iP*2]<<"\ny: "<<objects[i].pointList[iP*2+1]<<"\n";
+                    }
+
+
+                    shape.setPosition({(baseUnit*scene[i].X+camOffsetX)/zoomAMT+W/2, (baseUnit*scene[i].Y+camOffsetY)/zoomAMT+H/2});
+
+                    sf::Angle angle = sf::degrees(scene[i].rotation);
+                    shape.setRotation(angle);
+
+                    shape.setFillColor(sf::Color(scene[i].color));
+
+                    if(scene[i].collidedSAT==true&&debug==true){
+                        shape.setFillColor(sf::Color(0xff0000ff));
+                        scene[i].collidedSAT=false;
                     }
                     shape.setTexture(&objects[i].texture);
 
