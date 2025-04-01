@@ -48,6 +48,7 @@
         "sides": 0,
         "sizeModifier": 0.0,
         "solid": false,
+        "text": "lorium ipsum",
         "trigger": {
             "destroyO2": false,
             "event": "none",
@@ -60,8 +61,8 @@
         "width": 0.0
     },
     {
-        "X": 40.8555908203125,
-        "Y": 64.95804595947266,
+        "X": 14.152514457702637,
+        "Y": 57.6209716796875,
         "airRes": false,
         "coefficentOfFriction": 1.0,
         "color": 2863311615,
@@ -108,6 +109,7 @@
         "sides": 0,
         "sizeModifier": 0.0,
         "solid": true,
+        "text": "lorium ipsum",
         "trigger": {
             "destroyO2": false,
             "event": "none",
@@ -120,8 +122,8 @@
         "width": 546.4000244140625
     },
     {
-        "X": -75.18525695800781,
-        "Y": 30.232288360595703,
+        "X": -78.22138977050781,
+        "Y": 24.914403915405273,
         "airRes": true,
         "coefficentOfFriction": 1.0,
         "color": 2868838143,
@@ -168,6 +170,7 @@
         "sides": 0,
         "sizeModifier": 2.0,
         "solid": true,
+        "text": "lorium ipsum",
         "trigger": {
             "destroyO2": false,
             "event": "none",
@@ -180,8 +183,8 @@
         "width": 80.0
     },
     {
-        "X": -73.09663391113281,
-        "Y": 43.1817626953125,
+        "X": -78.7268295288086,
+        "Y": 33.50700759887695,
         "airRes": true,
         "coefficentOfFriction": 0.5,
         "color": 16777215,
@@ -228,6 +231,7 @@
         "sides": 0,
         "sizeModifier": 2.0,
         "solid": true,
+        "text": "lorium ipsum",
         "trigger": {
             "destroyO2": false,
             "event": "none",
@@ -288,6 +292,7 @@
         "sides": 4,
         "sizeModifier": 2.0,
         "solid": true,
+        "text": "lorium ipsum",
         "trigger": {
             "destroyO2": false,
             "event": "none",
@@ -348,6 +353,7 @@
         "sides": 3,
         "sizeModifier": 2.0,
         "solid": true,
+        "text": "lorium ipsum",
         "trigger": {
             "destroyO2": false,
             "event": "none",
@@ -360,8 +366,8 @@
         "width": 0.0
     },
     {
-        "X": 9.899999618530273,
-        "Y": 1.600000023841858,
+        "X": 47.89277267456055,
+        "Y": -53.920753479003906,
         "airRes": true,
         "coefficentOfFriction": 0.5,
         "color": 4294967295,
@@ -408,6 +414,7 @@
         "sides": 5,
         "sizeModifier": 3.0,
         "solid": true,
+        "text": "lorium ipsum",
         "trigger": {
             "destroyO2": false,
             "event": "none",
@@ -468,6 +475,7 @@
         "sides": 100,
         "sizeModifier": 3.0,
         "solid": true,
+        "text": "lorium ipsum",
         "trigger": {
             "destroyO2": false,
             "event": "none",
@@ -528,6 +536,7 @@
         "sides": 3,
         "sizeModifier": 4.0,
         "solid": true,
+        "text": "lorium ipsum",
         "trigger": {
             "destroyO2": false,
             "event": "none",
@@ -588,6 +597,7 @@
         "sides": 0,
         "sizeModifier": 2.0,
         "solid": true,
+        "text": "lorium ipsum",
         "trigger": {
             "destroyO2": false,
             "event": "none",
@@ -600,8 +610,8 @@
         "width": 0.0
     },
     {
-        "X": -64.1238784790039,
-        "Y": 0.98736572265625,
+        "X": -38.900001525878906,
+        "Y": -15.800000190734863,
         "airRes": true,
         "coefficentOfFriction": 1.0,
         "color": 2948583423,
@@ -648,6 +658,7 @@
         "sides": 100,
         "sizeModifier": 4.0,
         "solid": true,
+        "text": "lorium ipsum",
         "trigger": {
             "destroyO2": false,
             "event": "none",
@@ -660,8 +671,8 @@
         "width": 0.0
     },
     {
-        "X": -64.1238784790039,
-        "Y": 0.98736572265625,
+        "X": -64.5743179321289,
+        "Y": 2.1692748069763184,
         "airRes": true,
         "coefficentOfFriction": 0.5,
         "color": 4294967295,
@@ -708,6 +719,7 @@
         "sides": 100,
         "sizeModifier": 2.0,
         "solid": true,
+        "text": "lorium ipsum",
         "trigger": {
             "destroyO2": false,
             "event": "none",
@@ -720,8 +732,8 @@
         "width": 0.0
     },
     {
-        "X": -294.4447326660156,
-        "Y": -124.20747375488281,
+        "X": -68.30000305175781,
+        "Y": -38.400001525878906,
         "airRes": true,
         "coefficentOfFriction": 0.5,
         "color": 4294967295,
@@ -768,6 +780,7 @@
         "sides": 0,
         "sizeModifier": 0.0,
         "solid": true,
+        "text": "lorium ipsum",
         "trigger": {
             "destroyO2": false,
             "event": "none",
@@ -780,8 +793,8 @@
         "width": 0.0
     },
     {
-        "X": 22.0250244140625,
-        "Y": 34.8291130065918,
+        "X": 54.09999465942383,
+        "Y": -24.199993133544922,
         "airRes": true,
         "coefficentOfFriction": 1.0,
         "color": 4294967295,
@@ -828,6 +841,7 @@
         "sides": 4,
         "sizeModifier": 10.0,
         "solid": true,
+        "text": "lorium ipsum",
         "trigger": {
             "destroyO2": false,
             "event": "none",
@@ -840,8 +854,8 @@
         "width": 0.0
     },
     {
-        "X": -192.29196166992188,
-        "Y": 1.48974609375,
+        "X": -211.78237915039063,
+        "Y": -18.7015380859375,
         "airRes": false,
         "coefficentOfFriction": 0.0,
         "color": 16777130,
@@ -888,6 +902,7 @@
         "sides": 0,
         "sizeModifier": 2.0,
         "solid": false,
+        "text": "lorium ipsum",
         "trigger": {
             "destroyO2": false,
             "event": "destroy",

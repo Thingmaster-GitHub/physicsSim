@@ -80,6 +80,7 @@ struct object{
     //1 is player
     //2 is rectangle
     //3 genaric is convex polygon
+    //4 is text
     bool gravity=false;
     bool airRes=true;
     bool solid=true;
@@ -100,6 +101,7 @@ struct object{
     std::string loc= "blank.png";
     sf::Texture texture;
     int layer=0;
+    std::string text="lorium ipsum";
 
 };
 
@@ -172,6 +174,8 @@ class game{
                         mouseObject=i;
                     }
 
+                    //sets position of grabbed object
+                    //not how this should work
                     if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
                         if(objects[i].grabbed==true){
 
@@ -185,8 +189,8 @@ class game{
                         objects[i].grabbed=false;
                     }
                 }
-                for(int i = 0;i<0;i++){
-                    drawUI(window,objectLoadOrder[i],objects);
+                for(int i = 0;i<UI.size();i++){
+                    drawUI(window,objectLoadOrder[i],UI);
                 }
                 baseCollision();
                 //testingLayoutInf(window);
@@ -205,6 +209,13 @@ class game{
 
     private:
 
+        void createObject(){
+            object tmpObj //{objects[mouseObject].X,objects[mouseObject].Y,0,0,0,0,3,2,0,true,true,true,10,0xffffffff,0,5,0,{},false,false,false,{},{},1},
+            tmpObj.X=objects[mouseObject].X;
+            tmpObj.Y=objects[mouseObject].Y;
+            objets.push_back(tmpObj);
+            LayerObjects()
+        }
         //sets object load order for drawing
         void LayerObjects(){
             objectLoadOrder.clear();
@@ -303,7 +314,7 @@ class game{
                     {"rotation", obj.rotation}, {"sides", obj.sides}, {"sizeModifier", obj.sizeModifier},
                     {"objectType", obj.objectType}, {"gravity", obj.gravity},{"airRes", obj.airRes},{"solid",obj.solid}, {"mass", obj.mass},
                     {"color", obj.color}, {"width", obj.width}, {"height", obj.height},
-                    {"points", obj.points}, {"pointList", std::vector<float>(obj.pointList, obj.pointList + 30)},{"coefficentOfFriction",obj.coefficentOfFriction},{"layer",0},
+                    {"points", obj.points}, {"pointList", std::vector<float>(obj.pointList, obj.pointList + 30)},{"coefficentOfFriction",obj.coefficentOfFriction},{"layer",obj.layer},{"text",obj.text},
                             {"loc", obj.loc},
                             {"trigger", {
                                 {"id", obj.trigger.id},
@@ -360,6 +371,7 @@ class game{
                 obj.trigger.event = item["trigger"]["event"];
                 obj.trigger.destroyO2 = item["trigger"]["destroyO2"];
                 obj.trigger.typeReq = item["trigger"]["typeReq"];
+                obj.text=item["text"];
 
                 if (!obj.texture.loadFromFile(obj.loc)) {
                     std::cerr << "Failed to load texture: " << obj.loc << '\n';
@@ -395,20 +407,19 @@ class game{
             }
         }
         void drawUI(sf::RenderTarget& window,int i,std::vector<object>& scene){
-                if(circleShapePoly(i)){
+            if(circleShapePoly(i)){
 
 
-                    sf::CircleShape shape((baseUnit*scene[i].sizeModifier*2),scene[i].sides);
+                sf::CircleShape shape((baseUnit*scene[i].sizeModifier*2),scene[i].sides);
 
-                    shape.setOrigin({(baseUnit*scene[i].sizeModifier*2), (baseUnit*scene[i].sizeModifier*2)});
+                shape.setOrigin({(baseUnit*scene[i].sizeModifier*2), (baseUnit*scene[i].sizeModifier*2)});
 
-                    shape.setFillColor(sf::Color(scene[i].color));
+                shape.setFillColor(sf::Color(scene[i].color));
 
-                    sf::Angle angle = sf::degrees(scene[i].rotation);
-                    shape.setRotation(angle);
+                sf::Angle angle = sf::degrees(scene[i].rotation);
+                shape.setRotation(angle);
 
-                    shape.setPosition({(baseUnit*scene[i].X)+W/2, (baseUnit*scene[i].Y)+H/2});
-
+                shape.setPosition({(baseUnit*scene[i].X)+W/2, (baseUnit*scene[i].Y)+H/2});
 
                     if(scene[i].collidedSAT==true&&debug==true){
                         shape.setFillColor(sf::Color(0xff0000ff));
