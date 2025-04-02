@@ -11,7 +11,7 @@ const int H = 768;
 int objectCount =15;
 float baseUnit = (W/128+H/72)/2;
 
-bool debug = true;
+bool debug = false;
 
 bool physics = true;
 
@@ -216,51 +216,93 @@ class game{
         }
 
     private:
+        //handles keyboard inputs
         void input(const sf::Keyboard::Scan key){
-            //objects[mouseObject].grabbed=false;
             if(key==sf::Keyboard::Scancode::Equal){
                 createObject();
-            }else if(key==sf::Keyboard::Scancode::Num1){
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LControl)){
+            }else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LControl)){
+                if(key==sf::Keyboard::Scancode::Num1){
+
                     for(int i=0; i<objectCount;i++){
                         if(objects[i].grabbed==true){
                             objects[i].objectType=0;
+                            objects[i].color=4294967295;
+                            objects[i].sides=3;
                         }
                     }
-                }
-            }else if(key==sf::Keyboard::Scancode::Num2){
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LControl)){
-                    for(int i=0; i<objectCount;i++){
-                        if(objects[i].grabbed==true){
-                            objects[i].objectType=1;
-                        }
+                }else if(key==sf::Keyboard::Scancode::Num2){
+                        for(int i=0; i<objectCount;i++){
+                            if(objects[i].grabbed==true){
+                                objects[i].objectType=1;
+                                objects[i].color=4278255615;
+                                objects[i].sides=4;
+                            }
                     }
-                }
-            }else if(key==sf::Keyboard::Scancode::Num3){
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LControl)){
-                    for(int i=0; i<objectCount;i++){
-                        if(objects[i].grabbed==true){
-                            objects[i].objectType=2;
-                            objects[i].width=20;
-                            objects[i].height=10;
+                }else if(key==sf::Keyboard::Scancode::Num3){
+                        for(int i=0; i<objectCount;i++){
+                            if(objects[i].grabbed==true){
+                                objects[i].objectType=2;
+                                objects[i].width=20;
+                                objects[i].height=10;
+                                objects[i].color=4294967295;
+                            }
                         }
-                    }
-                }
-            }else if(key==sf::Keyboard::Scancode::Num4){
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LControl)){
-                    for(int i=0; i<objectCount;i++){
-                        if(objects[i].grabbed==true){
-                            objects[i].objectType=3;
+                }else if(key==sf::Keyboard::Scancode::Num4){
+                        for(int i=0; i<objectCount;i++){
+                            if(objects[i].grabbed==true){
+                                objects[i].objectType=3;
+                                objects[i].points=7;
+
+                                objects[i].pointList[0]=1.8942855596542358;
+                                objects[i].pointList[1]=4.548571586608887;
+                                objects[i].pointList[2]=2.6942856311798096;
+                                objects[i].pointList[3]=0.2485712170600891;
+                                objects[i].pointList[4]=2.1942856311798096;
+                                objects[i].pointList[5]=-1.3714287281036377;
+                                objects[i].pointList[6]=-0.5857136845588684;
+                                objects[i].pointList[7]=-3.4514284133911133;
+                                objects[i].pointList[8]=-1.6557143926620483;
+                                objects[i].pointList[9]=-2.4514284133911133;
+                                objects[i].pointList[10]=-2.52571439743042;
+                                objects[i].pointList[11]=0.26857125759124756;
+                                objects[i].pointList[12]=-2.015714406967163;
+                                objects[i].pointList[13]=2.208571434020996;
+
+
+                                objects[i].color=16711935;
+
+                                float X=0;
+                                float Y=0;
+                                for(int iP=0;iP<objects[i].points;iP++){
+                                    X += objects[i].pointList[iP*2];
+                                    Y += objects[i].pointList[iP*2+1];
+
+                                }
+                                X/=objects[i].points;
+                                Y/=objects[i].points;
+
+                                for(int iP=0;iP<objects[i].points;iP++){
+
+                                    objects[i].pointList[iP*2]-=X;
+                                    objects[i].pointList[iP*2+1]-=Y;
+
+                                }
+                            }
                         }
-                    }
-                }
-            }else if(key==sf::Keyboard::Scancode::Num5){
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LControl)){
-                    for(int i=0; i<objectCount;i++){
-                        if(objects[i].grabbed==true){
-                            objects[i].objectType=3;
+                }else if(key==sf::Keyboard::Scancode::Num5){
+                        for(int i=0; i<objectCount;i++){
+                            if(objects[i].grabbed==true){
+                                objects[i].objectType=4;
+                            }
                         }
-                    }
+                }else if(key==sf::Keyboard::Scancode::I){
+                        for(int i=0;i<objectCount;i++){
+                            if(objects[i].grabbed==true){
+                                objects[i].gravity=false;
+                                objects[i].mass=-1;
+                                objects[i].color=0x777777ff;
+                            }
+                        }
                 }
             }
         }
