@@ -11,7 +11,7 @@ const int H = 768;
 int objectCount =15;
 float baseUnit = (W/128+H/72)/2;
 
-bool debug = false;
+bool debug = true;
 
 bool physics = true;
 
@@ -100,6 +100,7 @@ struct object{
     triggerProperties trigger = {};
     std::string loc= "blank.png";
     sf::Texture texture;
+    returnXY offset = {0,0};
     int layer=0;
     std::string text="lorium ipsum";
 
@@ -137,11 +138,14 @@ class game{
                         window.close();
                     } else if (const auto* mouseWheelScrolled = event->getIf<sf::Event::MouseWheelScrolled>())
                     {
+
                         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LControl)){
                             zoom(mouseWheelScrolled->delta);
                         }else{
                             rotateObj(mouseWheelScrolled->delta);
                         }
+                    }else if(const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()){
+                        input(keyPressed->scancode);
                     }
 
 
@@ -179,13 +183,17 @@ class game{
                     if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
                         if(objects[i].grabbed==true){
 
-                                objects[i].X=objects[mouseObject].X;
-                                objects[i].Y=objects[mouseObject].Y;
+                                objects[i].X=objects[mouseObject].X-objects[i].offset.x;
+                                objects[i].Y=objects[mouseObject].Y-objects[i].offset.y;
                                 drawOutline(window,i);
-
+                                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Delete)){
+                                    deleteObject(i);
+                                }
 
                         }
                     }else{
+                        objects[i].offset.x=0;
+                        objects[i].offset.y=0;
                         objects[i].grabbed=false;
                     }
                 }
@@ -204,17 +212,75 @@ class game{
                 }
             }
             saveObjectsJSON(objects,"save.json");
-            saveObjectsJSON(UI,"UI.json");
+            //saveObjectsJSON(UI,"UI.json");
         }
 
     private:
+        void input(const sf::Keyboard::Scan key){
+            //objects[mouseObject].grabbed=false;
+            if(key==sf::Keyboard::Scancode::Equal){
+                createObject();
+            }else if(key==sf::Keyboard::Scancode::Num1){
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LControl)){
+                    for(int i=0; i<objectCount;i++){
+                        if(objects[i].grabbed==true){
+                            objects[i].objectType=0;
+                        }
+                    }
+                }
+            }else if(key==sf::Keyboard::Scancode::Num2){
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LControl)){
+                    for(int i=0; i<objectCount;i++){
+                        if(objects[i].grabbed==true){
+                            objects[i].objectType=1;
+                        }
+                    }
+                }
+            }else if(key==sf::Keyboard::Scancode::Num3){
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LControl)){
+                    for(int i=0; i<objectCount;i++){
+                        if(objects[i].grabbed==true){
+                            objects[i].objectType=2;
+                            objects[i].width=20;
+                            objects[i].height=10;
+                        }
+                    }
+                }
+            }else if(key==sf::Keyboard::Scancode::Num4){
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LControl)){
+                    for(int i=0; i<objectCount;i++){
+                        if(objects[i].grabbed==true){
+                            objects[i].objectType=3;
+                        }
+                    }
+                }
+            }else if(key==sf::Keyboard::Scancode::Num5){
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LControl)){
+                    for(int i=0; i<objectCount;i++){
+                        if(objects[i].grabbed==true){
+                            objects[i].objectType=3;
+                        }
+                    }
+                }
+            }
+        }
+        //deletes object
+        void deleteObject(int i){
 
+            objects.erase(objects.begin() + i);
+            objectCount--;
+        }
+        //creates object
         void createObject(){
-            object tmpObj //{objects[mouseObject].X,objects[mouseObject].Y,0,0,0,0,3,2,0,true,true,true,10,0xffffffff,0,5,0,{},false,false,false,{},{},1},
+            object tmpObj; //{objects[mouseObject].X,objects[mouseObject].Y,0,0,0,0,3,2,0,true,true,true,10,0xffffffff,0,5,0,{},false,false,false,{},{},1}
+            tmpObj.sides=3;
+            tmpObj.mass=10;
+            tmpObj.gravity=true;
             tmpObj.X=objects[mouseObject].X;
             tmpObj.Y=objects[mouseObject].Y;
-            objets.push_back(tmpObj);
-            LayerObjects()
+            objects.push_back(tmpObj);
+            objectCount++;
+            LayerObjects();
         }
         //sets object load order for drawing
         void LayerObjects(){
@@ -1246,9 +1312,17 @@ class game{
             if(objects[o1].objectType==-1||objects[o2].objectType==-1){
                 if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
                     if(objects[o1].objectType==-1){
+                        if(objects[o2].offset.x==0){
                         objects[o2].grabbed=true;
+                        objects[o2].offset.x=objects[o1].X-objects[o2].X;
+                        objects[o2].offset.y=objects[o1].Y-objects[o2].Y;
+                        }
                     }else{
+                        if(objects[o1].offset.x==0){
                         objects[o1].grabbed=true;
+                        objects[o1].offset.x=objects[o2].X-objects[o1].X;
+                        objects[o1].offset.y=objects[o2].Y-objects[o1].Y;
+                        }
                     }
                 }
             }
