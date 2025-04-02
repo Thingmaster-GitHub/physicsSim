@@ -92,6 +92,8 @@ struct object{
     triggerProperties trigger = {};
     std::string loc= "blank.png";
     sf::Texture texture;
+    int layer=0;
+    std::string text = "lorium ipsum";
 
 };
 std::vector<object> objects;
@@ -296,6 +298,8 @@ private:
             obj.trigger.event = item["trigger"]["event"];
             obj.trigger.destroyO2 = item["trigger"]["destroyO2"];
             obj.trigger.typeReq = item["trigger"]["typeReq"];
+            obj.text=item["text"];
+            obj.layer = item["layer"];
 
             if (!obj.texture.loadFromFile(obj.loc)) {
                 std::cerr << "Failed to load texture: " << obj.loc << '\n';
