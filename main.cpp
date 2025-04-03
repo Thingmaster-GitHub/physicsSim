@@ -8,7 +8,7 @@
 #include <SFML/Graphics.hpp>
 const int W = 1366;
 const int H = 768;
-const int objectCount = 15;
+int objectCount = 0;
 const float baseUnit = (W/128+H/72)/2;
 
 bool debug =    false;
@@ -104,7 +104,7 @@ public:
     void run(){
 
         returnXY p;
-        loadObjectsJSON(objects,"save.json");
+        objectCount = loadObjectsJSON(objects,"save.json");
 
         using std::chrono::duration_cast;
         using std::chrono::nanoseconds;
@@ -258,11 +258,11 @@ public:
     }
 
 private:
-    void loadObjectsJSON(std::vector<object>& objectsVect, const std::string& filename) {
+    int loadObjectsJSON(std::vector<object>& objectsVect, const std::string& filename) {
         std::ifstream file(filename);
         if (!file) {
             std::cerr << "Error opening JSON file!\n";
-            return;
+            return 0;
         }
 
         nlohmann::json j;
@@ -308,7 +308,7 @@ private:
             obj.Y*=baseUnit;
             objectsVect.push_back(obj);
         }
-
+        return objectsVect.size();
 
     }
     void trigger(int o1,int o2){
