@@ -103,7 +103,8 @@ struct object{
     returnXY offset = {0,0};
     int layer=0;
     std::string text="lorium ipsum";
-
+    bool selected=false;
+    bool clicked =false;
 };
 
 std::vector<object> objects;
@@ -116,6 +117,11 @@ class game{
         //runs program :3
         void run(){
             loadObjectsJSON(UI,"UI.json");
+            for(int i=0;i<UI.size();i++){
+                if (!UI[i].texture.loadFromFile(UI[i].loc)){
+                    //throw error or something
+                }
+            }
             objectCount = loadObjectsJSON(objects,"save.json");
             initialize();
 
@@ -157,6 +163,16 @@ class game{
                 // I'm too lazy to make this better
                 sf::Vector2i pos = sf::Mouse::getPosition(window);
                 Camera(mouseObject,pos);
+
+                //check for clicked object
+                bool clickQ =false;
+                for(int i=0;i<objectCount;i++){
+                    if(objects[i].clicked==true){
+                        clickQ=true;
+                    }
+                }
+                //this should be somwhere else ^
+                //need to handle mouse inputs from events
 
                 //draws all shapes+transformations
                 for(int i = 0; i<objectCount;i++){
@@ -200,7 +216,10 @@ class game{
                 for(int i = 0;i<UI.size();i++){
                     drawUI(window,objectLoadOrder[i],UI);
                 }
+
+
                 baseCollision();
+                //probably should be in mouse events ^
                 //testingLayoutInf(window);
                 window.display();
 
@@ -1356,12 +1375,16 @@ class game{
                     if(objects[o1].objectType==-1){
                         if(objects[o2].offset.x==0){
                         objects[o2].grabbed=true;
+                        objects[o2].selected=true;
+                        objects[o2].clicked=true;
                         objects[o2].offset.x=objects[o1].X-objects[o2].X;
                         objects[o2].offset.y=objects[o1].Y-objects[o2].Y;
                         }
                     }else{
                         if(objects[o1].offset.x==0){
                         objects[o1].grabbed=true;
+                        objects[o1].selected=true;
+                        objects[o1].clicked=true;
                         objects[o1].offset.x=objects[o2].X-objects[o1].X;
                         objects[o1].offset.y=objects[o2].Y-objects[o1].Y;
                         }
