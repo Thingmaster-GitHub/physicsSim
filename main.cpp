@@ -152,8 +152,8 @@ class game{
                     }else if(const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()){
                         input(keyPressed->scancode);
                     }else if (const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){
-                        if (mouseButtonPressed->button == sf::Mouse::Button::Right){
-
+                        if (mouseButtonPressed->button == sf::Mouse::Button::Left){
+                            Lclick();
                         }
                     }
                     //use this for text input!
@@ -173,16 +173,6 @@ class game{
                 // I'm too lazy to make this better
                 sf::Vector2i pos = sf::Mouse::getPosition(window);
                 Camera(mouseObject,pos);
-
-                //check for clicked object
-                bool clickQ =false;
-                for(int i=0;i<objectCount;i++){
-                    if(objects[i].clicked==true){
-                        clickQ=true;
-                    }
-                }
-                //this should be somwhere else ^
-                //need to handle mouse inputs from events
 
                 //draws all shapes+transformations
                 for(int i = 0; i<objectCount;i++){
@@ -204,14 +194,18 @@ class game{
                         mouseObject=i;
                     }
 
-                    //sets position of grabbed object
-                    //not how this should work
+
+                    //draws outline of selected object
+                    if(objects[i].selected){
+                        drawOutline(window,i);
+                    }
+                    //sets position of grabbd object
                     if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
                         if(objects[i].grabbed==true){
 
                                 objects[i].X=objects[mouseObject].X-objects[i].offset.x;
                                 objects[i].Y=objects[mouseObject].Y-objects[i].offset.y;
-                                drawOutline(window,i);
+
                                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Delete)){
                                     deleteObject(i);
                                 }
@@ -227,8 +221,8 @@ class game{
                     drawUI(window,objectLoadOrder[i],UI);
                 }
 
+                //baseCollision moved to Lclick
 
-                baseCollision();
                 //probably should be in mouse events ^
                 //testingLayoutInf(window);
                 window.display();
@@ -245,6 +239,100 @@ class game{
         }
 
     private:
+        void Lclick(){
+
+            baseCollision();
+            //check for clicked object
+            int clickQ = 0;
+            int queriedTrue=0;
+            for(int i=0;i<objectCount;i++){
+                if(objects[i].clicked){
+                    clickQ++;
+                    queriedTrue=i;
+                }
+            }
+            if(clickQ<1){
+                for(int i=0;i<objectCount;i++){
+                    objects[i].selected=false;
+                }
+            }else if(clickQ=1){
+                if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LShift)){
+                    objects[queriedTrue].selected=true;
+                    objects[queriedTrue].grabbed=true;
+                    objects[queriedTrue].offset.x=objects[mouseObject].X-objects[queriedTrue].X;
+                    objects[queriedTrue].offset.y=objects[mouseObject].Y-objects[queriedTrue].Y;
+                }else{
+                    if(objects[queriedTrue].selected==false){
+                        for(int i=0;i<objectCount;i++){
+                            objects[i].selected=false;
+                        }
+                        objects[queriedTrue].selected=true;
+                        objects[queriedTrue].grabbed=true;
+                        objects[queriedTrue].offset.x=objects[mouseObject].X-objects[queriedTrue].X;
+                        objects[queriedTrue].offset.y=objects[mouseObject].Y-objects[queriedTrue].Y;
+                    }else{
+                        for(int i=0;i<objectCount;i++){
+                            if(objects[i].selected==true){
+                                objects[i].grabbed=true;
+                                objects[i].offset.x=objects[mouseObject].X-objects[i].X;
+                                objects[i].offset.y=objects[mouseObject].Y-objects[i].Y;
+                            }
+                        }
+
+                    }
+
+                }
+            }else if(clickQ>1){
+                if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LShift)){
+                    //selects top object
+                    for(int i=0;i<objectCount;i++){
+                        if(objects[objectLoadOrder[i]].clicked){
+                            queriedTrue=objectLoadOrder[i];
+                        }
+                    }
+                    objects[queriedTrue].grabbed=true;
+                    objects[queriedTrue].offset.x=objects[mouseObject].X-objects[queriedTrue].X;
+                    objects[queriedTrue].offset.y=objects[mouseObject].Y-objects[queriedTrue].Y;
+                    objects[queriedTrue].selected=true;
+                }else{
+                    //finds top object
+                    for(int i=0;i<objectCount;i++){
+                        if(objects[objectLoadOrder[i]].clicked){
+                            queriedTrue=objectLoadOrder[i];
+                        }
+                    }
+                    //checks if
+                    if(objects[queriedTrue].selected==false){
+                        //deselects all
+                        for(int i=0;i<objectCount;i++){
+                            objects[i].selected=false;
+                        }
+
+                        objects[queriedTrue].grabbed=true;
+                        objects[queriedTrue].offset.x=objects[mouseObject].X-objects[queriedTrue].X;
+                        objects[queriedTrue].offset.y=objects[mouseObject].Y-objects[queriedTrue].Y;
+                        objects[queriedTrue].selected=true;
+                    }else{
+                        //sets selected objects to grabbed
+                        for(int i=0;i<objectCount;i++){
+                            if(objects[i].selected==true){
+                                objects[i].grabbed=true;
+                                objects[i].offset.x=objects[mouseObject].X-objects[i].X;
+                                objects[i].offset.y=objects[mouseObject].Y-objects[i].Y;
+                            }
+                        }
+                    }
+
+
+
+                }
+            }
+            //resets clicked values
+            for(int i=0;i<objectCount;i++){
+                objects[i].clicked=false;
+            }
+            std::cout<<"ran\n";
+        }
         //handles keyboard inputs
         void input(const sf::Keyboard::Scan key){
             if(key==sf::Keyboard::Scancode::Equal){
@@ -255,7 +343,9 @@ class game{
                     for(int i=0; i<objectCount;i++){
                         if(objects[i].grabbed==true){
                             objects[i].objectType=0;
-                            objects[i].color=4294967295;
+                            if(objects[i].mass!=-1){
+                                objects[i].color=4294967295;
+                            }
                             objects[i].sides=3;
                         }
                     }
@@ -263,7 +353,9 @@ class game{
                         for(int i=0; i<objectCount;i++){
                             if(objects[i].grabbed==true){
                                 objects[i].objectType=1;
-                                objects[i].color=4278255615;
+                                if(objects[i].mass!=-1){
+                                    objects[i].color=4278255615;
+                                }
                                 objects[i].sides=4;
                             }
                     }
@@ -273,13 +365,17 @@ class game{
                                 objects[i].objectType=2;
                                 objects[i].width=20;
                                 objects[i].height=10;
-                                objects[i].color=4294967295;
+
+                                if(objects[i].mass!=-1){
+                                    objects[i].color=4294967295;
+                                }
                             }
                         }
                 }else if(key==sf::Keyboard::Scancode::Num4){
                         for(int i=0; i<objectCount;i++){
                             if(objects[i].grabbed==true){
                                 objects[i].objectType=3;
+
                                 objects[i].points=7;
 
                                 objects[i].pointList[0]=1.8942855596542358;
@@ -298,8 +394,9 @@ class game{
                                 objects[i].pointList[13]=2.208571434020996;
 
 
+                                if(objects[i].mass!=-1){
                                 objects[i].color=16711935;
-
+                                }
                                 float X=0;
                                 float Y=0;
                                 for(int iP=0;iP<objects[i].points;iP++){
@@ -427,8 +524,6 @@ class game{
             std::cout<<zoomAMT<<"\n";
         }
         //draws outline
-        //window RenderWindow
-        //i index of object
         void drawOutline(sf::RenderTarget& window,int i){
             sf::VertexArray outline(sf::PrimitiveType::LineStrip,5);
 
@@ -543,6 +638,7 @@ class game{
                 }
             }
         }
+        //draws UI
         void drawUI(sf::RenderTarget& window,int i,std::vector<object>& scene){
             if(circleShapePoly(i)){
 
@@ -1384,16 +1480,16 @@ class game{
                 if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
                     if(objects[o1].objectType==-1){
                         if(objects[o2].offset.x==0){
-                        objects[o2].grabbed=true;
-                        objects[o2].selected=true;
+                        //objects[o2].grabbed=true;
+                        //objects[o2].selected=true;
                         objects[o2].clicked=true;
                         objects[o2].offset.x=objects[o1].X-objects[o2].X;
                         objects[o2].offset.y=objects[o1].Y-objects[o2].Y;
                         }
                     }else{
                         if(objects[o1].offset.x==0){
-                        objects[o1].grabbed=true;
-                        objects[o1].selected=true;
+                        //objects[o1].grabbed=true;
+                        //objects[o1].selected=true;
                         objects[o1].clicked=true;
                         objects[o1].offset.x=objects[o2].X-objects[o1].X;
                         objects[o1].offset.y=objects[o2].Y-objects[o1].Y;
