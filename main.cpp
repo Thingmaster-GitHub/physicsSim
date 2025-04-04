@@ -142,8 +142,7 @@ class game{
 
                     if (event->is<sf::Event::Closed>()){
                         window.close();
-                    } else if (const auto* mouseWheelScrolled = event->getIf<sf::Event::MouseWheelScrolled>())
-                    {
+                    } else if (const auto* mouseWheelScrolled = event->getIf<sf::Event::MouseWheelScrolled>()){
 
                         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LControl)){
                             zoom(mouseWheelScrolled->delta);
@@ -152,6 +151,17 @@ class game{
                         }
                     }else if(const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()){
                         input(keyPressed->scancode);
+                    }else if (const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){
+                        if (mouseButtonPressed->button == sf::Mouse::Button::Right){
+
+                        }
+                    }
+                    //use this for text input!
+                    //IDK how I'll use this yet, but it'll sure be usefull!
+                    if (const auto* textEntered = event->getIf<sf::Event::TextEntered>())
+                    {
+                        if (textEntered->unicode < 128)
+                            std::cout << "ASCII character typed: " << static_cast<char>(textEntered->unicode) << std::endl;
                     }
 
 
