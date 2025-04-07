@@ -31,6 +31,8 @@ float initMY;
 
 const bool wrap = false;//don't enable with centered camera.
 
+std::string cursorMode = "select";
+
 int mouseObject;
 float coefficientOfRestitution=0.6;
 struct returnXY{
@@ -252,8 +254,10 @@ class game{
                 }
             }
             if(clickQ<1){
-                for(int i=0;i<objectCount;i++){
-                    objects[i].selected=false;
+                if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LShift)==false){
+                    for(int i=0;i<objectCount;i++){
+                        objects[i].selected=false;
+                    }
                 }
             }else if(clickQ=1){
                 if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LShift)){
@@ -331,25 +335,25 @@ class game{
             for(int i=0;i<objectCount;i++){
                 objects[i].clicked=false;
             }
-            std::cout<<"ran\n";
         }
         //handles keyboard inputs
         void input(const sf::Keyboard::Scan key){
             if(key==sf::Keyboard::Scancode::Equal){
                 createObject();
-            }else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LControl)){
-                if(key==sf::Keyboard::Scancode::Num1){
+            }else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LControl||sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::RControl)){
+                if(cursorMode=="select"){
+                    if(key==sf::Keyboard::Scancode::Num1){
 
-                    for(int i=0; i<objectCount;i++){
-                        if(objects[i].grabbed==true){
-                            objects[i].objectType=0;
-                            if(objects[i].mass!=-1){
-                                objects[i].color=4294967295;
+                        for(int i=0; i<objectCount;i++){
+                            if(objects[i].grabbed==true){
+                                objects[i].objectType=0;
+                                if(objects[i].mass!=-1){
+                                    objects[i].color=4294967295;
+                                }
+                                objects[i].sides=3;
                             }
-                            objects[i].sides=3;
                         }
-                    }
-                }else if(key==sf::Keyboard::Scancode::Num2){
+                    }else if(key==sf::Keyboard::Scancode::Num2){
                         for(int i=0; i<objectCount;i++){
                             if(objects[i].grabbed==true){
                                 objects[i].objectType=1;
@@ -358,8 +362,8 @@ class game{
                                 }
                                 objects[i].sides=4;
                             }
-                    }
-                }else if(key==sf::Keyboard::Scancode::Num3){
+                        }
+                    }else if(key==sf::Keyboard::Scancode::Num3){
                         for(int i=0; i<objectCount;i++){
                             if(objects[i].grabbed==true){
                                 objects[i].objectType=2;
@@ -371,7 +375,7 @@ class game{
                                 }
                             }
                         }
-                }else if(key==sf::Keyboard::Scancode::Num4){
+                    }else if(key==sf::Keyboard::Scancode::Num4){
                         for(int i=0; i<objectCount;i++){
                             if(objects[i].grabbed==true){
                                 objects[i].objectType=3;
@@ -395,7 +399,7 @@ class game{
 
 
                                 if(objects[i].mass!=-1){
-                                objects[i].color=16711935;
+                                    objects[i].color=16711935;
                                 }
                                 float X=0;
                                 float Y=0;
@@ -415,21 +419,26 @@ class game{
                                 }
                             }
                         }
-                }else if(key==sf::Keyboard::Scancode::Num5){
+                    }else if(key==sf::Keyboard::Scancode::Num5){
                         for(int i=0; i<objectCount;i++){
                             if(objects[i].grabbed==true){
                                 objects[i].objectType=4;
                             }
                         }
-                }else if(key==sf::Keyboard::Scancode::I){
+                    }else if(key==sf::Keyboard::Scancode::I){
                         for(int i=0;i<objectCount;i++){
                             if(objects[i].grabbed==true){
                                 objects[i].gravity=false;
                                 objects[i].mass=-1;
-                                objects[i].color=0x777777ff;
+                                objects[i].color=0x2a2e32ff;
                             }
                         }
+                    }
                 }
+            }else if(key==sf::Keyboard::Scancode::S){
+                cursorMode="select";
+            }else if(key==sf::Keyboard::Scancode::E){
+                cursorMode="edit";
             }
         }
         //deletes object
