@@ -226,7 +226,9 @@ class game{
                 }
                 if(cursorMode=="edit"){
                     for(int i=0;i<objectCount;i++){
-                        drawPoints(window,objectLoadOrder[i]);
+                        if(objects[i].selected){
+                            drawPoints(window,objectLoadOrder[i]);
+                        }
                     }
                 }
 
@@ -247,6 +249,20 @@ class game{
         }
 
     private:
+        //returns the distance to nearest corner of specified shape
+        float cornerDistCheck(int o){
+            check=std::numeric_limits<float>::infinity()
+            for(int i=0;i<pointCount(o);i++){
+                returnXY position = {(baseUnit*objects[mouseObject].X+camOffsetX)/zoomAMT+W/2, (baseUnit*objects[mouseObject].Y+camOffsetY)/zoomAMT+H/2};
+
+                float distance=sqrt(square((point.x+baseUnit*objects[o].X+camOffsetX)/zoomAMT+W/2-position.x)+square((point.y+baseUnit*objects[o].Y+camOffsetY)/zoomAMT+H/2-position.y));
+
+                if(distance<=check){
+                    check=distance;
+                }
+            }
+            return check;
+        }
         //apply this in more places pls
         //should've written this earlier
         //gets point count of index
@@ -262,10 +278,11 @@ class game{
             }
         }
         void drawPoints(sf::RenderTarget& window,int o){
-            sf::CircleShape pointNotButter(8,20);
-            pointNotButter.setOrigin({8,8});
-            pointNotButter.setOutlineColor(sf::Color(25,25,25));
-            pointNotButter.setOutlineThickness(3.f);
+            sf::CircleShape pointNotButter(6,4);
+            pointNotButter.setOrigin({6,6});
+            pointNotButter.setOutlineColor(sf::Color(0,0,0));
+            pointNotButter.setOutlineThickness(2.f);
+            pointNotButter.setRotation(sf::degrees(45));
 
             for(int i=0;i<pointCount(o);i++){
                 returnXY point = angleOffset(o,i);
@@ -273,13 +290,14 @@ class game{
 
 
 
-                returnXY position = {(baseUnit*objects[i].X+camOffsetX)/zoomAMT+W/2, (baseUnit*objects[i].Y+camOffsetY)/zoomAMT+H/2};
+                returnXY position = {(baseUnit*objects[mouseObject].X+camOffsetX)/zoomAMT+W/2, (baseUnit*objects[mouseObject].Y+camOffsetY)/zoomAMT+H/2};
 
-                if(sqrt(square((point.x+baseUnit*objects[o].X+camOffsetX)/zoomAMT+W/2-position.x)+square((point.y+baseUnit*objects[o].Y+camOffsetY)/zoomAMT+H/2-position.y))<4){
-                    pointNotButter.setFillColor(sf::Color(200,200,200));
+                if(sqrt(square((point.x+baseUnit*objects[o].X+camOffsetX)/zoomAMT+W/2-position.x)+square((point.y+baseUnit*objects[o].Y+camOffsetY)/zoomAMT+H/2-position.y))<10){
+                    pointNotButter.setFillColor(sf::Color(100,100,100));
                 }else{
                     pointNotButter.setFillColor(sf::Color(255,255,255));
                 }
+                //pointNotButter.setPosition({position.x , position.y});
 
 
 
@@ -288,7 +306,7 @@ class game{
         }
         //left click
         void Lclick(){
-            if(cursorMode=="select"){
+
                 baseCollision();
                 //check for clicked object
                 int clickQ = 0;
@@ -308,7 +326,9 @@ class game{
                 }else if(clickQ=1){
                     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LShift)){
                         objects[queriedTrue].selected=true;
-                        objects[queriedTrue].grabbed=true;
+                        if(cursorMode=="select"){
+                            objects[queriedTrue].grabbed=true;
+                        }
                         objects[queriedTrue].offset.x=objects[mouseObject].X-objects[queriedTrue].X;
                         objects[queriedTrue].offset.y=objects[mouseObject].Y-objects[queriedTrue].Y;
                     }else{
@@ -317,13 +337,17 @@ class game{
                                 objects[i].selected=false;
                             }
                             objects[queriedTrue].selected=true;
-                            objects[queriedTrue].grabbed=true;
+                            if(cursorMode=="select"){
+                                objects[queriedTrue].grabbed=true;
+                            }
                             objects[queriedTrue].offset.x=objects[mouseObject].X-objects[queriedTrue].X;
                             objects[queriedTrue].offset.y=objects[mouseObject].Y-objects[queriedTrue].Y;
                         }else{
                             for(int i=0;i<objectCount;i++){
                                 if(objects[i].selected==true){
-                                    objects[i].grabbed=true;
+                                    if(cursorMode=="select"){
+                                        objects[i].grabbed=true;
+                                    }
                                     objects[i].offset.x=objects[mouseObject].X-objects[i].X;
                                     objects[i].offset.y=objects[mouseObject].Y-objects[i].Y;
                                 }
@@ -381,7 +405,7 @@ class game{
                 for(int i=0;i<objectCount;i++){
                     objects[i].clicked=false;
                 }
-            }
+
         }
         //handles keyboard inputs
         void input(const sf::Keyboard::Scan key){
