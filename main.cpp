@@ -253,14 +253,19 @@ class game{
         float cornerDistCheck(int o){
             float check=std::numeric_limits<float>::infinity();
             for(int i=0;i<pointCount(o);i++){
-                returnXY position = {(baseUnit*objects[mouseObject].X+camOffsetX)/zoomAMT+W/2, (baseUnit*objects[mouseObject].Y+camOffsetY)/zoomAMT+H/2};
 
                 returnXY point = angleOffset(o,i);
 
-                float distance=sqrt(square((point.x+baseUnit*objects[o].X+camOffsetX)/zoomAMT+W/2-position.x)+square((point.y+baseUnit*objects[o].Y+camOffsetY)/zoomAMT+H/2-position.y));
+                returnXY pointXY = {(point.x+baseUnit*objects[o].X+camOffsetX)/zoomAMT+W/2 ,(point.y+baseUnit*objects[o].Y+camOffsetY)/zoomAMT+H/2};
+
+                returnXY position ={(baseUnit*objects[mouseObject].X+camOffsetX)/zoomAMT+W/2,(baseUnit*objects[mouseObject].Y+camOffsetY)/zoomAMT+H/2};
+
+
+                float distance=sqrt(square(pointXY.x-position.x)+square(pointXY.y-position.y));
 
                 if(distance<=check){
                     check=distance;
+
                 }
             }
             return check;
@@ -319,6 +324,21 @@ class game{
                         queriedTrue=i;
                     }
                 }
+
+                //for editing points to work on overlaping shapes
+                int queriedPointSelected = 0;
+                bool pointSelected = false;
+
+                if(cursorMode=="edit"){
+                    for(int i=0;i<objectCount;i++){
+                        if(objects[objectLoadOrder[i]].selected){
+                            if(cornerDistCheck(objectLoadOrder[i])<10){
+                                pointSelected=true;
+                                queriedPointSelected=objectLoadOrder[i];
+                            }
+                        }
+                    }
+                }
                 if(clickQ<1){
                     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LShift)==false){
                         for(int i=0;i<objectCount;i++){
@@ -361,40 +381,44 @@ class game{
                 }else if(clickQ>1){
                     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LShift)){
                         //selects top object
-                        for(int i=0;i<objectCount;i++){
-                            if(objects[objectLoadOrder[i]].clicked){
-                                queriedTrue=objectLoadOrder[i];
-                            }
-                        }
-                        objects[queriedTrue].grabbed=true;
-                        objects[queriedTrue].offset.x=objects[mouseObject].X-objects[queriedTrue].X;
-                        objects[queriedTrue].offset.y=objects[mouseObject].Y-objects[queriedTrue].Y;
-                        objects[queriedTrue].selected=true;
-                    }else{
-                        //finds top object
-                        for(int i=0;i<objectCount;i++){
-                            if(objects[objectLoadOrder[i]].clicked){
-                                queriedTrue=objectLoadOrder[i];
-                            }
-                        }
-                        //checks if
-                        if(objects[queriedTrue].selected==false){
-                            //deselects all
+                        if(!pointSelected){
                             for(int i=0;i<objectCount;i++){
-                                objects[i].selected=false;
+                                if(objects[objectLoadOrder[i]].clicked){
+                                    queriedTrue=objectLoadOrder[i];
+                                }
                             }
-
                             objects[queriedTrue].grabbed=true;
                             objects[queriedTrue].offset.x=objects[mouseObject].X-objects[queriedTrue].X;
                             objects[queriedTrue].offset.y=objects[mouseObject].Y-objects[queriedTrue].Y;
                             objects[queriedTrue].selected=true;
-                        }else{
-                            //sets selected objects to grabbed
+                        }
+                    }else{
+                        if(!pointSelected){
+                            //finds top object
                             for(int i=0;i<objectCount;i++){
-                                if(objects[i].selected==true){
-                                    objects[i].grabbed=true;
-                                    objects[i].offset.x=objects[mouseObject].X-objects[i].X;
-                                    objects[i].offset.y=objects[mouseObject].Y-objects[i].Y;
+                                if(objects[objectLoadOrder[i]].clicked){
+                                    queriedTrue=objectLoadOrder[i];
+                                }
+                            }
+                            //checks if selected object isn't selected
+                            if(objects[queriedTrue].selected==false){
+                                //deselects all
+                                for(int i=0;i<objectCount;i++){
+                                    objects[i].selected=false;
+                                }
+
+                                objects[queriedTrue].grabbed=true;
+                                objects[queriedTrue].offset.x=objects[mouseObject].X-objects[queriedTrue].X;
+                                objects[queriedTrue].offset.y=objects[mouseObject].Y-objects[queriedTrue].Y;
+                                objects[queriedTrue].selected=true;
+                            }else{
+                                //sets selected objects to grabbed
+                                for(int i=0;i<objectCount;i++){
+                                    if(objects[i].selected==true){
+                                        objects[i].grabbed=true;
+                                        objects[i].offset.x=objects[mouseObject].X-objects[i].X;
+                                        objects[i].offset.y=objects[mouseObject].Y-objects[i].Y;
+                                    }
                                 }
                             }
                         }
@@ -609,11 +633,19 @@ class game{
         void drawOutline(sf::RenderTarget& window,int i){
             sf::VertexArray outline(sf::PrimitiveType::LineStrip,5);
 
-            outline[0].position = sf::Vector2f((getMaxX(i)+camOffsetX)/zoomAMT+W/2,(getMaxY(i)+camOffsetY)/zoomAMT+H/2);
-            outline[1].position = sf::Vector2f((getMinX(i)+camOffsetX)/zoomAMT+W/2,(getMaxY(i)+camOffsetY)/zoomAMT+H/2);
-            outline[2].position = sf::Vector2f((getMinX(i)+camOffsetX)/zoomAMT+W/2,(getMinY(i)+camOffsetY)/zoomAMT+H/2);
-            outline[3].position = sf::Vector2f((getMaxX(i)+camOffsetX)/zoomAMT+W/2,(getMinY(i)+camOffsetY)/zoomAMT+H/2);
-            outline[4].position = sf::Vector2f((getMaxX(i)+camOffsetX)/zoomAMT+W/2,(getMaxY(i)+camOffsetY)/zoomAMT+H/2);
+            if(cursorMode=="edit"){
+                outline[0].position = sf::Vector2f((getMaxX(i)-5+camOffsetX)/zoomAMT+W/2,(getMaxY(i)-5+camOffsetY)/zoomAMT+H/2);
+                outline[1].position = sf::Vector2f((getMinX(i)+5+camOffsetX)/zoomAMT+W/2,(getMaxY(i)-5+camOffsetY)/zoomAMT+H/2);
+                outline[2].position = sf::Vector2f((getMinX(i)+5+camOffsetX)/zoomAMT+W/2,(getMinY(i)+5+camOffsetY)/zoomAMT+H/2);
+                outline[3].position = sf::Vector2f((getMaxX(i)-5+camOffsetX)/zoomAMT+W/2,(getMinY(i)+5+camOffsetY)/zoomAMT+H/2);
+                outline[4].position = sf::Vector2f((getMaxX(i)-5+camOffsetX)/zoomAMT+W/2,(getMaxY(i)-5+camOffsetY)/zoomAMT+H/2);
+            }else{
+                outline[0].position = sf::Vector2f((getMaxX(i)+camOffsetX)/zoomAMT+W/2,(getMaxY(i)+camOffsetY)/zoomAMT+H/2);
+                outline[1].position = sf::Vector2f((getMinX(i)+camOffsetX)/zoomAMT+W/2,(getMaxY(i)+camOffsetY)/zoomAMT+H/2);
+                outline[2].position = sf::Vector2f((getMinX(i)+camOffsetX)/zoomAMT+W/2,(getMinY(i)+camOffsetY)/zoomAMT+H/2);
+                outline[3].position = sf::Vector2f((getMaxX(i)+camOffsetX)/zoomAMT+W/2,(getMinY(i)+camOffsetY)/zoomAMT+H/2);
+                outline[4].position = sf::Vector2f((getMaxX(i)+camOffsetX)/zoomAMT+W/2,(getMaxY(i)+camOffsetY)/zoomAMT+H/2);
+            }
 
             window.draw(outline);
         }
@@ -904,6 +936,7 @@ class game{
                                 objects[i].collidedbox=true;
                                 objects[iP].collidedbox=true;
                                 output = SAT(i,iP);//unfinished
+                                std::cout<<cornerDistCheck(i)<<"::"<<cornerDistCheck(iP)<<"\n";
                                 if(output.difference<-1||( (cornerDistCheck(i) < 10&&objects[iP].objectType==-1) || ( cornerDistCheck(iP) < 10&&objects[i].objectType==-1) &&cursorMode=="edit")){
                                     objects[i].collidedSAT=true;
                                     objects[iP].collidedSAT=true;
@@ -1290,6 +1323,9 @@ class game{
             }else{
                 pointOutput = -objects[object].sizeModifier*baseUnit*2;
             }
+            if(cursorMode=="edit"){
+                return pointOutput+baseUnit*objects[object].X-5;
+            }
             return pointOutput+baseUnit*objects[object].X;
         }
         //gets minimum Y
@@ -1329,6 +1365,9 @@ class game{
             }
 
 
+            if(cursorMode=="edit"){
+                return pointOutput+baseUnit*objects[object].Y-5;
+            }
             return pointOutput+baseUnit*objects[object].Y;
         }
         //gets maximum X
@@ -1366,6 +1405,10 @@ class game{
             }else{
                 pointOutput = objects[object].sizeModifier*baseUnit*2;
             }
+
+            if(cursorMode=="edit"){
+                return pointOutput+baseUnit*objects[object].X+5;
+            }
             return pointOutput+baseUnit*objects[object].X;
         }
         //gets maximum y
@@ -1402,6 +1445,10 @@ class game{
                 }
             }else{
                 pointOutput = objects[object].sizeModifier*baseUnit*2;
+            }
+
+            if(cursorMode=="edit"){
+                return pointOutput+baseUnit*objects[object].Y+5;
             }
             return pointOutput+baseUnit*objects[object].Y;
         }
