@@ -275,7 +275,7 @@ class game{
         //returns the distance to nearest corner of specified shape
         pointDist cornerDistCheck(int o){
             pointDist check= {std::numeric_limits<float>::infinity(),0};
-            for(int i=0;i<pointCount(o);i++){
+            for(int i=1;i<=pointCount(o);i++){
 
                 returnXY point = angleOffset(o,i);
 
@@ -286,9 +286,11 @@ class game{
 
                 float distance=sqrt(square(pointXY.x-position.x)+square(pointXY.y-position.y));
 
+                std::cout<<i<<"\n";
                 if(distance<=check.distance){
                     check.distance=distance;
                     check.point=i;
+
 
                 }
             }
@@ -665,7 +667,6 @@ class game{
             }else{
                 zoomAMT/=(ammount/10)+1;
             }
-            std::cout<<zoomAMT<<"\n";
         }
         //draws outline
         void drawOutline(sf::RenderTarget& window,int i){
