@@ -251,9 +251,11 @@ class game{
     private:
         //returns the distance to nearest corner of specified shape
         float cornerDistCheck(int o){
-            check=std::numeric_limits<float>::infinity()
+            float check=std::numeric_limits<float>::infinity();
             for(int i=0;i<pointCount(o);i++){
                 returnXY position = {(baseUnit*objects[mouseObject].X+camOffsetX)/zoomAMT+W/2, (baseUnit*objects[mouseObject].Y+camOffsetY)/zoomAMT+H/2};
+
+                returnXY point = angleOffset(o,i);
 
                 float distance=sqrt(square((point.x+baseUnit*objects[o].X+camOffsetX)/zoomAMT+W/2-position.x)+square((point.y+baseUnit*objects[o].Y+camOffsetY)/zoomAMT+H/2-position.y));
 
@@ -902,7 +904,7 @@ class game{
                                 objects[i].collidedbox=true;
                                 objects[iP].collidedbox=true;
                                 output = SAT(i,iP);//unfinished
-                                if(output.difference<0-1){
+                                if(output.difference<-1||( (cornerDistCheck(i) < 10&&objects[iP].objectType==-1) || ( cornerDistCheck(iP) < 10&&objects[i].objectType==-1) &&cursorMode=="edit")){
                                     objects[i].collidedSAT=true;
                                     objects[iP].collidedSAT=true;
                                     collisionResponse(i,iP);
