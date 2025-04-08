@@ -13,7 +13,7 @@ float baseUnit = (W/128+H/72)/2;
 
 bool debug = false;
 
-bool physics = true;
+
 
 float zoomAMT=1;
 
@@ -57,7 +57,10 @@ struct triggerProperties{
     bool destroyO2 = false;
     int typeReq = 1;
 };
-
+struct pointDist{
+    float distance=0;
+    int point=0;
+};
 struct object{
     float X = 0;
     float Y = 0;
@@ -107,11 +110,15 @@ struct object{
     std::string text="lorium ipsum";
     bool selected=false;
     bool clicked =false;
+
+    bool pointGrabbed=false;
+    int grabbedPoint = 0;//not used by circleShape
 };
 
 std::vector<object> objects;
 std::vector<object> UI;
 
+std::vector<int> UILoadOrder;
 std::vector<int> objectLoadOrder;
 
 class game{
@@ -130,7 +137,7 @@ class game{
 
             sf::ContextSettings settings;
             settings.antiAliasingLevel = 8.0;
-            sf::RenderWindow window(sf::VideoMode({W, H}), "game"/*, sf::Style::default, settings*/);
+            sf::RenderWindow window(sf::VideoMode({W, H}), "editor"/*, sf::Style::default, settings*/);
 
 
 
@@ -198,7 +205,9 @@ class game{
                         mouseObject=i;
                     }
 
-
+                    if(cursorMode=="edit"&&objects[i].pointGrabbed){
+                        grPointMV(i);
+                    }
                     //draws outline of selected object
                     if(objects[i].selected){
                         drawOutline(window,i);
@@ -219,6 +228,7 @@ class game{
                         objects[i].offset.x=0;
                         objects[i].offset.y=0;
                         objects[i].grabbed=false;
+                        objects[i].pointGrabbed=false;
                     }
                 }
                 for(int i = 0;i<UI.size();i++){
@@ -249,9 +259,22 @@ class game{
         }
 
     private:
+        void rectMvPoint(int o){
+            //caclulate 2 normals of points from point in object
+            returnXY p1 = angleOffset(o,objects[o].grabbedPoint);
+            returnXY p2 = {objects[mouseObject].X,objects[mouseObject].Y};
+            getNormal(p1,p2);
+        }
+        void grPointMV(int o){
+            if(circleShapePoly(o)){
+                objects[o].sizeModifier = sqrt(square(objects[o].X-objects[mouseObject].X)+square(objects[o].Y-objects[mouseObject].Y))/2;
+            }else if(rectShapePoly(o)){
+                rectMvPoint(o);
+            }
+        }
         //returns the distance to nearest corner of specified shape
-        float cornerDistCheck(int o){
-            float check=std::numeric_limits<float>::infinity();
+        pointDist cornerDistCheck(int o){
+            pointDist check= {std::numeric_limits<float>::infinity(),0};
             for(int i=0;i<pointCount(o);i++){
 
                 returnXY point = angleOffset(o,i);
@@ -263,8 +286,9 @@ class game{
 
                 float distance=sqrt(square(pointXY.x-position.x)+square(pointXY.y-position.y));
 
-                if(distance<=check){
-                    check=distance;
+                if(distance<=check.distance){
+                    check.distance=distance;
+                    check.point=i;
 
                 }
             }
@@ -315,6 +339,35 @@ class game{
         void Lclick(){
 
                 baseCollision();
+
+                //for editing points to work on overlaping shapes
+                if(cursorMode=="edit"){
+                    pointDist check = {};
+                    int queriedObjectSelected = 0;
+                    bool pointSelected = false;
+
+                    int Ochecked=0;
+
+                    for(int i=0;i<objectCount;i++){
+                        if(objects[objectLoadOrder[i]].selected){
+                            check = cornerDistCheck(objectLoadOrder[i]);
+                            if(check.distance<10){
+                                pointSelected=true;
+                                queriedObjectSelected=objectLoadOrder[i];
+                                Ochecked=i;
+                            }
+                        }
+                    }
+                    if(pointSelected){
+                        objects[Ochecked].grabbedPoint=true;
+                        objects[Ochecked].pointGrabbed=check.point;
+                        for(int i=0;i<objectCount;i++){
+                            objects[i].clicked=false;
+                        }
+                        return;
+                    }
+                }
+
                 //check for clicked object
                 int clickQ = 0;
                 int queriedTrue=0;
@@ -325,20 +378,7 @@ class game{
                     }
                 }
 
-                //for editing points to work on overlaping shapes
-                int queriedPointSelected = 0;
-                bool pointSelected = false;
 
-                if(cursorMode=="edit"){
-                    for(int i=0;i<objectCount;i++){
-                        if(objects[objectLoadOrder[i]].selected){
-                            if(cornerDistCheck(objectLoadOrder[i])<10){
-                                pointSelected=true;
-                                queriedPointSelected=objectLoadOrder[i];
-                            }
-                        }
-                    }
-                }
                 if(clickQ<1){
                     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LShift)==false){
                         for(int i=0;i<objectCount;i++){
@@ -381,51 +421,47 @@ class game{
                 }else if(clickQ>1){
                     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LShift)){
                         //selects top object
-                        if(!pointSelected){
-                            for(int i=0;i<objectCount;i++){
-                                if(objects[objectLoadOrder[i]].clicked){
-                                    queriedTrue=objectLoadOrder[i];
-                                }
+
+                        for(int i=0;i<objectCount;i++){
+                            if(objects[objectLoadOrder[i]].clicked){
+                                queriedTrue=objectLoadOrder[i];
                             }
+                        }
+                        objects[queriedTrue].grabbed=true;
+                        objects[queriedTrue].offset.x=objects[mouseObject].X-objects[queriedTrue].X;
+                        objects[queriedTrue].offset.y=objects[mouseObject].Y-objects[queriedTrue].Y;
+                        objects[queriedTrue].selected=true;
+
+                    }else{
+                        //finds top object
+                        for(int i=0;i<objectCount;i++){
+                            if(objects[objectLoadOrder[i]].clicked){
+                                queriedTrue=objectLoadOrder[i];
+                            }
+                        }
+                        //checks if selected object isn't selected
+                        if(objects[queriedTrue].selected==false){
+                            //deselects all
+                            for(int i=0;i<objectCount;i++){
+                                objects[i].selected=false;
+                            }
+
                             objects[queriedTrue].grabbed=true;
                             objects[queriedTrue].offset.x=objects[mouseObject].X-objects[queriedTrue].X;
                             objects[queriedTrue].offset.y=objects[mouseObject].Y-objects[queriedTrue].Y;
                             objects[queriedTrue].selected=true;
-                        }
-                    }else{
-                        if(!pointSelected){
-                            //finds top object
+                        }else{
+                            //sets selected objects to grabbed
                             for(int i=0;i<objectCount;i++){
-                                if(objects[objectLoadOrder[i]].clicked){
-                                    queriedTrue=objectLoadOrder[i];
-                                }
-                            }
-                            //checks if selected object isn't selected
-                            if(objects[queriedTrue].selected==false){
-                                //deselects all
-                                for(int i=0;i<objectCount;i++){
-                                    objects[i].selected=false;
-                                }
-
-                                objects[queriedTrue].grabbed=true;
-                                objects[queriedTrue].offset.x=objects[mouseObject].X-objects[queriedTrue].X;
-                                objects[queriedTrue].offset.y=objects[mouseObject].Y-objects[queriedTrue].Y;
-                                objects[queriedTrue].selected=true;
-                            }else{
-                                //sets selected objects to grabbed
-                                for(int i=0;i<objectCount;i++){
-                                    if(objects[i].selected==true){
-                                        objects[i].grabbed=true;
-                                        objects[i].offset.x=objects[mouseObject].X-objects[i].X;
-                                        objects[i].offset.y=objects[mouseObject].Y-objects[i].Y;
-                                    }
+                                if(objects[i].selected==true){
+                                    objects[i].grabbed=true;
+                                    objects[i].offset.x=objects[mouseObject].X-objects[i].X;
+                                    objects[i].offset.y=objects[mouseObject].Y-objects[i].Y;
                                 }
                             }
                         }
-
-
-
                     }
+
                 }
                 //resets clicked values
                 for(int i=0;i<objectCount;i++){
@@ -448,6 +484,7 @@ class game{
                                     objects[i].color=4294967295;
                                 }
                                 objects[i].sides=3;
+                                objects[i].sizeModifier=2;
                             }
                         }
                     }else if(key==sf::Keyboard::Scancode::Num2){
@@ -458,6 +495,7 @@ class game{
                                     objects[i].color=4278255615;
                                 }
                                 objects[i].sides=4;
+                                objects[i].sizeModifier=2;
                             }
                         }
                     }else if(key==sf::Keyboard::Scancode::Num3){
@@ -935,9 +973,8 @@ class game{
 
                                 objects[i].collidedbox=true;
                                 objects[iP].collidedbox=true;
-                                output = SAT(i,iP);//unfinished
-                                std::cout<<cornerDistCheck(i)<<"::"<<cornerDistCheck(iP)<<"\n";
-                                if(output.difference<-1||( (cornerDistCheck(i) < 10&&objects[iP].objectType==-1) || ( cornerDistCheck(iP) < 10&&objects[i].objectType==-1) &&cursorMode=="edit")){
+                                output = SAT(i,iP);
+                                if(output.difference<-1||( (cornerDistCheck(i).distance < 10&&objects[iP].objectType==-1) || ( cornerDistCheck(iP).distance < 10&&objects[i].objectType==-1) &&cursorMode=="edit")){
                                     objects[i].collidedSAT=true;
                                     objects[iP].collidedSAT=true;
                                     collisionResponse(i,iP);

@@ -671,13 +671,13 @@
         "width": 20.0
     },
     {
-        "X": 8.400005340576172,
-        "Y": -7.999996185302734,
+        "X": 16.100004196166992,
+        "Y": -3.8999977111816406,
         "airRes": true,
         "coefficentOfFriction": 0.5,
         "color": 4278255615,
         "gravity": true,
-        "height": 0.0,
+        "height": 10.0,
         "layer": 0,
         "loc": "blank.png",
         "mass": 10.0,
@@ -717,7 +717,7 @@
         "points": 0,
         "rotation": -495.0,
         "sides": 4,
-        "sizeModifier": 2.0,
+        "sizeModifier": 3.335418224334717,
         "solid": true,
         "text": "lorium ipsum",
         "trigger": {
@@ -729,7 +729,7 @@
         "velRot": 0.0,
         "velX": 0.0,
         "velY": 0.0,
-        "width": 0.0
+        "width": 20.0
     },
     {
         "X": -21.14066505432129,
@@ -1525,16 +1525,16 @@
         "width": 0.0
     },
     {
-        "X": 5.594737529754639,
-        "Y": -5.189474582672119,
+        "X": 209.91567993164063,
+        "Y": 208.8998260498047,
         "airRes": true,
         "coefficentOfFriction": 0.5,
-        "color": 4294967295,
-        "gravity": true,
-        "height": 0.0,
+        "color": 707670783,
+        "gravity": false,
+        "height": 10.0,
         "layer": 0,
         "loc": "blank.png",
-        "mass": 10.0,
+        "mass": -1.0,
         "objectType": 0,
         "pointList": [
             -0.0,
@@ -1569,9 +1569,9 @@
             -1.886159202660483e-16
         ],
         "points": 0,
-        "rotation": -30.0,
+        "rotation": 0.0,
         "sides": 3,
-        "sizeModifier": 2.0,
+        "sizeModifier": 166.11619567871094,
         "solid": true,
         "text": "lorium ipsum",
         "trigger": {
@@ -1583,7 +1583,7 @@
         "velRot": 0.0,
         "velX": 0.0,
         "velY": 0.0,
-        "width": 0.0
+        "width": 20.0
     },
     {
         "X": -15.14868450164795,
