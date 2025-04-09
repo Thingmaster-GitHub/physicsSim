@@ -259,12 +259,40 @@ class game{
         }
 
     private:
+        //rectacle move point
         void rectMvPoint(int o){
             //caclulate 2 normals of points from point in object
-            returnXY p1 = angleOffset(o,objects[o].grabbedPoint);
-            returnXY p2 = {objects[mouseObject].X,objects[mouseObject].Y};
-            getNormal(p1,p2);
+            returnXY p10;
+            returnXY p11;
+            if(objects[o].grabbedPoint=4){
+                p10 = angleOffset(o,1);
+                p11 = angleOffset(o,3);
+            }else if(objects[o].grabbedPoint=1){
+                p10 = angleOffset(o,2);
+                p11 = angleOffset(o,4);
+            }else{
+                p10 = angleOffset(o,objects[o].grabbedPoint-1);
+                p11 = angleOffset(o,objects[o].grabbedPoint+1);
+            }
+
+            returnXY p2 = {angleOffset(o,objects[o].grabbedPoint)};
+            returnXY mousePoint = {objects[mouseObject].X,objects[mouseObject].Y};
+            returnXY center = {objects[o].X,objects[o].Y};
+
+            returnXY n1 = invertNormal(getNormal(p10,p2));
+            returnXY n2 = invertNormal(getNormal(p11,p2));
+
+            float mouseProj1 = projectPointOntoNormal(mousePoint,n1);
+            float mouseProj2 = projectPointOntoNormal(mousePoint,n2);
+
+            float centerProj1 = projectPointOntoNormal(center,n1);
+            float centerProj2 = projectPointOntoNormal(center,n1);
+
+            float dist1 = abs(mouseProj1-centerProj1);
+            float dist2 = abs(mouseProj2-centerProj2);
+            std::cout<<"1: "<<dist1<<"\n2: "<<dist2<<"\n";
         }
+        //grabbed point movement
         void grPointMV(int o){
             if(circleShapePoly(o)){
                 objects[o].sizeModifier = sqrt(square(objects[o].X-objects[mouseObject].X)+square(objects[o].Y-objects[mouseObject].Y))/2;
@@ -286,7 +314,6 @@ class game{
 
                 float distance=sqrt(square(pointXY.x-position.x)+square(pointXY.y-position.y));
 
-                std::cout<<i<<"\n";
                 if(distance<=check.distance){
                     check.distance=distance;
                     check.point=i;
