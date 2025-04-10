@@ -11,7 +11,7 @@ const int H = 768;
 int objectCount =15;
 float baseUnit = (W/128+H/72)/2;
 
-bool debug = true;
+bool debug = false;
 
 
 
@@ -229,6 +229,7 @@ class game{
                         objects[i].offset.y=0;
                         objects[i].grabbed=false;
                         objects[i].pointGrabbed=false;
+                        objects[i].grabbedPoint=0;
                     }
                 }
                 for(int i = 0;i<UI.size();i++){
@@ -261,14 +262,17 @@ class game{
     private:
         //rectacle move point
         void rectMvPoint(int o){
+            float initW=objects[o].width;
+            float initH=objects[o].height;
             //caclulate 2 normals of points from point in object
+            std::cout<<"p: "<<objects[o].grabbedPoint<<"\n";
             returnXY p1;
-            if(objects[o].grabbedPoint=4){
+            if(objects[o].grabbedPoint==4){
                 p1 = angleOffset(o,1);
-            }else if(objects[o].grabbedPoint=1){
+            }else if(objects[o].grabbedPoint==1){
                 p1 = angleOffset(o,2);
             }else{
-                p1 = angleOffset(o,objects[o].grabbedPoint-1);
+                p1 = angleOffset(o,objects[o].grabbedPoint+1);
             }
 
             returnXY p2 = {angleOffset(o,objects[o].grabbedPoint)};
@@ -276,6 +280,7 @@ class game{
             returnXY center = {objects[o].X,objects[o].Y};
             returnXY Opposite;
 
+            //std::cout<<"p: "<<objects[o].grabbedPoint<<"\n";
             if(objects[o].grabbedPoint<3){
                 Opposite = {angleOffset(o,objects[o].grabbedPoint+2)};
             }else{
@@ -288,9 +293,14 @@ class game{
             Opposite.x+=center.x;
             Opposite.y+=center.y;
 
-            returnXY n2 = getNormal(p1,p2);
-            returnXY n1 = invertNormal(n2);
 
+            returnXY n1 = getNormal(p1,p2);
+            returnXY n2 = invertNormal(n1);
+
+            if(objects[o].grabbedPoint%2==0){
+                n2=n1;
+                n1 = invertNormal(n1);
+            }
             float mouseProj1 = projectPointOntoNormal(mousePoint,n1);
             float mouseProj2 = projectPointOntoNormal(mousePoint,n2);
 
@@ -299,12 +309,30 @@ class game{
 
             float dist1 = abs(mouseProj1-centerProj1);
             float dist2 = abs(mouseProj2-centerProj2);
-            std::cout<<"1: "<<dist1<<"\n2: "<<dist2<<"\n";
-            objects[o].height = dist1;//*(5/2);
-            objects[o].width = dist2;//*(5/2);
+
+            //std::cout<<"1: "<<dist1<<"\n2: "<<dist2<<"\n";
+
+            objects[o].height += (dist1-initH)/2;
+            objects[o].width += (dist2-initW)/2;
             //need to change position of rectangle so it stays in place visually
 
             objects[o].pointProjected=Opposite;
+
+            returnXY OPost;
+            if(objects[o].grabbedPoint<3){
+                OPost = {angleOffset(o,objects[o].grabbedPoint+2)};
+            }else{
+                OPost = {angleOffset(o,objects[o].grabbedPoint-2)};
+            }
+            OPost.x/=baseUnit;
+            OPost.y/=baseUnit;
+
+            OPost.x+=center.x;
+            OPost.y+=center.y;
+
+            //objects[o].X-=Opposite.x-OPost.x;
+            //objects[o].Y-=Opposite.y-OPost.y;
+
             //objects[o].X=(mousePoint.x+Opposite.x)/2;
             //objects[o].Y=(mousePoint.y+Opposite.x)/2;
 
@@ -338,6 +366,7 @@ class game{
 
                 }
             }
+
             return check;
         }
         //apply this in more places pls
@@ -399,14 +428,18 @@ class game{
                             check = cornerDistCheck(objectLoadOrder[i]);
                             if(check.distance<10){
                                 pointSelected=true;
+
                                 queriedObjectSelected=objectLoadOrder[i];
                                 Ochecked=i;
                             }
                         }
                     }
                     if(pointSelected){
-                        objects[Ochecked].grabbedPoint=true;
-                        objects[Ochecked].pointGrabbed=check.point;
+                        objects[Ochecked].grabbedPoint=check.point;
+                        objects[Ochecked].pointGrabbed=true;
+
+                        //std::cout<<"p: "<<check.point<<"\n";
+
                         for(int i=0;i<objectCount;i++){
                             objects[i].clicked=false;
                         }
