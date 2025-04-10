@@ -11,7 +11,7 @@ const int H = 768;
 int objectCount =15;
 float baseUnit = (W/128+H/72)/2;
 
-bool debug = false;
+bool debug = true;
 
 
 
@@ -262,35 +262,52 @@ class game{
         //rectacle move point
         void rectMvPoint(int o){
             //caclulate 2 normals of points from point in object
-            returnXY p10;
-            returnXY p11;
+            returnXY p1;
             if(objects[o].grabbedPoint=4){
-                p10 = angleOffset(o,1);
-                p11 = angleOffset(o,3);
+                p1 = angleOffset(o,1);
             }else if(objects[o].grabbedPoint=1){
-                p10 = angleOffset(o,2);
-                p11 = angleOffset(o,4);
+                p1 = angleOffset(o,2);
             }else{
-                p10 = angleOffset(o,objects[o].grabbedPoint-1);
-                p11 = angleOffset(o,objects[o].grabbedPoint+1);
+                p1 = angleOffset(o,objects[o].grabbedPoint-1);
             }
 
             returnXY p2 = {angleOffset(o,objects[o].grabbedPoint)};
             returnXY mousePoint = {objects[mouseObject].X,objects[mouseObject].Y};
             returnXY center = {objects[o].X,objects[o].Y};
+            returnXY Opposite;
 
-            returnXY n1 = invertNormal(getNormal(p10,p2));
-            returnXY n2 = invertNormal(getNormal(p11,p2));
+            if(objects[o].grabbedPoint<3){
+                Opposite = {angleOffset(o,objects[o].grabbedPoint+2)};
+            }else{
+                Opposite = {angleOffset(o,objects[o].grabbedPoint-2)};
+            }
+
+            Opposite.x/=baseUnit;
+            Opposite.y/=baseUnit;
+
+            Opposite.x+=center.x;
+            Opposite.y+=center.y;
+
+            returnXY n2 = getNormal(p1,p2);
+            returnXY n1 = invertNormal(n2);
 
             float mouseProj1 = projectPointOntoNormal(mousePoint,n1);
             float mouseProj2 = projectPointOntoNormal(mousePoint,n2);
 
-            float centerProj1 = projectPointOntoNormal(center,n1);
-            float centerProj2 = projectPointOntoNormal(center,n1);
+            float centerProj1 = projectPointOntoNormal(Opposite,n1);
+            float centerProj2 = projectPointOntoNormal(Opposite,n2);
 
             float dist1 = abs(mouseProj1-centerProj1);
             float dist2 = abs(mouseProj2-centerProj2);
             std::cout<<"1: "<<dist1<<"\n2: "<<dist2<<"\n";
+            objects[o].height = dist1;//*(5/2);
+            objects[o].width = dist2;//*(5/2);
+            //need to change position of rectangle so it stays in place visually
+
+            objects[o].pointProjected=Opposite;
+            //objects[o].X=(mousePoint.x+Opposite.x)/2;
+            //objects[o].Y=(mousePoint.y+Opposite.x)/2;
+
         }
         //grabbed point movement
         void grPointMV(int o){
@@ -1270,7 +1287,7 @@ class game{
 
         //returns offset of specified point from shape center
         returnXY angleOffset(int i,int point){//should return the point as an offset from the center of the shape with X and Y values
-            int butterSize = 5;
+
             returnXY output = {0,0};
             if(circleShapePoly(i))/*circleShape*/{
                 if(objects[i].sides%2!=0){
@@ -1806,10 +1823,10 @@ class game{
                 window.draw(pointNotButter);
             }
             pointNotButter.setFillColor(sf::Color(0x00ff00ff));
-            pointNotButter.setPosition({objects[i].pointProjected.x+camOffsetX+W/2,objects[i].pointProjected.y+camOffsetY+H/2});
+            pointNotButter.setPosition({objects[i].pointProjected.x*baseUnit+camOffsetX+W/2,objects[i].pointProjected.y*baseUnit+camOffsetY+H/2});
 
             window.draw(pointNotButter);
-            pointNotButter.setPosition({objects[i].pointProjected2.x+camOffsetX+W/2,objects[i].pointProjected2.y+camOffsetY+H/2});
+            pointNotButter.setPosition({objects[i].pointProjected2.x*baseUnit+camOffsetX+W/2,objects[i].pointProjected2.y*baseUnit+camOffsetY+H/2});
 
             window.draw(pointNotButter);
 
