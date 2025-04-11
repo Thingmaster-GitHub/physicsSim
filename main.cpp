@@ -299,7 +299,6 @@ class game{
             float initW=objects[o].width;
             float initH=objects[o].height;
             //caclulate 2 normals of points from point in object
-            std::cout<<"p: "<<objects[o].grabbedPoint<<"\n";
             returnXY p1;
             if(objects[o].grabbedPoint==4){
                 p1 = angleOffset(o,1);
@@ -341,13 +340,32 @@ class game{
             float centerProj1 = projectPointOntoNormal(Opposite,n1);
             float centerProj2 = projectPointOntoNormal(Opposite,n2);
 
-            float dist1 = abs(mouseProj1-centerProj1);
-            float dist2 = abs(mouseProj2-centerProj2);
+            float dist1 = (mouseProj1-centerProj1);
+            float dist2 = (mouseProj2-centerProj2);
+            //height
+            if(dist1<0){
+                dist1*=-1;
+
+
+            }
+            //width
+            if(dist2<0){
+
+                dist2*=-1;
+
+            }
 
             //std::cout<<"1: "<<dist1<<"\n2: "<<dist2<<"\n";
 
-            objects[o].height += (dist1-initH)/2;
-            objects[o].width += (dist2-initW)/2;
+            float h=objects[o].height+(dist1-initH)/2;
+            float w=objects[o].width+(dist2-initW)/2;
+            if(h>0){
+
+                objects[o].height = (h);
+            }
+            if(w>0){
+                objects[o].width = (w);
+            }
             //need to change position of rectangle so it stays in place visually
 
             objects[o].pointProjected=Opposite;
@@ -367,8 +385,29 @@ class game{
             objects[o].X+=Opposite.x-OPost.x;
             objects[o].Y+=Opposite.y-OPost.y;
 
-            //objects[o].X=(mousePoint.x+Opposite.x)/2;
-            //objects[o].Y=(mousePoint.y+Opposite.x)/2;
+            std::cout<<objects[o].grabbedPoint<<"::"<<cornerDistCheck(o).point<<"\n";
+            if(!(objects[o].grabbedPoint == cornerDistCheck(o).point)){
+                objects[o].grabbedPoint = cornerDistCheck(o).point;
+
+                objects[o].X-=Opposite.x-OPost.x;
+                objects[o].Y-=Opposite.y-OPost.y;
+
+
+                if(objects[o].grabbedPoint<3){
+                    OPost = {angleOffset(o,objects[o].grabbedPoint+2)};
+                }else{
+                    OPost = {angleOffset(o,objects[o].grabbedPoint-2)};
+                }
+                OPost.x/=baseUnit;
+                OPost.y/=baseUnit;
+
+                OPost.x+=center.x;
+                OPost.y+=center.y;
+
+                objects[o].X+=Opposite.x-OPost.x;
+                objects[o].Y+=Opposite.y-OPost.y;
+            }
+
 
         }
         //grabbed point movement
