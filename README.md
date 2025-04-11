@@ -14,14 +14,15 @@ this progam is used to edit levels, they are currently saved upon progam exit.
 -alt + scroll + mouse hold, fine rotate
 
 -scroll wheel, rotate objects
-# TODO
-# controls:
 
 -shift + left click, multi select
 
+-more advanced object selection
+# TODO
+
 # features
 
--more advanced object selection
+-text rendering
 
 -object groups in editor
 

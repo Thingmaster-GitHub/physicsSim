@@ -35,6 +35,7 @@ std::string cursorMode = "select";
 
 int mouseObject;
 float coefficientOfRestitution=0.6;
+
 struct returnXY{
     float x;
     float y;
@@ -108,19 +109,24 @@ struct object{
     returnXY offset = {0,0};
     int layer=0;
     std::string text="lorium ipsum";
+    std::string fontLoc = "Comic Sans MS.ttf";
+    sf::Font font;
     bool selected=false;
     bool clicked =false;
 
     bool pointGrabbed=false;
     int grabbedPoint = 0;//not used by circleShape
 };
-
+struct cpy{
+    object coppied;
+    int coppiedObj;
+};
 std::vector<object> objects;
 std::vector<object> UI;
 
 std::vector<int> UILoadOrder;
 std::vector<int> objectLoadOrder;
-
+std::vector<cpy> copyArray;
 class game{
     public:
         //runs program :3
@@ -128,6 +134,9 @@ class game{
             loadObjectsJSON(UI,"UI.json");
             for(int i=0;i<UI.size();i++){
                 if (!UI[i].texture.loadFromFile(UI[i].loc)){
+                    //throw error or something
+                }
+                if (!UI[i].font.openFromFile(UI[i].fontLoc)){
                     //throw error or something
                 }
             }
@@ -211,6 +220,9 @@ class game{
                     //draws outline of selected object
                     if(objects[i].selected){
                         drawOutline(window,i);
+                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Delete)){
+                            deleteObject(i);
+                        }
                     }
                     //sets position of grabbd object
                     if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
@@ -219,9 +231,7 @@ class game{
                                 objects[i].X=objects[mouseObject].X-objects[i].offset.x;
                                 objects[i].Y=objects[mouseObject].Y-objects[i].offset.y;
 
-                                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Delete)){
-                                    deleteObject(i);
-                                }
+
 
                         }
                     }else{
@@ -247,7 +257,6 @@ class game{
 
                 //testingLayoutInf(window);
                 window.display();
-
             }
 
             for(int i=0;i<objectCount;i++){
@@ -260,6 +269,31 @@ class game{
         }
 
     private:
+        //pastes
+        void paste(){
+            for(int i=0;i<copyArray.size();i++){
+
+                object tmpobj=copyArray[i].coppied;
+                tmpobj.selected=true;
+                objects[copyArray[i].coppiedObj].selected=false;
+                objects[copyArray[i].coppiedObj].grabbed=false;
+                objects.push_back(tmpobj);
+                objectCount++;
+            }
+            initialize();
+
+        }
+        //copies
+        void copy(){
+            copyArray.clear();
+
+            for(int i=0;i<objectCount;i++){
+                if(objects[i].selected){
+                    cpy tmpCpy = {objects[i],i};
+                    copyArray.push_back(tmpCpy);
+                }
+            }
+        }
         //rectacle move point
         void rectMvPoint(int o){
             float initW=objects[o].width;
@@ -330,8 +364,8 @@ class game{
             OPost.x+=center.x;
             OPost.y+=center.y;
 
-            //objects[o].X-=Opposite.x-OPost.x;
-            //objects[o].Y-=Opposite.y-OPost.y;
+            objects[o].X+=Opposite.x-OPost.x;
+            objects[o].Y+=Opposite.y-OPost.y;
 
             //objects[o].X=(mousePoint.x+Opposite.x)/2;
             //objects[o].Y=(mousePoint.y+Opposite.x)/2;
@@ -466,7 +500,11 @@ class game{
                     }
                 }else if(clickQ=1){
                     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LShift)){
-                        objects[queriedTrue].selected=true;
+                        if(objects[queriedTrue].selected==true){
+                            objects[queriedTrue].selected=false;
+                        }else{
+                            objects[queriedTrue].selected=true;
+                        }
                         if(cursorMode=="select"){
                             objects[queriedTrue].grabbed=true;
                         }
@@ -647,6 +685,10 @@ class game{
                                 objects[i].color=0x2a2e32ff;
                             }
                         }
+                    }else if(key==sf::Keyboard::Scancode::C){
+                        copy();
+                    }else if(key==sf::Keyboard::Scancode::V){
+                        paste();
                     }
                 }
             }else if(key==sf::Keyboard::Scancode::S){
@@ -671,7 +713,7 @@ class game{
             tmpObj.Y=objects[mouseObject].Y;
             objects.push_back(tmpObj);
             objectCount++;
-            LayerObjects();
+            initialize();
         }
         //sets object load order for drawing
         void LayerObjects(){
@@ -733,6 +775,9 @@ class game{
 
                 }
                 if (!objects[i].texture.loadFromFile(objects[i].loc)){
+                    //throw error or something
+                }
+                if (!objects[i].font.openFromFile(objects[i].fontLoc)){
                     //throw error or something
                 }
             }
@@ -966,6 +1011,18 @@ class game{
                     shape.setTexture(&scene[i].texture);
 
                     window.draw(shape);
+                }else if(TextShapePoly(i)){
+                    sf::Text shape(scene[i].font);
+
+                    returnXY point = angleOffset(i,4);
+
+                    //shape.setPosition({(point.x+baseUnit*objects[i].X+camOffsetX)/zoomAMT+W/2, (point.y+baseUnit*objects[i].Y+camOffsetY)/zoomAMT+H/2});
+                    shape.setPosition({(baseUnit*scene[i].X+camOffsetX)/zoomAMT+W/2, (baseUnit*scene[i].Y+camOffsetY)/zoomAMT+H/2});
+
+                    shape.setFillColor(sf::Color(scene[i].color));
+
+                    shape.setString(scene[i].text);
+                    window.draw(shape);
                 }else if(rectShapePoly(i)){
                     sf::RectangleShape shape(sf::Vector2f((scene[i].width*baseUnit)/zoomAMT, (scene[i].height*baseUnit)/zoomAMT));
 
@@ -1006,7 +1063,7 @@ class game{
                         shape.setFillColor(sf::Color(0xff0000ff));
                         scene[i].collidedSAT=false;
                     }
-                    shape.setTexture(&objects[i].texture);
+                    shape.setTexture(&scene[i].texture);
 
                     window.draw(shape);
 
@@ -1747,7 +1804,7 @@ class game{
         }
         //returns if object is type rectangle
         bool rectShapePoly(int object){
-            if(objects[object].objectType==2||objects[object].objectType==-3){
+            if(objects[object].objectType==2||objects[object].objectType==-3||objects[object].objectType==4){
                 return true;
             }else{
                 return false;
@@ -1756,6 +1813,13 @@ class game{
         //returns if object is type convex polygon
         bool convexShapePoly(int object){
             if(objects[object].objectType==3){
+                return true;
+            }else{
+                return false;
+            }
+        }
+        bool TextShapePoly(int object){
+            if(objects[object].objectType==4){
                 return true;
             }else{
                 return false;
@@ -1807,7 +1871,7 @@ class game{
 
                     window.draw(pointNotButter);
                 }
-            }else if(objects[i].objectType==2){
+            }else if(objects[i].objectType==2||objects[i].objectType==4){
                 for(int iP=0;iP<4;iP++){
                     sf::CircleShape pointNotButter(10/zoomAMT,20);
                     pointNotButter.setOrigin({10/zoomAMT, 10/zoomAMT});
