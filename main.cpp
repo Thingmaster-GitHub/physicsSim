@@ -179,9 +179,10 @@ class game{
                     if (const auto* textEntered = event->getIf<sf::Event::TextEntered>())
                     {
                         if (textEntered->unicode < 128){
-
+                            std::cout << "ASCII character typed: " << static_cast<char>(textEntered->unicode) << std::endl;
+                            text(static_cast<char>(textEntered->unicode));
                         }
-                            //std::cout << "ASCII character typed: " << static_cast<char>(textEntered->unicode) << std::endl;
+
                     }
 
 
@@ -385,7 +386,6 @@ class game{
             objects[o].X+=Opposite.x-OPost.x;
             objects[o].Y+=Opposite.y-OPost.y;
 
-            std::cout<<objects[o].grabbedPoint<<"::"<<cornerDistCheck(o).point<<"\n";
             if(!(objects[o].grabbedPoint == cornerDistCheck(o).point)){
                 objects[o].grabbedPoint = cornerDistCheck(o).point;
 
@@ -456,6 +456,7 @@ class game{
                 return 0;
             }
         }
+        //draws points
         void drawPoints(sf::RenderTarget& window,int o){
             sf::CircleShape pointNotButter(6,4);
             pointNotButter.setOrigin({6,6});
@@ -1053,13 +1054,16 @@ class game{
                 }else if(TextShapePoly(i)){
                     sf::Text shape(scene[i].font);
 
-                    returnXY point = angleOffset(i,4);
 
                     //shape.setPosition({(point.x+baseUnit*objects[i].X+camOffsetX)/zoomAMT+W/2, (point.y+baseUnit*objects[i].Y+camOffsetY)/zoomAMT+H/2});
-                    shape.setPosition({(baseUnit*scene[i].X+camOffsetX)/zoomAMT+W/2, (baseUnit*scene[i].Y+camOffsetY)/zoomAMT+H/2});
+                    returnXY point = angleOffset(i,4);
+
+                    shape.setPosition({(point.x+baseUnit*objects[i].X+camOffsetX)/zoomAMT+W/2, (point.y+baseUnit*objects[i].Y+camOffsetY)/zoomAMT+H/2});
+                    sf::Angle angle = sf::degrees(scene[i].rotation);
+                    shape.setRotation(angle);
 
                     shape.setFillColor(sf::Color(scene[i].color));
-
+                    shape.setCharacterSize(scene[i].sizeModifier*12/zoomAMT);
                     shape.setString(scene[i].text);
                     window.draw(shape);
                 }else if(rectShapePoly(i)){
