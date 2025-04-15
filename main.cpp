@@ -116,6 +116,8 @@ struct object{
 
     bool pointGrabbed=false;
     int grabbedPoint = 0;//not used by circleShape
+    std::string txtLbl = "default";
+    std::string textExtra="";//UI element, please ignore
 };
 struct cpy{
     object coppied;
@@ -179,7 +181,6 @@ class game{
                     if (const auto* textEntered = event->getIf<sf::Event::TextEntered>())
                     {
                         if (textEntered->unicode < 128){
-                            std::cout << "ASCII character typed: " << static_cast<char>(textEntered->unicode) << std::endl;
                             textCh(static_cast<char>(textEntered->unicode));
                         }
 
@@ -245,6 +246,16 @@ class game{
                 }
                 for(int i = 0;i<UI.size();i++){
                     drawUI(window,objectLoadOrder[i],UI);
+                    if(UI[i].objectType==-1){
+                        sf::Vector2i position = sf::Mouse::getPosition(window);
+                        UI[i].X=(position.x-W/2)/baseUnit;
+                        UI[i].Y=(position.y-H/2)/baseUnit;
+
+                        //pointNotButter.setPosition({(baseUnit*UI[i].X)+W/2, (baseUnit*UI[i].Y)+H/2});
+                    }
+                    if(debug){
+                        debugerUI(window,i);
+                    }
                 }
                 if(cursorMode=="edit"){
                     for(int i=0;i<objectCount;i++){
@@ -254,7 +265,6 @@ class game{
                     }
                 }
 
-                //baseCollision moved to Lclick
 
                 //testingLayoutInf(window);
                 window.display();
@@ -270,6 +280,12 @@ class game{
         }
 
     private:
+        void textSelected(){
+            int count=0;i++
+            for(int i=0;i<objectCount;i++){
+
+            }
+        }
         void textCh(char txt){
             for(int i=0;i<objectCount;i++){
                 if(objects[i].selected){
@@ -501,7 +517,27 @@ class game{
         //left click
         void Lclick(){
 
-                baseCollision();
+                baseCollisionUI();
+                int count=0;
+                for(int i=0;i<UI.size();i++){
+                    if(UI[i].clicked){
+                        count++;
+                    }
+
+                }
+                std::cout<<"count: "<<count<<"\n";
+                if(count==0){
+                    baseCollision();
+                }else{
+                    for(int i=0;i<objectCount;i++){
+                        objects[i].clicked=false;
+                    }
+                    for(int i=0;i<UI.size();i++){
+                        UI[i].clicked=false;
+                        UI[i].selected=false;
+                        UI[i].grabbed=false;
+                    }
+                }
 
                 //for editing points to work on overlaping shapes
                 if(cursorMode=="edit"){
@@ -547,7 +583,7 @@ class game{
 
 
                 if(clickQ<1){
-                    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LShift)==false){
+                    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LShift)==false&&count==0){
                         for(int i=0;i<objectCount;i++){
                             objects[i].selected=false;
                         }
@@ -732,6 +768,8 @@ class game{
                                 objects[i].objectType=4;
                                 objects[i].color=0xffffffff;
                                 objects[i].sizeModifier=24;
+                                objects[i].width=20;
+                                objects[i].height=10;
                             }
                         }
                     }else if(key==sf::Keyboard::Scancode::I){
@@ -878,7 +916,7 @@ class game{
                     {"rotation", obj.rotation}, {"sides", obj.sides}, {"sizeModifier", obj.sizeModifier},
                     {"objectType", obj.objectType}, {"gravity", obj.gravity},{"airRes", obj.airRes},{"solid",obj.solid}, {"mass", obj.mass},
                     {"color", obj.color}, {"width", obj.width}, {"height", obj.height},
-                    {"points", obj.points}, {"pointList", std::vector<float>(obj.pointList, obj.pointList + 30)},{"coefficentOfFriction",obj.coefficentOfFriction},{"layer",obj.layer},{"text",obj.text},
+                    {"points", obj.points}, {"pointList", std::vector<float>(obj.pointList, obj.pointList + 30)},{"coefficentOfFriction",obj.coefficentOfFriction},{"layer",obj.layer},{"text",obj.text},{"txtLbl",obj.txtLbl},
                             {"loc", obj.loc},
                             {"trigger", {
                                 {"id", obj.trigger.id},
@@ -936,6 +974,7 @@ class game{
                 obj.trigger.destroyO2 = item["trigger"]["destroyO2"];
                 obj.trigger.typeReq = item["trigger"]["typeReq"];
                 obj.text=item["text"];
+                obj.txtLbl=item["txtLbl"];
 
                 if (!obj.texture.loadFromFile(obj.loc)) {
                     std::cerr << "Failed to load texture: " << obj.loc << '\n';
@@ -1004,7 +1043,7 @@ class game{
                 shape.setRotation(angle);
 
                 shape.setFillColor(sf::Color(scene[i].color));
-                shape.setCharacterSize(scene[i].sizeModifier);
+                shape.setCharacterSize(scene[i].sizeModifier*baseUnit/12);
                 shape.setString(scene[i].text);
                 window.draw(shape);
             }else if(rectShapePoly(objects[i].objectType)){
@@ -1094,7 +1133,7 @@ class game{
                     shape.setRotation(angle);
 
                     shape.setFillColor(sf::Color(scene[i].color));
-                    shape.setCharacterSize(scene[i].sizeModifier/zoomAMT);
+                    shape.setCharacterSize(scene[i].sizeModifier/zoomAMT*baseUnit/12);
                     shape.setString(scene[i].text);
                     window.draw(shape);
                 }else if(rectShapePoly(scene[i].objectType)){
@@ -1868,6 +1907,21 @@ class game{
                 }
             }
         }
+        //respone to collision
+        void collisionResponseUI(int o1,int o2){
+
+            //mouse pointer
+            if(UI[o1].objectType==-1||UI[o2].objectType==-1){
+                if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
+                    if(UI[o1].objectType==-1){
+                        UI[o2].clicked=true;
+
+                    }else{
+                        UI[o1].clicked=true;
+                    }
+                }
+            }
+        }
         //returns if object is of type regular polygon(sf::circleShape)
         bool circleShapePoly(int type){
             if(type==0||type==1){
@@ -1924,7 +1978,8 @@ class game{
                 XMin = getMinXUI(i);
                 YMax = getMaxYUI(i);
                 YMin = getMinYUI(i);
-                for(int iP=i+1;iP<objectCount;iP++){
+
+                for(int iP=i+1;iP<UI.size();iP++){
 
                     if(i!=iP){
                         XMaxCh = getMaxXUI(iP);
@@ -1937,14 +1992,13 @@ class game{
                                 if(debug==true){
                                     //std::cout<<i<<" ("<<UI[i].X<<", "<<UI[i].Y<<") intersects with "<<iP<<" ("<<UI[iP].X<<", "<<UI[iP].Y<<") !(bounding box)\n";
                                 }
-
                                 UI[i].collidedbox=true;
                                 UI[iP].collidedbox=true;
                                 output = SATUI(i,iP);
                                 if(output.difference<-1||( (cornerDistCheck(i).distance < 10&&UI[iP].objectType==-1) || ( cornerDistCheck(iP).distance < 10&&UI[i].objectType==-1) &&cursorMode=="edit")){
                                     UI[i].collidedSAT=true;
                                     UI[iP].collidedSAT=true;
-                                    collisionResponse(i,iP);
+                                    collisionResponseUI(i,iP);
                                     if(debug==true){
                                         std::cout<<i<<" ("<<UI[i].X<<", "<<UI[i].Y<<") intersects with "<<iP<<" ("<<UI[iP].X<<", "<<UI[iP].Y<<") !(SAT)\n";
                                     }
@@ -2630,6 +2684,91 @@ class game{
 
 
         }
+        void debugerUI(sf::RenderTarget& window,int i){
+            sf::CircleShape pointNotButter(4,20);
+            pointNotButter.setOrigin({4, 1});
+
+            sf::VertexArray outline(sf::PrimitiveType::LineStrip,5);
+
+            outline[0].position = sf::Vector2f((getMaxXUI(i))+W/2,(getMaxYUI(i))+H/2);
+            outline[1].position = sf::Vector2f((getMinXUI(i))+W/2,(getMaxYUI(i))+H/2);
+            outline[2].position = sf::Vector2f((getMinXUI(i))+W/2,(getMinYUI(i))+H/2);
+            outline[3].position = sf::Vector2f((getMaxXUI(i))+W/2,(getMinYUI(i))+H/2);
+            outline[4].position = sf::Vector2f((getMaxXUI(i))+W/2,(getMaxYUI(i))+H/2);
+
+
+            if(UI[i].collidedbox==true){
+                outline[0].color = sf::Color(0xff0000ff);
+                outline[1].color = sf::Color(0xff0000ff);
+                outline[2].color = sf::Color(0xff0000ff);
+                outline[3].color = sf::Color(0xff0000ff);
+                outline[4].color = sf::Color(0xff0000ff);
+                UI[i].collidedbox=false;
+            }
+
+            window.draw(outline);
+
+            //drawing points
+            if((UI[i].objectType==0||UI[i].objectType==1)&&UI[i].sides<=10){
+
+                for(int iP=0;iP<UI[i].sides;iP++){
+                    sf::CircleShape pointNotButter(10,20);
+                    pointNotButter.setOrigin({10, 10});
+                    returnXY point = angleOffset(i,iP);
+
+                    pointNotButter.setPosition({(point.x+baseUnit*UI[i].X)+W/2, (point.y+baseUnit*UI[i].Y)+H/2});
+                    pointNotButter.setFillColor(sf::Color(255-iP*30,0,0));
+
+                    window.draw(pointNotButter);
+                }
+            }else if(UI[i].objectType==2||UI[i].objectType==4){
+                for(int iP=0;iP<4;iP++){
+                    sf::CircleShape pointNotButter(10,20);
+                    pointNotButter.setOrigin({10, 10});
+                    returnXY point = angleOffsetUI(i,iP);
+
+                    pointNotButter.setPosition({(point.x+baseUnit*UI[i].X)+W/2, (point.y+baseUnit*UI[i].Y)+H/2});
+                    pointNotButter.setFillColor(sf::Color(255-iP*30,0,0));
+
+                    window.draw(pointNotButter);
+                }
+            }else if(UI[i].objectType==3){
+                for(int iP=0;iP<UI[i].points;iP++){
+                    sf::CircleShape pointNotButter(10,20);
+                    pointNotButter.setOrigin({10, 10});
+                    returnXY point = angleOffsetUI(i,iP);
+
+                    pointNotButter.setPosition({(point.x+baseUnit*UI[i].X)+W/2, (point.y+baseUnit*UI[i].Y)+H/2});
+                    pointNotButter.setFillColor(sf::Color(255-iP*30,0,0));
+
+                    window.draw(pointNotButter);
+                }
+            }else if(UI[i].objectType==-1||UI[i].objectType==-2){
+                sf::CircleShape pointNotButter(10,20);
+                pointNotButter.setOrigin({10, 10});
+
+
+                pointNotButter.setPosition({(baseUnit*UI[i].X)+W/2, (baseUnit*UI[i].Y)+H/2});
+                if(UI[i].objectType==-1){
+                    pointNotButter.setFillColor(sf::Color(255,0,255));
+                }else{
+                    pointNotButter.setFillColor(sf::Color(255,0,0));
+                }
+
+
+                window.draw(pointNotButter);
+            }
+            pointNotButter.setFillColor(sf::Color(0x00ff00ff));
+            pointNotButter.setPosition({UI[i].pointProjected.x*baseUnit+W/2,UI[i].pointProjected.y*baseUnit});
+
+            window.draw(pointNotButter);
+            pointNotButter.setPosition({UI[i].pointProjected2.x*baseUnit+W/2,UI[i].pointProjected2.y*baseUnit});
+
+            window.draw(pointNotButter);
+
+
+        }
+
 
 };
 
