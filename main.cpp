@@ -280,23 +280,78 @@ class game{
         }
 
     private:
+        //loads data into textExtra for UI elements
         void textSelected(){
-            int count=0;i++
+            int count=0;
+            int selected=0;
             for(int i=0;i<objectCount;i++){
-
+                if(objects[i].selected){
+                    count++;
+                    selected=i;
+                }
+            }
+            if(count==1){
+                for(int i=0;i<UI.size();i++){
+                    if(UI[i].txtLbl=="text label"){
+                        UI[i].textExtra=objects[selected].txtLbl;
+                    }
+                    if(UI[i].txtLbl=="Color"){
+                        std::stringstream sstream;
+                        sstream << std::hex << objects[selected].color;
+                        UI[i].textExtra = sstream.str();
+                    }
+                }
             }
         }
+        //changes text
         void textCh(char txt){
             for(int i=0;i<objectCount;i++){
                 if(objects[i].selected){
-                    if(txt==0x08){
-                        if(objects[i].text.size()!=0){
-                            objects[i].text.pop_back();
+                    if(cursorMode=="edit"){
+                        if(txt==0x08){
+                            if(objects[i].text.size()!=0){
+                                objects[i].text.pop_back();
+                            }
+                        }else{
+                            objects[i].text+=txt;
                         }
-                    }else{
-                        objects[i].text+=txt;
-                    }
+                    }else if(cursorMode=="select"){
+                        int selected=0;
+                        int count=0;
+                        for(int iP=0;iP<UI.size();iP++){
+                            if(UI[iP].selected){
+                                selected=iP;
+                                count++;
 
+                            }
+                        }
+
+                        if(count==1){
+                            //soo manny forr loooops
+                            //asdijahshfik
+                            if(UI[selected].txtLbl=="text label"){
+                                if(txt==0x08){
+                                    if(UI[selected].textExtra.size()!=0){
+                                        UI[selected].textExtra.pop_back();
+                                    }
+                                }else{
+                                    UI[selected].textExtra+=txt;
+                                }
+                                objects[i].txtLbl=UI[selected].textExtra;
+                            }else if(UI[selected].txtLbl=="Color"){
+                                if(txt==0x08){
+                                    if(UI[selected].textExtra.size()!=0){
+                                        UI[selected].textExtra.pop_back();
+                                    }
+                                }else{
+                                    UI[selected].textExtra+=txt;
+                                }
+                                std::stringstream ss;
+                                ss << std::hex << UI[selected].textExtra;
+                                ss >> objects[i].color;
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -525,17 +580,33 @@ class game{
                     }
 
                 }
-                std::cout<<"count: "<<count<<"\n";
                 if(count==0){
                     baseCollision();
                 }else{
+                    if(count>1){
+                        //asiufgdsiuhvjk time to code somthing I did't plan on or want to do!
+                        //selecting UI elements
+                        //yipee
+                        // :(
+                        int selected=0;
+                        for(int i=0;i<UI.size();i++){
+                            if(UI[i].clicked){
+                                selected=i;
+                                UI[i].selected=false;
+                            }
+                        }
+                        //at least UI doesn't have a draw order...
+                        //should I add that
+                        //nah that'd be too much work
+                        //have fun reading my spaghetti code
+                        UI[selected].selected=true;
+                    }
+
                     for(int i=0;i<objectCount;i++){
                         objects[i].clicked=false;
                     }
                     for(int i=0;i<UI.size();i++){
                         UI[i].clicked=false;
-                        UI[i].selected=false;
-                        UI[i].grabbed=false;
                     }
                 }
 
@@ -674,6 +745,9 @@ class game{
                 for(int i=0;i<objectCount;i++){
                     objects[i].clicked=false;
                 }
+                if(count==0){
+                    textSelected();
+                }
 
         }
         //handles keyboard inputs
@@ -784,12 +858,12 @@ class game{
                         copy();
                     }else if(key==sf::Keyboard::Scancode::V){
                         paste();
+                    }else if(key==sf::Keyboard::Scancode::D){
+                        cursorMode="select";
+                    }else if(key==sf::Keyboard::Scancode::E){
+                        cursorMode="edit";
                     }
                 }
-            }else if(key==sf::Keyboard::Scancode::S){
-                cursorMode="select";
-            }else if(key==sf::Keyboard::Scancode::E){
-                cursorMode="edit";
             }
         }
         //deletes object
@@ -1044,7 +1118,7 @@ class game{
 
                 shape.setFillColor(sf::Color(scene[i].color));
                 shape.setCharacterSize(scene[i].sizeModifier*baseUnit/12);
-                shape.setString(scene[i].text);
+                shape.setString(scene[i].text+scene[i].textExtra);
                 window.draw(shape);
             }else if(rectShapePoly(objects[i].objectType)){
                     sf::RectangleShape shape(sf::Vector2f((scene[i].width*baseUnit), (scene[i].height*baseUnit)));
@@ -1915,7 +1989,6 @@ class game{
                 if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
                     if(UI[o1].objectType==-1){
                         UI[o2].clicked=true;
-
                     }else{
                         UI[o1].clicked=true;
                     }
@@ -1946,6 +2019,7 @@ class game{
                 return false;
             }
         }
+        //returns if object is type text
         bool TextShapePoly(int type){
             if(type==4){
                 return true;
