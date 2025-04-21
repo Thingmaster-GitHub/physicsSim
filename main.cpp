@@ -118,6 +118,8 @@ struct object{
     int grabbedPoint = 0;//not used by circleShape
     std::string txtLbl = "default";
     std::string textExtra="";//UI element, please ignore
+    bool txtBoxSelected = false;
+    bool editable = false; //does't do anything yet
 };
 struct cpy{
     object coppied;
@@ -300,14 +302,28 @@ class game{
                         sstream << std::hex << objects[selected].color;
                         UI[i].textExtra = sstream.str();
                     }
+                    if(UI[i].txtLbl=="layer"){
+                        UI[i].textExtra = std::to_string(objects[selected].layer);
+                    }
                 }
             }
         }
         //changes text
         void textCh(char txt){
+            int selected=0;
+            int count=0;
+            for(int iP=0;iP<UI.size();iP++){
+                if(UI[iP].txtBoxSelected){
+                    selected=iP;
+                    count++;
+
+                }
+            }
+
             for(int i=0;i<objectCount;i++){
+
                 if(objects[i].selected){
-                    if(cursorMode=="edit"){
+                    if(objects[i].txtBoxSelected){
                         if(txt==0x08){
                             if(objects[i].text.size()!=0){
                                 objects[i].text.pop_back();
@@ -315,18 +331,7 @@ class game{
                         }else{
                             objects[i].text+=txt;
                         }
-                    }else if(cursorMode=="select"){
-                        int selected=0;
-                        int count=0;
-                        for(int iP=0;iP<UI.size();iP++){
-                            if(UI[iP].selected){
-                                selected=iP;
-                                count++;
-
-                            }
-                        }
-
-                        if(count==1){
+                    }else if(count==1){
                             //soo manny forr loooops
                             //asdijahshfik
                             if(UI[selected].txtLbl=="text label"){
@@ -349,9 +354,19 @@ class game{
                                 std::stringstream ss;
                                 ss << std::hex << UI[selected].textExtra;
                                 ss >> objects[i].color;
+                            }else if(UI[selected].txtLbl=="layer"){
+                                if(txt==0x08){
+                                    if(UI[selected].textExtra.size()!=0){
+                                        UI[selected].textExtra.pop_back();
+                                    }
+                                }else{
+                                    UI[selected].textExtra+=txt;
+                                }
+
+                                objects[i].layer = stoi(UI[selected].textExtra);
                             }
-                        }
                     }
+
                 }
             }
         }
@@ -399,7 +414,6 @@ class game{
             returnXY center = {objects[o].X,objects[o].Y};
             returnXY Opposite;
 
-            //std::cout<<"p: "<<objects[o].grabbedPoint<<"\n";
             if(objects[o].grabbedPoint<3){
                 Opposite = {angleOffset(o,objects[o].grabbedPoint+2)};
             }else{
@@ -441,7 +455,6 @@ class game{
 
             }
 
-            //std::cout<<"1: "<<dist1<<"\n2: "<<dist2<<"\n";
 
             float h=objects[o].height+(dist1-initH)/2;
             float w=objects[o].width+(dist2-initW)/2;
@@ -571,6 +584,13 @@ class game{
         }
         //left click
         void Lclick(){
+            //deselects text box
+            for(int i=0;i<objectCount;i++){
+                objects[i].txtBoxSelected=false;
+            }
+            for(int i=0;i<UI.size();i++){
+                UI[i].txtBoxSelected=false;
+            }
 
                 baseCollisionUI();
                 int count=0;
@@ -578,7 +598,6 @@ class game{
                     if(UI[i].clicked){
                         count++;
                     }
-
                 }
                 if(count==0){
                     baseCollision();
@@ -592,16 +611,20 @@ class game{
                         for(int i=0;i<UI.size();i++){
                             if(UI[i].clicked){
                                 selected=i;
-                                UI[i].selected=false;
+                                UI[i].txtBoxSelected=false;
                             }
                         }
                         //at least UI doesn't have a draw order...
                         //should I add that
                         //nah that'd be too much work
                         //have fun reading my spaghetti code
-                        UI[selected].selected=true;
+
+                        if(TextShapePoly(UI[selected].objectType)){
+                            UI[selected].txtBoxSelected=true;
+                        }
                     }
 
+                    //unclicks
                     for(int i=0;i<objectCount;i++){
                         objects[i].clicked=false;
                     }
@@ -610,7 +633,7 @@ class game{
                     }
                 }
 
-                //for editing points to work on overlaping shapes
+                //point selection
                 if(cursorMode=="edit"){
                     pointDist check = {};
                     int queriedObjectSelected = 0;
@@ -633,7 +656,7 @@ class game{
                         objects[Ochecked].grabbedPoint=check.point;
                         objects[Ochecked].pointGrabbed=true;
 
-                        //std::cout<<"p: "<<check.point<<"\n";
+
 
                         for(int i=0;i<objectCount;i++){
                             objects[i].clicked=false;
@@ -660,6 +683,11 @@ class game{
                         }
                     }
                 }else if(clickQ=1){
+                    if(TextShapePoly(objects[queriedTrue].objectType)){
+                        objects[queriedTrue].txtBoxSelected=true;
+                    }
+
+
                     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LShift)){
                         if(objects[queriedTrue].selected==true){
                             objects[queriedTrue].selected=false;
@@ -739,6 +767,9 @@ class game{
                             }
                         }
                     }
+                    if(TextShapePoly(objects[queriedTrue].objectType)){
+                        objects[queriedTrue].txtBoxSelected=true;
+                    }
 
                 }
                 //resets clicked values
@@ -749,13 +780,14 @@ class game{
                     textSelected();
                 }
 
+
         }
         //handles keyboard inputs
         void input(const sf::Keyboard::Scan key){
             if(key==sf::Keyboard::Scancode::Equal){
                 createObject();
             }else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LControl)||sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::RControl)){
-                if(cursorMode=="select"){
+                //if(cursorMode=="select"){
                     if(key==sf::Keyboard::Scancode::Num1){
 
                         for(int i=0; i<objectCount;i++){
@@ -863,7 +895,7 @@ class game{
                     }else if(key==sf::Keyboard::Scancode::E){
                         cursorMode="edit";
                     }
-                }
+                //}
             }
         }
         //deletes object
@@ -1085,7 +1117,7 @@ class game{
         }
         //draws UI
         void drawUI(sf::RenderTarget& window,int i,std::vector<object>& scene){
-            if(circleShapePoly(objects[i].objectType)){
+            if(circleShapePoly(scene[i].objectType)){
 
 
                 sf::CircleShape shape((baseUnit*scene[i].sizeModifier*2),scene[i].sides);
@@ -1110,7 +1142,7 @@ class game{
                 sf::Text shape(scene[i].font);
 
 
-                returnXY point = angleOffset(i,4);
+                returnXY point = angleOffsetUI(i,4);
 
                 shape.setPosition({(point.x+baseUnit*scene[i].X)+W/2, (point.y+baseUnit*scene[i].Y)+H/2});
                 sf::Angle angle = sf::degrees(scene[i].rotation);
@@ -1118,9 +1150,14 @@ class game{
 
                 shape.setFillColor(sf::Color(scene[i].color));
                 shape.setCharacterSize(scene[i].sizeModifier*baseUnit/12);
-                shape.setString(scene[i].text+scene[i].textExtra);
+                if((std::rand()%100)<20&&scene[i].txtBoxSelected){
+                    shape.setString(scene[i].text+scene[i].textExtra+"|");
+                }else{
+                    shape.setString(scene[i].text+scene[i].textExtra);
+                }
+
                 window.draw(shape);
-            }else if(rectShapePoly(objects[i].objectType)){
+            }else if(rectShapePoly(scene[i].objectType)){
                     sf::RectangleShape shape(sf::Vector2f((scene[i].width*baseUnit), (scene[i].height*baseUnit)));
 
                     shape.setOrigin({(scene[i].width*baseUnit/2), (scene[i].height*baseUnit/2)});
@@ -1139,13 +1176,13 @@ class game{
                     shape.setTexture(&scene[i].texture);
 
                     window.draw(shape);
-                }else if(convexShapePoly(objects[i].objectType)){
+            }else if(convexShapePoly(scene[i].objectType)){
                     sf::ConvexShape shape;
                     shape.setPointCount(scene[i].points);
 
                     for(int iP = 0; iP<scene[i].points;iP++){
                         shape.setPoint(iP, sf::Vector2f((scene[i].pointList[iP*2]*baseUnit*scene[i].sizeModifier), (scene[i].pointList[iP*2+1]*baseUnit*scene[i].sizeModifier)));
-                        //std::cout<<"x: "<<objects[i].pointList[iP*2]<<"\ny: "<<objects[i].pointList[iP*2+1]<<"\n";
+
                     }
 
 
@@ -1160,11 +1197,11 @@ class game{
                         shape.setFillColor(sf::Color(0xff0000ff));
                         scene[i].collidedSAT=false;
                     }
-                    shape.setTexture(&objects[i].texture);
+                    shape.setTexture(&scene[i].texture);
 
                     window.draw(shape);
 
-                }
+            }
                 if(debug==true){
                     std::cout<<"DRAWN!: "<<i<<"\n";
                 }
@@ -1208,7 +1245,11 @@ class game{
 
                     shape.setFillColor(sf::Color(scene[i].color));
                     shape.setCharacterSize(scene[i].sizeModifier/zoomAMT*baseUnit/12);
-                    shape.setString(scene[i].text);
+                    if((std::rand()%100)<20&&scene[i].txtBoxSelected){
+                        shape.setString(scene[i].text+"|");
+                    }else{
+                        shape.setString(scene[i].text);
+                    }
                     window.draw(shape);
                 }else if(rectShapePoly(scene[i].objectType)){
                     sf::RectangleShape shape(sf::Vector2f((scene[i].width*baseUnit)/zoomAMT, (scene[i].height*baseUnit)/zoomAMT));
@@ -1235,7 +1276,7 @@ class game{
 
                     for(int iP = 0; iP<scene[i].points;iP++){
                         shape.setPoint(iP, sf::Vector2f((scene[i].pointList[iP*2]*baseUnit*scene[i].sizeModifier)/zoomAMT, (scene[i].pointList[iP*2+1]*baseUnit*scene[i].sizeModifier)/zoomAMT));
-                        //std::cout<<"x: "<<objects[i].pointList[iP*2]<<"\ny: "<<objects[i].pointList[iP*2+1]<<"\n";
+
                     }
 
 
@@ -1286,11 +1327,11 @@ class game{
                         XMinCh = getMinX(iP);
                         YMaxCh = getMaxY(iP);
                         YMinCh = getMinY(iP);
-                        //std::cout<<"top Y 1: "<<YMin<<"\ntop Y 2: "<<YMinCh<<"\nbottom Y 1: "<<YMax<<"\nbottom Y 2: "<<YMaxCh<<"\n\n";
+
                         if(!(XMin>XMaxCh||XMax<XMinCh||YMin>YMaxCh||YMax<YMinCh)){
                             if(objects[i].objectType==-1||objects[iP].objectType==-1){
                                 if(debug==true){
-                                    //std::cout<<i<<" ("<<objects[i].X<<", "<<objects[i].Y<<") intersects with "<<iP<<" ("<<objects[iP].X<<", "<<objects[iP].Y<<") !(bounding box)\n";
+
                                 }
 
                                 objects[i].collidedbox=true;
@@ -1545,8 +1586,7 @@ class game{
                     pointNotButter.setPosition({iX*baseUnit, iY*baseUnit});
 
                     window.draw(pointNotButter);
-                    //std::cout<< "\nwa:"<<wa<<"\nha: "<<ha<<"\ncmb: "<<cmb<<"\nmlt: "<<mlt<<"\n";
-                    //std::cout<<"butter: \niX: "<<iX<<"\niY: "<<iY<<"\nout: \niX: "<<iX*baseUnit<<"\niY: "<<iY*baseUnit<<"\nreq: \nheight: "<<H<<"\nwidth: "<<W<<"\nunits: "<<mlt<<"\n";
+
                 }
             }
         }
@@ -1586,14 +1626,14 @@ class game{
                     output.y=dist*cos(-degToRad(objects[i].rotation+90*(point)+90)-rad);
                 }
 
-                //std::cout<<"point: "<<point<<"\ndeg: " << radToDeg(rad)<<"\ndist: "<< dist <<"\nbaseUnit: "<<baseUnit<<"\n";
+
             }else if(convexShapePoly(objects[i].objectType)){
                 float dist = sqrt(square(objects[i].pointList[point*2])+square(objects[i].pointList[point*2+1]))*baseUnit*objects[i].sizeModifier;
                 float rad =asin(objects[i].pointList[point*2+1]*baseUnit*objects[i].sizeModifier/dist);
 
                 float x=objects[i].pointList[point*2];
                 float y=objects[i].pointList[point*2+1];
-                //std::cout<<"\n\npoint: "<<point<<"\n\nXch: "<<X<<"\nYch: "<<Y<<"\n\nXpoint: "<<objects[i].pointList[point*2]<<"\nYpoint: "<<objects[i].pointList[point*2+1]<<"\n\nx: "<<x<<"\ny: "<<y<<"\n";
+
 
                 if(congruent(objects[i].pointList[point*2],objects[i].pointList[point*2+1])){
                     if(x<0){
@@ -1604,7 +1644,7 @@ class game{
                         output.y=dist*cos(-degToRad(objects[i].rotation-90)-rad);
                     }
 
-                    //std::cout<<"point: "<<point<<"\n\n";
+
                 }else{
                     if(x<0){
                         output.x=dist*sin(-degToRad(objects[i].rotation+90)+rad);
@@ -1616,13 +1656,12 @@ class game{
 
                 }
 
-                    //std::cout<<"point: "<<point<<"\n";
-                    //std::cout<<"rotation: "<<rot<<"\n";
 
-                //std::cout<<"point: "<<point<<"\nX: "<<x<<"\nY: "<<y<<"\ninX: "<<objects[i].pointList[point*2]<<"\ninY: "<<objects[i].pointList[point*2+1]<<"\n\n";
+
+
             }
 
-            //std::cout<<"object type: "<<objects[i].objectType<<"\n";
+
 
             return output;
         }
@@ -2060,11 +2099,11 @@ class game{
                         XMinCh = getMinXUI(iP);
                         YMaxCh = getMaxYUI(iP);
                         YMinCh = getMinYUI(iP);
-                        //std::cout<<"top Y 1: "<<YMin<<"\ntop Y 2: "<<YMinCh<<"\nbottom Y 1: "<<YMax<<"\nbottom Y 2: "<<YMaxCh<<"\n\n";
+
                         if(!(XMin>XMaxCh||XMax<XMinCh||YMin>YMaxCh||YMax<YMinCh)){
                             if(UI[i].objectType==-1||UI[iP].objectType==-1){
                                 if(debug==true){
-                                    //std::cout<<i<<" ("<<UI[i].X<<", "<<UI[i].Y<<") intersects with "<<iP<<" ("<<UI[iP].X<<", "<<UI[iP].Y<<") !(bounding box)\n";
+
                                 }
                                 UI[i].collidedbox=true;
                                 UI[iP].collidedbox=true;
@@ -2332,14 +2371,14 @@ class game{
                     output.y=dist*cos(-degToRad(UI[i].rotation+90*(point)+90)-rad);
                 }
 
-                //std::cout<<"point: "<<point<<"\ndeg: " << radToDeg(rad)<<"\ndist: "<< dist <<"\nbaseUnit: "<<baseUnit<<"\n";
+
             }else if(convexShapePoly(UI[i].objectType)){
                 float dist = sqrt(square(UI[i].pointList[point*2])+square(UI[i].pointList[point*2+1]))*baseUnit*UI[i].sizeModifier;
                 float rad =asin(UI[i].pointList[point*2+1]*baseUnit*UI[i].sizeModifier/dist);
 
                 float x=UI[i].pointList[point*2];
                 float y=UI[i].pointList[point*2+1];
-                //std::cout<<"\n\npoint: "<<point<<"\n\nXch: "<<X<<"\nYch: "<<Y<<"\n\nXpoint: "<<UI[i].pointList[point*2]<<"\nYpoint: "<<UI[i].pointList[point*2+1]<<"\n\nx: "<<x<<"\ny: "<<y<<"\n";
+
 
                 if(congruent(UI[i].pointList[point*2],UI[i].pointList[point*2+1])){
                     if(x<0){
@@ -2350,7 +2389,7 @@ class game{
                         output.y=dist*cos(-degToRad(UI[i].rotation-90)-rad);
                     }
 
-                    //std::cout<<"point: "<<point<<"\n\n";
+
                 }else{
                     if(x<0){
                         output.x=dist*sin(-degToRad(UI[i].rotation+90)+rad);
@@ -2362,13 +2401,10 @@ class game{
 
                 }
 
-                //std::cout<<"point: "<<point<<"\n";
-                //std::cout<<"rotation: "<<rot<<"\n";
 
-                //std::cout<<"point: "<<point<<"\nX: "<<x<<"\nY: "<<y<<"\ninX: "<<UI[i].pointList[point*2]<<"\ninY: "<<UI[i].pointList[point*2+1]<<"\n\n";
             }
 
-            //std::cout<<"object type: "<<UI[i].objectType<<"\n";
+
 
             return output;
         }
