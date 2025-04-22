@@ -6,8 +6,8 @@
 #include <cmath>
 #include <limits>
 #include <SFML/Graphics.hpp>
-const int W = 1920;
-const int H = 1080;
+const int W = 1280;
+const int H = 720;
 int objectCount =15;
 float baseUnit = (W/128+H/72)/2;
 
@@ -120,6 +120,7 @@ struct object{
     std::string textExtra="";//UI element, please ignore
     bool txtBoxSelected = false;
     bool editable = false; //does't do anything yet
+    float bgDist =1;//unimplimented
 };
 struct cpy{
     object coppied;
@@ -248,7 +249,7 @@ class game{
                 }
                 winOutline(window);
                 for(int i = 0;i<UI.size();i++){
-                    drawUI(window,objectLoadOrder[i],UI);
+                    drawUI(window,UILoadOrder[i],UI);
                     if(UI[i].objectType==-1){
                         sf::Vector2i position = sf::Mouse::getPosition(window);
                         UI[i].X=(position.x-W/2)/baseUnit;
@@ -263,7 +264,8 @@ class game{
                 if(cursorMode=="edit"){
                     for(int i=0;i<objectCount;i++){
                         if(objects[i].selected){
-                            drawPoints(window,objectLoadOrder[i]);
+                            drawPoints(window,i);
+
                         }
                     }
                 }
@@ -377,8 +379,9 @@ class game{
                                     UI[selected].textExtra+=txt;
                                 }
                                 std::stringstream ss;
-                                ss << UI[i].textExtra;
+                                ss << UI[selected].textExtra;
                                 ss >> objects[i].layer;
+                                LayerObjects();
                             }
                     }
 
@@ -624,14 +627,11 @@ class game{
                         // :(
                         int selected=0;
                         for(int i=0;i<UI.size();i++){
-                            if(UI[i].clicked){
+                            if(UI[UILoadOrder[i]].clicked){
                                 selected=i;
-                                UI[i].txtBoxSelected=false;
+                                UI[UILoadOrder[i]].txtBoxSelected=false;
                             }
                         }
-                        //at least UI doesn't have a draw order...
-                        //should I add that
-                        //nah that'd be too much work
                         //have fun reading my spaghetti code
 
                         if(TextShapePoly(UI[selected].objectType)){
@@ -808,8 +808,8 @@ class game{
                         for(int i=0; i<objectCount;i++){
                             if(objects[i].grabbed==true){
                                 objects[i].objectType=0;
-                                if(objects[i].mass!=-1){
-                                    objects[i].color=4294967295;
+                                if(objects[i].color==16711935||objects[i].color==0xff00ffff){
+                                    objects[i].color=0xffffffff;
                                 }
                                 objects[i].sides=3;
                                 objects[i].sizeModifier=2;
@@ -819,8 +819,8 @@ class game{
                         for(int i=0; i<objectCount;i++){
                             if(objects[i].grabbed==true){
                                 objects[i].objectType=1;
-                                if(objects[i].mass!=-1){
-                                    objects[i].color=4278255615;
+                                if(objects[i].color==16711935||objects[i].color==0xff00ffff){
+                                    objects[i].color=0xff00ffff;
                                 }
                                 objects[i].sides=4;
                                 objects[i].sizeModifier=2;
@@ -833,8 +833,8 @@ class game{
                                 objects[i].width=20;
                                 objects[i].height=10;
 
-                                if(objects[i].mass!=-1){
-                                    objects[i].color=4294967295;
+                                if(objects[i].color==16711935||objects[i].color==0xff00ffff){
+                                    objects[i].color=0xffffffff;
                                 }
                             }
                         }
@@ -861,7 +861,7 @@ class game{
                                 objects[i].pointList[13]=2.208571434020996;
 
 
-                                if(objects[i].mass!=-1){
+                                if(objects[i].color==0xffffffff||objects[i].color==0xff00ffff){
                                     objects[i].color=16711935;
                                 }
                                 float X=0;
@@ -887,7 +887,9 @@ class game{
                         for(int i=0; i<objectCount;i++){
                             if(objects[i].grabbed==true){
                                 objects[i].objectType=4;
-                                objects[i].color=0xffffffff;
+                                if(objects[i].color==16711935||objects[i].color==0xff00ffff){
+                                    objects[i].color=0xffffffff;
+                                }
                                 objects[i].sizeModifier=24;
                                 objects[i].width=20;
                                 objects[i].height=10;
@@ -898,7 +900,6 @@ class game{
                             if(objects[i].grabbed==true){
                                 objects[i].gravity=false;
                                 objects[i].mass=-1;
-                                objects[i].color=0x2a2e32ff;
                             }
                         }
                     }else if(key==sf::Keyboard::Scancode::C){
@@ -930,6 +931,29 @@ class game{
             objects.push_back(tmpObj);
             objectCount++;
             initialize();
+        }
+        //sets object load order for drawing
+        void LayerObjectsUI(){
+            UILoadOrder.clear();
+
+            int maxLoaded=-std::numeric_limits<int>::infinity();
+            int minLoaded=std::numeric_limits<int>::infinity();
+            for(int i=0;i<UI.size();i++){
+                if(UI[i].layer>maxLoaded){
+                    maxLoaded=UI[i].layer;
+                }
+                if(UI[i].layer<minLoaded){
+                    minLoaded=UI[i].layer;
+                }
+            }
+
+            for(int i=minLoaded;i<=maxLoaded;i++){
+                for(int ip=0;ip<UI.size();ip++){
+                    if(UI[ip].layer==i){
+                        UILoadOrder.push_back(ip);
+                    }
+                }
+            }
         }
         //sets object load order for drawing
         void LayerObjects(){
@@ -998,6 +1022,7 @@ class game{
                 }
             }
             LayerObjects();
+            LayerObjectsUI();
         }
         void zoom(float ammount){
             if(ammount<0){
@@ -1368,7 +1393,6 @@ class game{
 
             }
         }
-
         //SAT calculations
         SATout SAT(int o1,int o2){
             SATout output;
@@ -1497,7 +1521,6 @@ class game{
 
             return output;
         }
-
         //polygon on ponlygon collisions
         SATout SATLoop(int o1,int o2,int times,SATout output){
             returnXY normal;
@@ -1543,7 +1566,6 @@ class game{
 
             return output;
         }
-
         //SAT calculation for circle on polygon colisions
         SATout SATLoopCirclePoly(int o1, int o2, int times,SATout output){
             returnXY normal;
@@ -1591,7 +1613,6 @@ class game{
 
             return output;
         }
-
         //graphs points that are baseUnit appart in spacing
         void testingLayoutInf(sf::RenderTarget& window){
             sf::CircleShape pointNotButter(1,20);
@@ -1605,18 +1626,15 @@ class game{
                 }
             }
         }
-
         //degrees to radians
         float degToRad(float deg){
             for(int i = 0;deg>360;deg-=360){}
             return deg*(3.14/180);
         }
-
         //radians to degrees
         float radToDeg(float rad){
             return rad*(180/3.14);
         }
-
         //returns offset of specified point from shape center
         returnXY angleOffset(int i,int point){//should return the point as an offset from the center of the shape with X and Y values
 
@@ -1680,12 +1698,10 @@ class game{
 
             return output;
         }
-
         //squares input
         float square(float n){
             return n*n;
         }
-
         //if the polarity of both inputs is the same, returns true
         bool congruent(float x,float y){
             if(x<0&&y<0){
@@ -1696,7 +1712,6 @@ class game{
                 return false;
             }
         }
-
         //used for bounding box
         //gets minimum X
         float getMinX(int object){
@@ -1865,7 +1880,6 @@ class game{
             }
             return pointOutput+baseUnit*objects[object].Y;
         }
-
         //gets maximum normal of shape
         maxMin getMaxNormal(int object,returnXY normal){
             maxMin output;
@@ -1927,7 +1941,6 @@ class game{
             }
             return output;
         }
-
         //gets minimum normal of shape
         maxMin getMinNormal(int object,returnXY normal){
             maxMin output;
@@ -2081,7 +2094,6 @@ class game{
                 return false;
             }
         }
-
         //rotates normal vector 90 degrees
         returnXY invertNormal(returnXY normal){
             returnXY output;
@@ -2139,7 +2151,6 @@ class game{
 
             }
         }
-
         //SAT calculations
         SATout SATUI(int o1,int o2){
             SATout output;
@@ -2268,7 +2279,6 @@ class game{
 
             return output;
         }
-
         //polygon on ponlygon collisions
         SATout SATLoopUI(int o1,int o2,int times,SATout output){
             returnXY normal;
@@ -2314,7 +2324,6 @@ class game{
 
             return output;
         }
-
         //SAT calculation for circle on polygon colisions
         SATout SATLoopCirclePolyUI(int o1, int o2, int times,SATout output){
             returnXY normal;
@@ -2423,6 +2432,7 @@ class game{
 
             return output;
         }
+
         float getMinXUI(int object){
 
             float pointOutput = angleOffsetUI(object,0).x;
@@ -2589,7 +2599,6 @@ class game{
             }
             return pointOutput+baseUnit*UI[object].Y;
         }
-
         //gets maximum normal of shape
         maxMin getMaxNormalUI(int object,returnXY normal){
             maxMin output;
@@ -2651,7 +2660,6 @@ class game{
             }
             return output;
         }
-
         //gets minimum normal of shape
         maxMin getMinNormalUI(int object,returnXY normal){
             maxMin output;
@@ -2809,6 +2817,7 @@ class game{
 
 
         }
+
         void debugerUI(sf::RenderTarget& window,int i){
             sf::CircleShape pointNotButter(4,20);
             pointNotButter.setOrigin({4, 1});
