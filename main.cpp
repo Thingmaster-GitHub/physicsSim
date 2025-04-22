@@ -6,8 +6,8 @@
 #include <cmath>
 #include <limits>
 #include <SFML/Graphics.hpp>
-const int W = 1366;
-const int H = 768;
+const int W = 1920;
+const int H = 1080;
 int objectCount =15;
 float baseUnit = (W/128+H/72)/2;
 
@@ -246,6 +246,7 @@ class game{
                         objects[i].grabbedPoint=0;
                     }
                 }
+                winOutline(window);
                 for(int i = 0;i<UI.size();i++){
                     drawUI(window,objectLoadOrder[i],UI);
                     if(UI[i].objectType==-1){
@@ -268,6 +269,7 @@ class game{
                 }
 
 
+
                 //testingLayoutInf(window);
                 window.display();
             }
@@ -282,6 +284,17 @@ class game{
         }
 
     private:
+        void winOutline(sf::RenderTarget& window){
+            sf::VertexArray outline(sf::PrimitiveType::LineStrip,5);
+
+            outline[0].position = sf::Vector2f((W/2+camOffsetX)/zoomAMT+W/2,(H/2+camOffsetY)/zoomAMT+H/2);
+            outline[1].position = sf::Vector2f((-W/2+camOffsetX)/zoomAMT+W/2,(H/2+camOffsetY)/zoomAMT+H/2);
+            outline[2].position = sf::Vector2f((-W/2+camOffsetX)/zoomAMT+W/2,(-H/2+camOffsetY)/zoomAMT+H/2);
+            outline[3].position = sf::Vector2f((W/2+camOffsetX)/zoomAMT+W/2,(-H/2+camOffsetY)/zoomAMT+H/2);
+            outline[4].position = sf::Vector2f((W/2+camOffsetX)/zoomAMT+W/2,(H/2+camOffsetY)/zoomAMT+H/2);
+
+            window.draw(outline);
+        }
         //loads data into textExtra for UI elements
         void textSelected(){
             int count=0;
@@ -303,6 +316,7 @@ class game{
                         UI[i].textExtra = sstream.str();
                     }
                     if(UI[i].txtLbl=="layer"){
+
                         UI[i].textExtra = std::to_string(objects[selected].layer);
                     }
                 }
@@ -362,8 +376,9 @@ class game{
                                 }else{
                                     UI[selected].textExtra+=txt;
                                 }
-
-                                objects[i].layer = stoi(UI[selected].textExtra);
+                                std::stringstream ss;
+                                ss << UI[i].textExtra;
+                                ss >> objects[i].layer;
                             }
                     }
 
