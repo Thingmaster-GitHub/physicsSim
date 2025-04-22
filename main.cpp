@@ -94,6 +94,8 @@ struct object{
     sf::Texture texture;
     int layer=0;
     std::string text = "lorium ipsum";
+    std::string fontLoc = "Comic Sans MS.ttf";
+    sf::Font font;
 
 };
 std::vector<object> objects;
@@ -143,6 +145,9 @@ public:
             if (!objects[i].texture.loadFromFile(objects[i].loc)){
                 //10/0;
                 //I'm too lazy to throw an error here
+            }
+            if (!objects[i].font.openFromFile(objects[i].fontLoc)){
+                //throw error or something
             }
         }
 
@@ -413,6 +418,23 @@ private:
                 shape.setTexture(&objects[i].texture);
 
                 window.draw(shape);
+            }else if(TextShapePoly(objects[i].objectType)){
+                sf::Text shape(objects[i].font);
+
+
+                //shape.setPosition({(point.x+baseUnit*objects[i].X+camOffsetX)/zoomAMT+W/2, (point.y+baseUnit*objects[i].Y+camOffsetY)/zoomAMT+H/2});
+                returnXY point = angleOffset(i,4);
+
+                shape.setPosition({(point.x+baseUnit*objects[i].X+camOffsetX)+W/2, (point.y+baseUnit*objects[i].Y+camOffsetY)+H/2});
+                sf::Angle angle = sf::degrees(objects[i].rotation);
+                shape.setRotation(angle);
+
+                shape.setFillColor(sf::Color(objects[i].color));
+                shape.setCharacterSize(objects[i].sizeModifier*baseUnit/12);
+
+                shape.setString(objects[i].text);
+
+                window.draw(shape);
             }else if(rectShapePoly(i)&&objects[i].objectType!=-3){
                 sf::RectangleShape shape(sf::Vector2f(objects[i].width*baseUnit, objects[i].height*baseUnit));
 
@@ -464,8 +486,6 @@ private:
 
         }
     }
-
-
     //transforms objects by velocity, gravity, and air resistance.
     void transform(int i,float timediff){
         objects[i].X+=objects[i].velX/timediff*baseUnit/500;
@@ -502,7 +522,6 @@ private:
         //std::cout<<objects[i].velY<<"\n";
 
     }
-
     //checks bounding box collisions and runs SAT if intersects
     void baseCollision(float timediff){
         float XMax;
@@ -558,7 +577,6 @@ private:
 
         }
     }
-
     //SAT calculations
     SATout SAT(int o1,int o2){
         SATout output;
@@ -708,7 +726,6 @@ private:
 
         return output;
     }
-
     //polygon on ponlygon collisions
     SATout SATLoop(int o1,int o2,int times,SATout output){
         returnXY normal;
@@ -754,7 +771,6 @@ private:
 
         return output;
     }
-
     //SAT calculation for circle on polygon colisions
     SATout SATLoopCirclePoly(int o1, int o2, int times,SATout output){
         returnXY normal;
@@ -802,7 +818,6 @@ private:
 
         return output;
     }
-
     //graphs points that are baseUnit appart in spacing
     void testingLayoutInf(sf::RenderTarget& window){
         sf::CircleShape pointNotButter(1,20);
@@ -817,18 +832,15 @@ private:
             }
         }
     }
-
     //degrees to radians
     float degToRad(float deg){
         for(int i = 0;deg>360;deg-=360){}
         return deg*(3.14/180);
     }
-
     //radians to degrees
     float radToDeg(float rad){
         return rad*(180/3.14);
     }
-
     //returns offset of specified point from shape center
     returnXY angleOffset(int i,int point){//should return the point as an offset from the center of the shape with X and Y values
         int butterSize = 5;
@@ -893,12 +905,10 @@ private:
 
         return output;
     }
-
     //squares input
     float square(float n){
         return n*n;
     }
-
     //if the polarity of both inputs is the same, returns true
     bool congruent(float x,float y){
         if(x<0&&y<0){
@@ -909,7 +919,6 @@ private:
             return false;
         }
     }
-
     //used for bounding box
     //gets minimum X
     float getMinX(int object){
@@ -1064,7 +1073,6 @@ private:
         }
         return pointOutput+objects[object].Y;
     }
-
     //gets maximum normal of shape
     maxMin getMaxNormal(int object,returnXY normal){
         maxMin output;
@@ -1126,7 +1134,6 @@ private:
         }
         return output;
     }
-
     //gets minimum normal of shape
     maxMin getMinNormal(int object,returnXY normal){
         maxMin output;
@@ -1350,7 +1357,7 @@ private:
     }
     //returns if object is type rectangle
     bool rectShapePoly(int object){
-        if(objects[object].objectType==2||objects[object].objectType==-3){
+        if(objects[object].objectType==2||objects[object].objectType==-3||objects[object].objectType==4){
             return true;
         }else{
             return false;
@@ -1364,7 +1371,13 @@ private:
             return false;
         }
     }
-
+    bool TextShapePoly(int object){
+        if(objects[object].objectType==4){
+            return true;
+        }else{
+            return false;
+        }
+    }
     //rotates normal vector 90 degrees
     returnXY invertNormal(returnXY normal){
         returnXY output;
@@ -1372,7 +1385,6 @@ private:
         output.y=-normal.x;
         return output;
     }
-
     //don't input an obect besides ones for this calculated SAT input
     //calculated projected offset of shape for rotation
     float VelRotCalc(int o1,int o2,SATout input,int direction){
@@ -1430,9 +1442,11 @@ private:
 
 
     }
+
     float distance(returnXY point1,returnXY point2){
         return sqrt(square(point1.x-point2.x)+square(point1.y-point2.y));
     }
+
     void friction(int o1,int o2,returnXY normal,float timediff){
         returnXY inverted = invertNormal(normal);
         returnXY vel = {objects[o1].velX,objects[o1].velY};
@@ -1460,6 +1474,7 @@ private:
 
 
     }
+
     void debuger(sf::RenderTarget& window,int i){
         sf::CircleShape pointNotButter(4,20);
         pointNotButter.setOrigin({4, 1});
