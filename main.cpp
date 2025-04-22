@@ -6,6 +6,8 @@
 #include <cmath>
 #include <limits>
 #include <SFML/Graphics.hpp>
+const int mX=48;
+const int mY=28;
 const int W = 1280;
 const int H = 720;
 int objectCount =15;
@@ -214,9 +216,10 @@ class game{
 
                         //inverse of draw call in debug
                         //{(baseUnit*objects[i].X+camOffsetX)/zoomAMT+W/2, (baseUnit*objects[i].Y+camOffsetY)/zoomAMT+H/2}
-                        objects[i].X = ((position.x)*zoomAMT-camOffsetX-W/2*zoomAMT)/baseUnit;
-                        objects[i].Y = ((position.y)*zoomAMT-camOffsetY-H/2*zoomAMT)/baseUnit;
+                        objects[i].X = ((position.x)*zoomAMT-camOffsetX-mX*baseUnit*zoomAMT)/baseUnit;
+                        objects[i].Y = ((position.y)*zoomAMT-camOffsetY-mY*baseUnit*zoomAMT)/baseUnit;
                         mouseObject=i;
+                        std::cout<<"X: "<<position.x<<"\nY: "<<position.y<<"\n";
                     }
 
                     if(cursorMode=="edit"&&objects[i].pointGrabbed){
@@ -289,11 +292,11 @@ class game{
         void winOutline(sf::RenderTarget& window){
             sf::VertexArray outline(sf::PrimitiveType::LineStrip,5);
 
-            outline[0].position = sf::Vector2f((W/2+camOffsetX)/zoomAMT+W/2,(H/2+camOffsetY)/zoomAMT+H/2);
-            outline[1].position = sf::Vector2f((-W/2+camOffsetX)/zoomAMT+W/2,(H/2+camOffsetY)/zoomAMT+H/2);
-            outline[2].position = sf::Vector2f((-W/2+camOffsetX)/zoomAMT+W/2,(-H/2+camOffsetY)/zoomAMT+H/2);
-            outline[3].position = sf::Vector2f((W/2+camOffsetX)/zoomAMT+W/2,(-H/2+camOffsetY)/zoomAMT+H/2);
-            outline[4].position = sf::Vector2f((W/2+camOffsetX)/zoomAMT+W/2,(H/2+camOffsetY)/zoomAMT+H/2);
+            outline[0].position = sf::Vector2f((W/2+camOffsetX)/zoomAMT+mX*baseUnit,(H/2+camOffsetY)/zoomAMT+mY*baseUnit);
+            outline[1].position = sf::Vector2f((-W/2+camOffsetX)/zoomAMT+mX*baseUnit,(H/2+camOffsetY)/zoomAMT+mY*baseUnit);
+            outline[2].position = sf::Vector2f((-W/2+camOffsetX)/zoomAMT+mX*baseUnit,(-H/2+camOffsetY)/zoomAMT+mY*baseUnit);
+            outline[3].position = sf::Vector2f((W/2+camOffsetX)/zoomAMT+mX*baseUnit,(-H/2+camOffsetY)/zoomAMT+mY*baseUnit);
+            outline[4].position = sf::Vector2f((W/2+camOffsetX)/zoomAMT+mX*baseUnit,(H/2+camOffsetY)/zoomAMT+mY*baseUnit);
 
             window.draw(outline);
         }
@@ -1036,17 +1039,17 @@ class game{
             sf::VertexArray outline(sf::PrimitiveType::LineStrip,5);
 
             if(cursorMode=="edit"){
-                outline[0].position = sf::Vector2f((getMaxX(i)-5+camOffsetX)/zoomAMT+W/2,(getMaxY(i)-5+camOffsetY)/zoomAMT+H/2);
-                outline[1].position = sf::Vector2f((getMinX(i)+5+camOffsetX)/zoomAMT+W/2,(getMaxY(i)-5+camOffsetY)/zoomAMT+H/2);
-                outline[2].position = sf::Vector2f((getMinX(i)+5+camOffsetX)/zoomAMT+W/2,(getMinY(i)+5+camOffsetY)/zoomAMT+H/2);
-                outline[3].position = sf::Vector2f((getMaxX(i)-5+camOffsetX)/zoomAMT+W/2,(getMinY(i)+5+camOffsetY)/zoomAMT+H/2);
-                outline[4].position = sf::Vector2f((getMaxX(i)-5+camOffsetX)/zoomAMT+W/2,(getMaxY(i)-5+camOffsetY)/zoomAMT+H/2);
+                outline[0].position = sf::Vector2f((getMaxX(i)-5+camOffsetX)/zoomAMT+mX*baseUnit,(getMaxY(i)-5+camOffsetY)/zoomAMT+mY*baseUnit);
+                outline[1].position = sf::Vector2f((getMinX(i)+5+camOffsetX)/zoomAMT+mX*baseUnit,(getMaxY(i)-5+camOffsetY)/zoomAMT+mY*baseUnit);
+                outline[2].position = sf::Vector2f((getMinX(i)+5+camOffsetX)/zoomAMT+mX*baseUnit,(getMinY(i)+5+camOffsetY)/zoomAMT+mY*baseUnit);
+                outline[3].position = sf::Vector2f((getMaxX(i)-5+camOffsetX)/zoomAMT+mX*baseUnit,(getMinY(i)+5+camOffsetY)/zoomAMT+mY*baseUnit);
+                outline[4].position = sf::Vector2f((getMaxX(i)-5+camOffsetX)/zoomAMT+mX*baseUnit,(getMaxY(i)-5+camOffsetY)/zoomAMT+mY*baseUnit);
             }else{
-                outline[0].position = sf::Vector2f((getMaxX(i)+camOffsetX)/zoomAMT+W/2,(getMaxY(i)+camOffsetY)/zoomAMT+H/2);
-                outline[1].position = sf::Vector2f((getMinX(i)+camOffsetX)/zoomAMT+W/2,(getMaxY(i)+camOffsetY)/zoomAMT+H/2);
-                outline[2].position = sf::Vector2f((getMinX(i)+camOffsetX)/zoomAMT+W/2,(getMinY(i)+camOffsetY)/zoomAMT+H/2);
-                outline[3].position = sf::Vector2f((getMaxX(i)+camOffsetX)/zoomAMT+W/2,(getMinY(i)+camOffsetY)/zoomAMT+H/2);
-                outline[4].position = sf::Vector2f((getMaxX(i)+camOffsetX)/zoomAMT+W/2,(getMaxY(i)+camOffsetY)/zoomAMT+H/2);
+                outline[0].position = sf::Vector2f((getMaxX(i)+camOffsetX)/zoomAMT+mX*baseUnit,(getMaxY(i)+camOffsetY)/zoomAMT+mY*baseUnit);
+                outline[1].position = sf::Vector2f((getMinX(i)+camOffsetX)/zoomAMT+mX*baseUnit,(getMaxY(i)+camOffsetY)/zoomAMT+mY*baseUnit);
+                outline[2].position = sf::Vector2f((getMinX(i)+camOffsetX)/zoomAMT+mX*baseUnit,(getMinY(i)+camOffsetY)/zoomAMT+mY*baseUnit);
+                outline[3].position = sf::Vector2f((getMaxX(i)+camOffsetX)/zoomAMT+mX*baseUnit,(getMinY(i)+camOffsetY)/zoomAMT+mY*baseUnit);
+                outline[4].position = sf::Vector2f((getMaxX(i)+camOffsetX)/zoomAMT+mX*baseUnit,(getMaxY(i)+camOffsetY)/zoomAMT+mY*baseUnit);
             }
 
             window.draw(outline);
@@ -1262,7 +1265,7 @@ class game{
                     sf::Angle angle = sf::degrees(scene[i].rotation);
                     shape.setRotation(angle);
 
-                    shape.setPosition({(baseUnit*scene[i].X+camOffsetX)/zoomAMT+W/2, (baseUnit*scene[i].Y+camOffsetY)/zoomAMT+H/2});
+                    shape.setPosition({(baseUnit*scene[i].X+camOffsetX)/zoomAMT+mX*baseUnit, (baseUnit*scene[i].Y+camOffsetY)/zoomAMT+mY*baseUnit});
 
 
                     if(scene[i].collidedSAT==true&&debug==true){
@@ -1279,7 +1282,7 @@ class game{
                     //shape.setPosition({(point.x+baseUnit*objects[i].X+camOffsetX)/zoomAMT+W/2, (point.y+baseUnit*objects[i].Y+camOffsetY)/zoomAMT+H/2});
                     returnXY point = angleOffset(i,4);
 
-                    shape.setPosition({(point.x+baseUnit*scene[i].X+camOffsetX)/zoomAMT+W/2, (point.y+baseUnit*scene[i].Y+camOffsetY)/zoomAMT+H/2});
+                    shape.setPosition({(point.x+baseUnit*scene[i].X+camOffsetX)/zoomAMT+mX*baseUnit, (point.y+baseUnit*scene[i].Y+camOffsetY)/zoomAMT+mY*baseUnit});
                     sf::Angle angle = sf::degrees(scene[i].rotation);
                     shape.setRotation(angle);
 
@@ -1301,7 +1304,7 @@ class game{
                     sf::Angle angle = sf::degrees(scene[i].rotation);
                     shape.setRotation(angle);
 
-                    shape.setPosition({(baseUnit*scene[i].X+camOffsetX)/zoomAMT+W/2, (baseUnit*scene[i].Y+camOffsetY)/zoomAMT+H/2});
+                    shape.setPosition({(baseUnit*scene[i].X+camOffsetX)/zoomAMT+mX*baseUnit, (baseUnit*scene[i].Y+camOffsetY)/zoomAMT+mY*baseUnit});
 
                     if(scene[i].collidedSAT==true&&debug==true){
                         shape.setFillColor(sf::Color(0xff0000ff));
@@ -1320,7 +1323,7 @@ class game{
                     }
 
 
-                    shape.setPosition({(baseUnit*scene[i].X+camOffsetX)/zoomAMT+W/2, (baseUnit*scene[i].Y+camOffsetY)/zoomAMT+H/2});
+                    shape.setPosition({(baseUnit*scene[i].X+camOffsetX)/zoomAMT+mX*baseUnit, (baseUnit*scene[i].Y+camOffsetY)/zoomAMT+mY*baseUnit});
 
                     sf::Angle angle = sf::degrees(scene[i].rotation);
                     shape.setRotation(angle);
