@@ -219,7 +219,6 @@ class game{
                         objects[i].X = ((position.x)*zoomAMT-camOffsetX-mX*baseUnit*zoomAMT)/baseUnit;
                         objects[i].Y = ((position.y)*zoomAMT-camOffsetY-mY*baseUnit*zoomAMT)/baseUnit;
                         mouseObject=i;
-                        std::cout<<"X: "<<position.x<<"\nY: "<<position.y<<"\n";
                     }
 
                     if(cursorMode=="edit"&&objects[i].pointGrabbed){
@@ -416,6 +415,49 @@ class game{
                 }
             }
         }
+        void convexMvPoint(int o){
+            //returnXY point = angleOffset(o,objects[o].grabbedPoint);
+            int point = objects[o].grabbedPoint;
+            int pointComp = 0;
+            if(point=0){
+                pointComp=1;
+            }
+            returnXY PointCompInit = angleOffset(o,pointComp);
+
+            PointCompInit.x+=objects[o].X;
+            PointCompInit.y+=objects[o].Y;
+
+            objects[o].pointList[point*2] = (objects[mouseObject].X-objects[o].X)/2;
+            objects[o].pointList[point*2+1] = (objects[mouseObject].Y-objects[o].Y)/2;
+
+            //recenter
+            float X=0;
+            float Y=0;
+            if(objects[o].mass<=0){
+                objects[o].mass=std::numeric_limits<float>::infinity();
+            }
+            for(int i=0;i<objects[o].points;i++){
+                X += objects[o].pointList[i*2];
+                Y += objects[o].pointList[i*2+1];
+
+            }
+            X/=objects[o].points;
+            Y/=objects[o].points;
+
+            for(int i=0;i<objects[o].points;i++){
+
+                objects[o].pointList[i*2]-=X;
+                objects[o].pointList[i*2+1]-=Y;
+
+            }
+
+            returnXY PointCompPost = angleOffset(o,pointComp);
+
+            PointCompPost.x+=objects[o].X;
+            PointCompPost.y+=objects[o].Y;
+
+
+        }
         //rectacle move point
         void rectMvPoint(int o){
             float initW=objects[o].width;
@@ -535,12 +577,14 @@ class game{
                 objects[o].sizeModifier = sqrt(square(objects[o].X-objects[mouseObject].X)+square(objects[o].Y-objects[mouseObject].Y))/2;
             }else if(rectShapePoly(objects[o].objectType)){
                 rectMvPoint(o);
+            }else if(convexShapePoly(objects[o].objectType)){
+                convexMvPoint(o);
             }
         }
         //returns the distance to nearest corner of specified shape
         pointDist cornerDistCheck(int o){
             pointDist check= {std::numeric_limits<float>::infinity(),0};
-            for(int i=1;i<=pointCount(o);i++){
+            for(int i=0;i<=pointCount(o);i++){
 
                 returnXY point = angleOffset(o,i);
 
@@ -558,7 +602,6 @@ class game{
 
                 }
             }
-
             return check;
         }
         //apply this in more places pls
@@ -1663,7 +1706,7 @@ class game{
                 }
 
 
-            }else if(convexShapePoly(objects[i].objectType)){
+            }else if(convexShapePoly(objects[i].objectType)){//why didn't I just use a distance formula??
                 float dist = sqrt(square(objects[i].pointList[point*2])+square(objects[i].pointList[point*2+1]))*baseUnit*objects[i].sizeModifier;
                 float rad =asin(objects[i].pointList[point*2+1]*baseUnit*objects[i].sizeModifier/dist);
 
