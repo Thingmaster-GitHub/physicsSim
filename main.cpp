@@ -585,7 +585,7 @@ class game{
 
             for(int i=0;i<pointCount(o);i++){
                 returnXY point = angleOffset(o,i);
-                pointNotButter.setPosition({(point.x+baseUnit*objects[o].X+camOffsetX)/zoomAMT+W/2 , (point.y+baseUnit*objects[o].Y+camOffsetY)/zoomAMT+H/2});
+                pointNotButter.setPosition({(point.x+baseUnit*objects[o].X+camOffsetX)/zoomAMT+mX*baseUnit , (point.y+baseUnit*objects[o].Y+camOffsetY)/zoomAMT+mY*baseUnit});
 
 
 

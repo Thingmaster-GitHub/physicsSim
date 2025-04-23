@@ -62,8 +62,8 @@
         "width": 20.0
     },
     {
-        "X": -27.100000381469727,
-        "Y": -30.200000762939453,
+        "X": -27.0,
+        "Y": -27.100000381469727,
         "airRes": true,
         "coefficentOfFriction": 0.5,
         "color": 4294967295,
@@ -728,7 +728,7 @@
         "points": 0,
         "rotation": -495.0,
         "sides": 4,
-        "sizeModifier": 2.8040173053741455,
+        "sizeModifier": 2.2209255695343018,
         "solid": true,
         "text": "lorium ipsum",
         "trigger": {
@@ -1736,13 +1736,13 @@
         "width": 1.233917236328125
     },
     {
-        "X": -12.362894058227539,
-        "Y": 9.039578437805176,
+        "X": -12.217378616333008,
+        "Y": 9.094810485839844,
         "airRes": true,
         "coefficentOfFriction": 0.5,
         "color": 2303797759,
         "gravity": true,
-        "height": 9.036588668823242,
+        "height": 8.8770751953125,
         "layer": -1,
         "loc": "blank.png",
         "mass": 10.0,
@@ -1795,7 +1795,7 @@
         "velRot": 0.0,
         "velX": 0.0,
         "velY": 0.0,
-        "width": 12.528579711914063
+        "width": 12.795891761779785
     },
     {
         "X": -12.81805419921875,
@@ -1846,7 +1846,7 @@
         "sides": 3,
         "sizeModifier": 24.0,
         "solid": true,
-        "text": "hi :)",
+        "text": "hi :)\u0005",
         "trigger": {
             "destroyO2": false,
             "event": "none",
@@ -1906,7 +1906,7 @@
         "points": 0,
         "rotation": -390.0,
         "sides": 3,
-        "sizeModifier": 2.0,
+        "sizeModifier": 1.9145588874816895,
         "solid": true,
         "text": "lorium ipsum",
         "trigger": {
