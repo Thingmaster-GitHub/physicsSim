@@ -416,16 +416,17 @@ class game{
             }
         }
         void convexMvPoint(int o){
+            //removes rotation
+            for(int i=0;i<pointCount(o);i++){
+                returnXY point = angleOffset(o,i);
+
+                std::cout<<objects[o].pointList[i*2]<<" : "<<point.x<<"\n";
+                objects[o].pointList[i*2]=point.x;
+                objects[o].pointList[i*2+1]=point.y;
+            }
+            objects[o].rotation=0;
             //returnXY point = angleOffset(o,objects[o].grabbedPoint);
             int point = objects[o].grabbedPoint;
-            int pointComp = 0;
-            if(point=0){
-                pointComp=1;
-            }
-            returnXY PointCompInit = angleOffset(o,pointComp);
-
-            PointCompInit.x+=objects[o].X;
-            PointCompInit.y+=objects[o].Y;
 
             objects[o].pointList[point*2] = (objects[mouseObject].X-objects[o].X)/2;
             objects[o].pointList[point*2+1] = (objects[mouseObject].Y-objects[o].Y)/2;
@@ -451,10 +452,9 @@ class game{
 
             }
 
-            returnXY PointCompPost = angleOffset(o,pointComp);
 
-            PointCompPost.x+=objects[o].X;
-            PointCompPost.y+=objects[o].Y;
+            objects[o].X+=X*2;
+            objects[o].Y+=Y*2;
 
 
         }
