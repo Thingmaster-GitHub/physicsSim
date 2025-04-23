@@ -99,6 +99,7 @@ struct object{
 
 };
 std::vector<object> objects;
+std::vector<int> objectLoadOrder;
 
 class game{
 public:
@@ -107,6 +108,8 @@ public:
 
         returnXY p;
         objectCount = loadObjectsJSON(objects,"save.json");
+
+        LayerObjects();
 
         using std::chrono::duration_cast;
         using std::chrono::nanoseconds;
@@ -169,7 +172,7 @@ public:
 
             //draws all shapes+transformations
             for(int i = 0; i<objectCount;i++){
-                drawShape(window,i);
+                drawShape(window,objectLoadOrder[i]);
 
                 if(debug==true){
                     debuger(window,i);
@@ -254,7 +257,7 @@ public:
             //testingLayoutInf(window);
             window.display();
             auto end = clock::now();
-            std::cout <<1000000000/duration_cast<nanoseconds>(end-start).count() << "\n";//fps
+            //std::cout <<1000000000/duration_cast<nanoseconds>(end-start).count() << "\n";//fps
             timediff=1000000000/duration_cast<nanoseconds>(end-start).count()/60;
 
             jumpDown(timediff);
@@ -263,6 +266,30 @@ public:
     }
 
 private:
+    //sets object load order for drawing
+    void LayerObjects(){
+        objectLoadOrder.clear();
+
+        int maxLoaded=-std::numeric_limits<int>::infinity();
+        int minLoaded=std::numeric_limits<int>::infinity();
+        for(int i=0;i<objectCount;i++){
+            if(objects[i].layer>maxLoaded){
+                maxLoaded=objects[i].layer;
+            }
+            if(objects[i].layer<minLoaded){
+                minLoaded=objects[i].layer;
+            }
+        }
+
+        for(int i=minLoaded;i<=maxLoaded;i++){
+            for(int ip=0;ip<objectCount;ip++){
+                if(objects[ip].layer==i){
+                    objectLoadOrder.push_back(ip);
+                }
+            }
+        }
+    }
+    //loads in objects
     int loadObjectsJSON(std::vector<object>& objectsVect, const std::string& filename) {
         std::ifstream file(filename);
         if (!file) {
@@ -296,6 +323,7 @@ private:
             obj.points = item["points"];
             obj.coefficentOfFriction = item["coefficentOfFriction"];
             obj.loc = item["loc"];
+            obj.layer = item["layer"];
             auto pointList = item["pointList"].get<std::vector<float>>();
             std::copy(pointList.begin(), pointList.end(), obj.pointList);
 
@@ -316,6 +344,7 @@ private:
         return objectsVect.size();
 
     }
+    //trigger logic
     void trigger(int o1,int o2){
 
         if(objects[o1].trigger.event=="destroy"){
@@ -333,6 +362,7 @@ private:
         }
 
     }
+    //jump countdown
     void jumpDown(float timediff){
         if(jumpCountDown>=0){
             jumpCountDown-=1/timediff/20;
@@ -418,14 +448,14 @@ private:
                 shape.setTexture(&objects[i].texture);
 
                 window.draw(shape);
-            }else if(TextShapePoly(objects[i].objectType)){
+            }else if(TextShapePoly(i)){
                 sf::Text shape(objects[i].font);
 
 
                 //shape.setPosition({(point.x+baseUnit*objects[i].X+camOffsetX)/zoomAMT+W/2, (point.y+baseUnit*objects[i].Y+camOffsetY)/zoomAMT+H/2});
                 returnXY point = angleOffset(i,4);
 
-                shape.setPosition({(point.x+baseUnit*objects[i].X+camOffsetX)+W/2, (point.y+baseUnit*objects[i].Y+camOffsetY)+H/2});
+                shape.setPosition({(point.x+objects[i].X+camOffsetX), (point.y+objects[i].Y+camOffsetY)});
                 sf::Angle angle = sf::degrees(objects[i].rotation);
                 shape.setRotation(angle);
 
@@ -435,6 +465,8 @@ private:
                 shape.setString(objects[i].text);
 
                 window.draw(shape);
+
+                std::cout<<"X: "<<objects[i].X<<"\nY: "<<objects[i].Y<<"\n";
             }else if(rectShapePoly(i)&&objects[i].objectType!=-3){
                 sf::RectangleShape shape(sf::Vector2f(objects[i].width*baseUnit, objects[i].height*baseUnit));
 
