@@ -666,7 +666,7 @@ class game{
                                 pointSelected=true;
 
                                 queriedObjectSelected=objectLoadOrder[i];
-                                Ochecked=i;
+                                Ochecked=objectLoadOrder[i];
                             }
                         }
                     }
