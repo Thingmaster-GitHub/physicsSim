@@ -415,16 +415,20 @@ class game{
                 }
             }
         }
+        //moves covexShape points
         void convexMvPoint(int o){
             //removes rotation
-            for(int i=0;i<pointCount(o);i++){
+            //get rid of this if statement for thousands of floating point impercision errors :3
+            if(objects[o].rotation!=0){
+                for(int i=0;i<pointCount(o);i++){
                 returnXY point = angleOffset(o,i);
 
-                std::cout<<objects[o].pointList[i*2]<<" : "<<point.x<<"\n";
-                objects[o].pointList[i*2]=point.x;
-                objects[o].pointList[i*2+1]=point.y;
+                std::cout<<objects[o].pointList[i*2]<<" : "<<point.x<<"/"<<objects[o].sizeModifier<<"/"<<baseUnit<<"="<<point.x/objects[o].sizeModifier/baseUnit<<"\n";
+                objects[o].pointList[i*2]=point.x/objects[o].sizeModifier/baseUnit;
+                objects[o].pointList[i*2+1]=point.y/objects[o].sizeModifier/baseUnit;
+                }
+                objects[o].rotation=0;
             }
-            objects[o].rotation=0;
             //returnXY point = angleOffset(o,objects[o].grabbedPoint);
             int point = objects[o].grabbedPoint;
 
