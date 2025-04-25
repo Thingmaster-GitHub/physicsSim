@@ -184,8 +184,6 @@ class game{
                             Lclick();
                         }
                     }
-                    //use this for text input!
-                    //IDK how I'll use this yet, but it'll sure be usefull!
                     if (const auto* textEntered = event->getIf<sf::Event::TextEntered>())
                     {
                         if (textEntered->unicode < 128){
@@ -443,13 +441,11 @@ class game{
                 for(int i=0;i<pointCount(o);i++){
                 returnXY point = angleOffset(o,i);
 
-                std::cout<<objects[o].pointList[i*2]<<" : "<<point.x<<"/"<<objects[o].sizeModifier<<"/"<<baseUnit<<"="<<point.x/objects[o].sizeModifier/baseUnit<<"\n";
                 objects[o].pointList[i*2]=point.x/objects[o].sizeModifier/baseUnit;
                 objects[o].pointList[i*2+1]=point.y/objects[o].sizeModifier/baseUnit;
                 }
                 objects[o].rotation=0;
             }
-            //returnXY point = angleOffset(o,objects[o].grabbedPoint);
             int point = objects[o].grabbedPoint;
 
             objects[o].pointList[point*2] = (objects[mouseObject].X-objects[o].X)/2;
@@ -1123,6 +1119,7 @@ class game{
             window.draw(outline);
         }
         //saves objects to json files
+        //created with the help of chatgpt
         void saveObjectsJSON(const std::vector<object>& objects, const std::string& filename) {
             nlohmann::json j;
 
@@ -1149,6 +1146,7 @@ class game{
             file.close();
         }
         //loads objects from json file
+        //created with the help of chatgpt
         int loadObjectsJSON(std::vector<object>& objectsVect, const std::string& filename) {
             std::ifstream file(filename);
             if (!file) {
