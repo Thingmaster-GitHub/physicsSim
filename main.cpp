@@ -47,6 +47,8 @@ struct triggerProperties{
     //for event "destroy"
     bool destroyO2 = false;
     int typeReq = 1;
+    bool isIDReq = false;
+    string IDReq = "default"
 };
 
 struct object{
@@ -348,7 +350,7 @@ private:
     void trigger(int o1,int o2){
 
         if(objects[o1].trigger.event=="destroy"){
-            if(objects[o1].trigger.typeReq==objects[o2].objectType){
+            if(objects[o1].trigger.typeReq==objects[o2].objectType && (objects[o1].trigger.isIDReq==false || objects[o1].trigger.IDReq==objects[o2].trigger) ){
                 for(int i=0;i<objectCount;i++){
                     if(objects[o1].trigger.id==objects[i].trigger.id){
                         objects[i].objectType=-4;
@@ -1403,6 +1405,7 @@ private:
             return false;
         }
     }
+
     bool TextShapePoly(int object){
         if(objects[object].objectType==4){
             return true;
