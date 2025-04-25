@@ -171,6 +171,9 @@ class game{
 
                         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LControl)){
                             zoom(mouseWheelScrolled->delta);
+                        }else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LShift)){
+                            scaleObj(mouseWheelScrolled->delta);
+
                         }else{
                             rotateObj(mouseWheelScrolled->delta);
                         }
@@ -288,6 +291,23 @@ class game{
         }
 
     private:
+        void scaleObj(float amt){
+
+            for(int i=0;i<objectCount;i++){
+                if(objects[i].selected){
+                    std::cout<<"amt: "<<amt<<"\nsize: "<<objects[i].sizeModifier<<"\n";
+                    if(objects[i].sizeModifier>1){
+                        objects[i].sizeModifier+=amt;
+                    }else{
+                        if(amt>0){
+                            objects[i].sizeModifier*=amt*1.5;
+                        }else{
+                            objects[i].sizeModifier/=abs(amt*1.5);
+                        }
+                    }
+                }
+            }
+        }
         void winOutline(sf::RenderTarget& window){
             sf::VertexArray outline(sf::PrimitiveType::LineStrip,5);
 
@@ -1074,6 +1094,7 @@ class game{
             LayerObjects();
             LayerObjectsUI();
         }
+        //controls zoom
         void zoom(float ammount){
             if(ammount<0){
                 zoomAMT*=(-1*ammount/10)+1;
@@ -1183,7 +1204,6 @@ class game{
 
         }
         //controls camera
-        //calculated projected offset of shape for rotation
         void Camera(int mouseObject,sf::Vector2i position){
             if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Right)){
                 if(scrMove==false){
@@ -1523,45 +1543,45 @@ class game{
 
 
             }
-                if(circleShapePoly(objects[o1].objectType)){
-                    if(objects[o1].sides<=10){
-                        output = SATLoop(o1,o2,objects[o2].sides,output);
-                        if(output.difference>0){
-                            return output;
-                        }
-                    }
-
-                }else if(rectShapePoly(objects[o1].objectType)){
-                    output = SATLoop(o1,o2,4,output);
-                    if(output.difference>0){
-                        return output;
-                    }
-                }else if(convexShapePoly(objects[o1].objectType)){
-                    output = SATLoop(o1,o2,objects[o1].points,output);
+            if(circleShapePoly(objects[o1].objectType)){
+                if(objects[o1].sides<=10){
+                    output = SATLoop(o1,o2,objects[o2].sides,output);
                     if(output.difference>0){
                         return output;
                     }
                 }
 
-                if(circleShapePoly(objects[o2].objectType)){
-                    if(objects[o2].sides<=10){
-                        output = SATLoop(o2,o1,objects[o2].sides,output);
-                    }
-                    if(output.difference>0){
-                        return output;
-                    }
-
-                }else if(rectShapePoly(objects[o2].objectType)){
-                    output = SATLoop(o2,o1,4,output);
-                    if(output.difference>0){
-                        return output;
-                    }
-                }else if(convexShapePoly(objects[o2].objectType)){
-                    output = SATLoop(o2,o1,objects[o2].points,output);
-                    if(output.difference>0){
-                        return output;
-                    }
+            }else if(rectShapePoly(objects[o1].objectType)){
+                output = SATLoop(o1,o2,4,output);
+                if(output.difference>0){
+                    return output;
                 }
+            }else if(convexShapePoly(objects[o1].objectType)){
+                output = SATLoop(o1,o2,objects[o1].points,output);
+                if(output.difference>0){
+                    return output;
+                }
+            }
+
+            if(circleShapePoly(objects[o2].objectType)){
+                if(objects[o2].sides<=10){
+                    output = SATLoop(o2,o1,objects[o2].sides,output);
+                }
+                if(output.difference>0){
+                    return output;
+                }
+
+            }else if(rectShapePoly(objects[o2].objectType)){
+                output = SATLoop(o2,o1,4,output);
+                if(output.difference>0){
+                    return output;
+                }
+            }else if(convexShapePoly(objects[o2].objectType)){
+                output = SATLoop(o2,o1,objects[o2].points,output);
+                if(output.difference>0){
+                    return output;
+                }
+            }
 
 
 
@@ -2964,5 +2984,3 @@ int main()
 
     return 0;
 }
-
-
