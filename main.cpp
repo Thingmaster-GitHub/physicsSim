@@ -9,47 +9,44 @@
 #include "structs.hpp"
 #include "global.hpp"
 
-mX=48;
-mY=28;
+const int mX=48;
+const int mY=28;
+const int W = 1280;
+const int H = 720;
+int objectCount =15;
+float baseUnit = (W/128+H/72)/2;
 
-W = 1280;
-H = 720;
-
-objectCount =15;
-baseUnit = (W/128+H/72)/2;
-
-debug = false;
+bool debug = false;
 
 
 
-zoomAMT=1;
+float zoomAMT=1;
 
-jumpCountDown = 1;
-canJump=0;
+float jumpCountDown = 1;
+int canJump=0;
 
-centerCamera = true;
-camOffsetX=0;
-camOffsetY=0;
-scrMove=false;
-initXoff;
-initYoff;
-initMX;
-initMY;
+const bool centerCamera = true;
+float camOffsetX=0;
+float camOffsetY=0;
+bool scrMove=false;
+float initXoff;
+float initYoff;
+float initMX;
+float initMY;
 
-wrap = false;//don't enable with centered camera.
+const bool wrap = false;//don't enable with centered camera.
 
-cursorMode = "select";
+std::string cursorMode = "select";
 
-mouseObject;
-coefficientOfRestitution=0.6;
+int mouseObject;
+float coefficientOfRestitution=0.6;
 
+std::vector<object> objects;
+std::vector<object> UI;
 
-objects;
-UI;
-
-UILoadOrder;
-objectLoadOrder;
-copyArray;
+std::vector<int> UILoadOrder;
+std::vector<int> objectLoadOrder;
+std::vector<cpy> copyArray;
 class game{
     public:
         //runs program :3

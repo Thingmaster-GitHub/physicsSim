@@ -23,7 +23,7 @@ extern float zoomAMT;
 extern float jumpCountDown;
 extern int canJump;
 
-extern const bool centerCamera = true;
+extern const bool centerCamera;
 extern float camOffsetX;
 extern float camOffsetY;
 extern bool scrMove;
@@ -32,7 +32,7 @@ extern float initYoff;
 extern float initMX;
 extern float initMY;
 
-extern const bool wrap = false;//depriciated
+extern const bool wrap;
 
 extern std::string cursorMode;
 
