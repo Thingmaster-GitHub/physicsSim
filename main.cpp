@@ -1,26 +1,27 @@
 
-
+#include "global.hpp"
 #include "game.hpp"
 
-W = 1366;
-H = 768;
-objectCount = 0;
-baseUnit = (W/128+H/72)/2;
-debug =    false;
+int W = 1366;
+int H = 768;
+int objectCount = 0;
+float baseUnit = (W/128+H/72)/2;
 
-physics = true;
+bool debug =    false;
 
-jumpCountDown = 1;
-canJump=0;
+bool physics = true;
 
-centerCamera = true;
-camOffsetX=0;
-camOffsetY=0;
+float jumpCountDown = 1;
+int canJump=0;
 
-wrap = false;//don't enable with centered camera.
+bool centerCamera = true;
+float camOffsetX=0;
+float camOffsetY=0;
 
-mouseObject;
-coefficientOfRestitution=0.6;
+const bool wrap = false;//don't enable with centered camera.
+
+int mouseObject;
+float coefficientOfRestitution=0.6;
 
 std::vector<object> objects;
 std::vector<int> objectLoadOrder;

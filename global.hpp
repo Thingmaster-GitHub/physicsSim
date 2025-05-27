@@ -1,24 +1,25 @@
+#include "game.hpp"
 //just a normal header file, nothing to see here
-extern const int W = 1366;
-extern const int H = 768;
-extern int objectCount = 0;
-extern const float baseUnit = (W/128+H/72)/2;
+extern int W;
+extern int H;
+extern int objectCount;
+extern float baseUnit;
 
-extern bool debug =    false;
+extern bool debug;
 
-extern bool physics = true;
+extern bool physics;
 
-extern float jumpCountDown = 1;
-extern int canJump=0;
+extern float jumpCountDown;
+extern int canJump;
 
-extern const bool centerCamera = true;
-extern float camOffsetX=0;
-extern float camOffsetY=0;
+extern bool centerCamera;
+extern float camOffsetX;
+extern float camOffsetY;
 
-extern const bool wrap = false;//don't enable with centered camera.
+extern const bool wrap;//depriciated
 
 extern int mouseObject;
-extern float coefficientOfRestitution=0.6;
+extern float coefficientOfRestitution;
 
 extern std::vector<object> objects;
 extern std::vector<int> objectLoadOrder;
