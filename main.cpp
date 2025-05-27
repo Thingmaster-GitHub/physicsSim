@@ -341,6 +341,10 @@ class game{
 
                         UI[i].textExtra = std::to_string(objects[selected].layer);
                     }
+                    if(UI[i].txtLbl=="size"){
+
+                        UI[i].textExtra = std::to_string(objects[selected].sizeModifier);
+                    }
                 }
             }
         }
@@ -401,6 +405,18 @@ class game{
                                 std::stringstream ss;
                                 ss << UI[selected].textExtra;
                                 ss >> objects[i].layer;
+                                LayerObjects();
+                            }else if(UI[selected].txtLbl=="size"){
+                                if(txt==0x08){
+                                    if(UI[selected].textExtra.size()!=0){
+                                        UI[selected].textExtra.pop_back();
+                                    }
+                                }else{
+                                    UI[selected].textExtra+=txt;
+                                }
+                                std::stringstream ss;
+                                ss << UI[selected].textExtra;
+                                ss >> objects[i].sizeModifier;
                                 LayerObjects();
                             }
                     }

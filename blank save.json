@@ -55,14 +55,15 @@
             "id": "default",
             "typeReq": 1
         },
+        "txtLbl": "default",
         "velRot": 0.0,
         "velX": 0.0,
         "velY": 0.0,
         "width": 20.0
     },
     {
-        "X": -313.83673095703125,
-        "Y": -176.44699096679688,
+        "X": -134.49966430664063,
+        "Y": -74.82479858398438,
         "airRes": true,
         "coefficentOfFriction": 0.5,
         "color": 4294967295,
@@ -116,6 +117,7 @@
             "id": "default",
             "typeReq": 1
         },
+        "txtLbl": "default",
         "velRot": 0.0,
         "velX": 0.0,
         "velY": 0.0,
@@ -177,6 +179,7 @@
             "id": "default",
             "typeReq": 1
         },
+        "txtLbl": "default",
         "velRot": 0.0,
         "velX": 0.0,
         "velY": 0.0,
