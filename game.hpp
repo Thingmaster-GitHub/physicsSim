@@ -1,3 +1,4 @@
+#include "structs.hpp"
 class game{
 public:
     //runs program :3
@@ -113,7 +114,7 @@ private:
     //rotates normal vector 90 degrees
     returnXY invertNormal(returnXY normal);
     //checks bounding box collisions and runs SAT if intersects
-    void baseCollisionUI()
+    void baseCollisionUI();
     //SAT calculations
     SATout SATUI(int o1,int o2);
     //polygon on ponlygon collisions
