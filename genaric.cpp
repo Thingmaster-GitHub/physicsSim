@@ -478,9 +478,9 @@ void game::Lclick(){
     int clickQ = 0;
     int queriedTrue=0;
     for(int i=0;i<objectCount;i++){
-        if(objects[i].clicked){
+        if(objects[objectLoadOrder[i]].clicked){
             clickQ++;
-            queriedTrue=i;
+            queriedTrue=objectLoadOrder[i];
         }
     }
 

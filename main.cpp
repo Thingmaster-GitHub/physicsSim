@@ -12,8 +12,8 @@
 
 const int mX=48;
 const int mY=28;
-const int W = 1280;
-const int H = 720;
+const int W = 1920;
+const int H = 1080;
 int objectCount =15;
 float baseUnit = (W/128+H/72)/2;
 
