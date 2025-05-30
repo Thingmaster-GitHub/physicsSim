@@ -1,6 +1,6 @@
-#include "game.hpp"
-#include "structs.hpp"
-#include "global.hpp"
+#include "headers/game.hpp"
+#include "headers/structs.hpp"
+#include "headers/global.hpp"
 
 void game::run(){
     loadObjectsJSON(UI,"UI.json");
@@ -18,7 +18,7 @@ void game::run(){
 
     sf::ContextSettings settings;
     settings.antiAliasingLevel = 8.0;
-    sf::RenderWindow window(sf::VideoMode({W, H}), "editor"/*, sf::Style::default, settings*/);
+    sf::RenderWindow window(sf::VideoMode({static_cast<unsigned int>(W), static_cast<unsigned int>(H)}), "editor"/*, sf::Style::default, settings*/);
 
 
 
@@ -65,7 +65,7 @@ void game::run(){
         //shouldn't write it like this
         // I'm too lazy to make this better
         sf::Vector2i pos = sf::Mouse::getPosition(window);
-        Camera(mouseObject,pos);
+        Camera(pos);
 
         //draws all shapes+transformations
         for(int i = 0; i<objectCount;i++){
@@ -90,13 +90,7 @@ void game::run(){
             if(cursorMode=="edit"&&objects[i].pointGrabbed){
                 grPointMV(i);
             }
-            //draws outline of selected object
-            if(objects[i].selected){
-                drawOutline(window,i);
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Delete)){
-                    deleteObject(i);
-                }
-            }
+
             //sets position of grabbd object
             if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
                 if(objects[i].grabbed==true){
@@ -113,6 +107,15 @@ void game::run(){
                 objects[i].grabbed=false;
                 objects[i].pointGrabbed=false;
                 objects[i].grabbedPoint=0;
+            }
+            //draws outline of selected object
+            if(objects[i].selected){
+                drawOutline(window,i);
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Delete)){
+                    deleteObject(i);
+                    i--;
+                    LayerObjects();
+                }
             }
         }
         winOutline(window);
@@ -151,4 +154,119 @@ void game::run(){
     }
     saveObjectsJSON(objects,"save.json");
     //saveObjectsJSON(UI,"UI.json");
+}
+//initilizes program
+void game::initialize(){
+    for(int i = 0;i<objectCount;i++){
+        float X=0;
+        float Y=0;
+        if(objects[i].mass<=0){
+            objects[i].mass=std::numeric_limits<float>::infinity();
+        }
+        for(int iP=0;iP<objects[i].points;iP++){
+            X += objects[i].pointList[iP*2];
+            Y += objects[i].pointList[iP*2+1];
+
+        }
+        X/=objects[i].points;
+        Y/=objects[i].points;
+
+        for(int iP=0;iP<objects[i].points;iP++){
+
+            objects[i].pointList[iP*2]-=X;
+            objects[i].pointList[iP*2+1]-=Y;
+
+        }
+        if (!objects[i].texture.loadFromFile(objects[i].loc)){
+            //throw error or something
+        }
+        if (!objects[i].font.openFromFile(objects[i].fontLoc)){
+            //throw error or something
+        }
+    }
+    LayerObjects();
+    LayerObjectsUI();
+}
+//saves objects to json files
+//created with the help of chatgpt
+void game::saveObjectsJSON(const std::vector<object>& objects, const std::string& filename) {
+    nlohmann::json j;
+
+    for (size_t i = 0; i < objectCount; ++i) {
+        const auto& obj = objects[i];
+        j.push_back({
+            {"X", obj.X}, {"Y", obj.Y}, {"velX", obj.velX}, {"velY", obj.velY},{"velRot", obj.velRot},
+            {"rotation", obj.rotation}, {"sides", obj.sides}, {"sizeModifier", obj.sizeModifier},
+            {"objectType", obj.objectType}, {"gravity", obj.gravity},{"airRes", obj.airRes},{"solid",obj.solid}, {"mass", obj.mass},
+            {"color", obj.color}, {"width", obj.width}, {"height", obj.height},
+            {"points", obj.points}, {"pointList", std::vector<float>(obj.pointList, obj.pointList + 30)},{"coefficentOfFriction",obj.coefficentOfFriction},{"layer",obj.layer},{"text",obj.text},{"txtLbl",obj.txtLbl},
+                    {"loc", obj.loc},
+                    {"trigger", {
+                        {"id", obj.trigger.id},
+                        {"event", obj.trigger.event},
+                        {"destroyO2", obj.trigger.destroyO2},
+                        {"typeReq", obj.trigger.typeReq}
+                    }}
+        });
+    }
+
+    std::ofstream file(filename);
+    file << j.dump(4); // Pretty-print with indent of 4 spaces
+    file.close();
+}
+//loads objects from json file
+//created with the help of chatgpt
+int game::loadObjectsJSON(std::vector<object>& objectsVect, const std::string& filename) {
+    std::ifstream file(filename);
+    if (!file) {
+        std::cerr << "Error opening JSON file!\n";
+        return 0;
+    }
+
+    nlohmann::json j;
+    file >> j;
+    file.close();
+
+    objectsVect.clear();
+    for (const auto& item : j) {
+        object obj;
+        obj.X = item["X"];
+        obj.Y = item["Y"];
+        obj.velX = item["velX"];
+        obj.velY = item["velY"];
+        obj.velRot = item["velRot"];
+        obj.rotation = item["rotation"];
+        obj.sides = item["sides"];
+        obj.sizeModifier = item["sizeModifier"];
+        obj.objectType = item["objectType"];
+        obj.gravity = item["gravity"];
+        obj.airRes = item["airRes"];
+        obj.solid = item["solid"];
+        obj.mass = item["mass"];
+        obj.color = item["color"];
+        obj.width = item["width"];
+        obj.height = item["height"];
+        obj.points = item["points"];
+        obj.coefficentOfFriction = item["coefficentOfFriction"];
+        obj.loc = item["loc"];
+        obj.layer = item["layer"];
+        auto pointList = item["pointList"].get<std::vector<float>>();
+        std::copy(pointList.begin(), pointList.end(), obj.pointList);
+
+        obj.trigger.id = item["trigger"]["id"];
+        obj.trigger.event = item["trigger"]["event"];
+        obj.trigger.destroyO2 = item["trigger"]["destroyO2"];
+        obj.trigger.typeReq = item["trigger"]["typeReq"];
+        obj.text=item["text"];
+        obj.txtLbl=item["txtLbl"];
+
+        if (!obj.texture.loadFromFile(obj.loc)) {
+            std::cerr << "Failed to load texture: " << obj.loc << '\n';
+        }
+
+        objectsVect.push_back(obj);
+    }
+    return objectsVect.size();
+
+
 }

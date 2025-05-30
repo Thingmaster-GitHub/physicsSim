@@ -6,14 +6,14 @@
 #include <cmath>
 #include <limits>
 #include <SFML/Graphics.hpp>
-#include "structs.hpp"
-#include "global.hpp"
-#include "game.hpp"
+#include "headers/structs.hpp"
+#include "headers/global.hpp"
+#include "headers/game.hpp"
 
 const int mX=48;
 const int mY=28;
-const int W = 1920;
-const int H = 1080;
+const int W = 1366;
+const int H = 768;
 int objectCount =15;
 float baseUnit = (W/128+H/72)/2;
 
