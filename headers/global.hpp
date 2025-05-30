@@ -43,6 +43,4 @@ extern float coefficientOfRestitution;
 extern std::vector<object> objects;
 extern std::vector<object> UI;
 
-extern std::vector<int> UILoadOrder;
-extern std::vector<int> objectLoadOrder;
 extern std::vector<cpy> copyArray;

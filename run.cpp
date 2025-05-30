@@ -69,7 +69,7 @@ void game::run(){
 
         //draws all shapes+transformations
         for(int i = 0; i<objectCount;i++){
-            drawShape(window,objectLoadOrder[i],objects);
+            drawShape(window,i,objects);
 
 
             if(debug==true){
@@ -120,7 +120,7 @@ void game::run(){
         }
         winOutline(window);
         for(int i = 0;i<UI.size();i++){
-            drawUI(window,UILoadOrder[i],UI);
+            drawUI(window,i,UI);
             if(UI[i].objectType==-1){
                 sf::Vector2i position = sf::Mouse::getPosition(window);
                 UI[i].X=(position.x-W/2)/baseUnit;

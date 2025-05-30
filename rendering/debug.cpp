@@ -96,18 +96,17 @@ void game::debuger(sf::RenderTarget& window,int i){
 
 
 }
-
 void game::debugerUI(sf::RenderTarget& window,int i){
     sf::CircleShape pointNotButter(4,20);
     pointNotButter.setOrigin({4, 1});
 
     sf::VertexArray outline(sf::PrimitiveType::LineStrip,5);
 
-    outline[0].position = sf::Vector2f((getMaxXUI(i))+mX*baseUnit,(getMaxYUI(i))+mY*baseUnit);
-    outline[1].position = sf::Vector2f((getMinXUI(i))+mX*baseUnit,(getMaxYUI(i))+mY*baseUnit);
-    outline[2].position = sf::Vector2f((getMinXUI(i))+mX*baseUnit,(getMinYUI(i))+mY*baseUnit);
-    outline[3].position = sf::Vector2f((getMaxXUI(i))+mX*baseUnit,(getMinYUI(i))+mY*baseUnit);
-    outline[4].position = sf::Vector2f((getMaxXUI(i))+mX*baseUnit,(getMaxYUI(i))+mY*baseUnit);
+    outline[0].position = sf::Vector2f((getMaxXUI(i))+W/2,(getMaxYUI(i))+H/2);
+    outline[1].position = sf::Vector2f((getMinXUI(i))+W/2,(getMaxYUI(i))+H/2);
+    outline[2].position = sf::Vector2f((getMinXUI(i))+W/2,(getMinYUI(i))+H/2);
+    outline[3].position = sf::Vector2f((getMaxXUI(i))+W/2,(getMinYUI(i))+H/2);
+    outline[4].position = sf::Vector2f((getMaxXUI(i))+W/2,(getMaxYUI(i))+H/2);
 
 
     if(UI[i].collidedbox==true){
@@ -129,7 +128,7 @@ void game::debugerUI(sf::RenderTarget& window,int i){
             pointNotButter.setOrigin({10, 10});
             returnXY point = angleOffset(i,iP);
 
-            pointNotButter.setPosition({(point.x+baseUnit*UI[i].X)+mX*baseUnit, (point.y+baseUnit*UI[i].Y)+mY*baseUnit});
+            pointNotButter.setPosition({(point.x+baseUnit*UI[i].X)+W/2, (point.y+baseUnit*UI[i].Y)+H/2});
             pointNotButter.setFillColor(sf::Color(255-iP*30,0,0));
 
             window.draw(pointNotButter);
@@ -140,7 +139,7 @@ void game::debugerUI(sf::RenderTarget& window,int i){
             pointNotButter.setOrigin({10, 10});
             returnXY point = angleOffsetUI(i,iP);
 
-            pointNotButter.setPosition({(point.x+baseUnit*UI[i].X)+mX*baseUnit, (point.y+baseUnit*UI[i].Y)+mY*baseUnit});
+            pointNotButter.setPosition({(point.x+baseUnit*UI[i].X)+W/2, (point.y+baseUnit*UI[i].Y)+H/2});
             pointNotButter.setFillColor(sf::Color(255-iP*30,0,0));
 
             window.draw(pointNotButter);
@@ -151,7 +150,7 @@ void game::debugerUI(sf::RenderTarget& window,int i){
             pointNotButter.setOrigin({10, 10});
             returnXY point = angleOffsetUI(i,iP);
 
-            pointNotButter.setPosition({(point.x+baseUnit*UI[i].X)+mX*baseUnit, (point.y+baseUnit*UI[i].Y)+mY*baseUnit});
+            pointNotButter.setPosition({(point.x+baseUnit*UI[i].X)+W/2, (point.y+baseUnit*UI[i].Y)+H/2});
             pointNotButter.setFillColor(sf::Color(255-iP*30,0,0));
 
             window.draw(pointNotButter);
@@ -161,7 +160,7 @@ void game::debugerUI(sf::RenderTarget& window,int i){
         pointNotButter.setOrigin({10, 10});
 
 
-        pointNotButter.setPosition({(baseUnit*UI[i].X)+mX*baseUnit, (baseUnit*UI[i].Y)+mY*baseUnit});
+        pointNotButter.setPosition({(baseUnit*UI[i].X)+W/2, (baseUnit*UI[i].Y)+H/2});
         if(UI[i].objectType==-1){
             pointNotButter.setFillColor(sf::Color(255,0,255));
         }else{
@@ -172,10 +171,10 @@ void game::debugerUI(sf::RenderTarget& window,int i){
         window.draw(pointNotButter);
     }
     pointNotButter.setFillColor(sf::Color(0x00ff00ff));
-    pointNotButter.setPosition({UI[i].pointProjected.x*baseUnit+mX*baseUnit,UI[i].pointProjected.y*baseUnit});
+    pointNotButter.setPosition({UI[i].pointProjected.x*baseUnit+W/2,UI[i].pointProjected.y*baseUnit});
 
     window.draw(pointNotButter);
-    pointNotButter.setPosition({UI[i].pointProjected2.x*baseUnit+mX*baseUnit,UI[i].pointProjected2.y*baseUnit});
+    pointNotButter.setPosition({UI[i].pointProjected2.x*baseUnit+W/2,UI[i].pointProjected2.y*baseUnit});
 
     window.draw(pointNotButter);
 

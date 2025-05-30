@@ -36,9 +36,9 @@ void game::Lclick(){
             // :(
             int selected=0;
             for(int i=0;i<UI.size();i++){
-                if(UI[UILoadOrder[i]].clicked){
-                    selected=UILoadOrder[i];
-                    UI[UILoadOrder[i]].txtBoxSelected=false;
+                if(UI[i].clicked){
+                    selected=i;
+                    UI[i].txtBoxSelected=false;
                 }
             }
             //have fun reading my spaghetti code
@@ -66,13 +66,13 @@ void game::Lclick(){
         int Ochecked=0;
 
         for(int i=0;i<objectCount;i++){
-            if(objects[objectLoadOrder[i]].selected){
-                check = cornerDistCheck(objectLoadOrder[i]);
+            if(objects[i].selected){
+                check = cornerDistCheck(i);
                 if(check.distance<10){
                     pointSelected=true;
 
-                    queriedObjectSelected=objectLoadOrder[i];
-                    Ochecked=objectLoadOrder[i];
+                    queriedObjectSelected=i;
+                    Ochecked=i;
                 }
             }
         }
@@ -93,9 +93,9 @@ void game::Lclick(){
     int clickQ = 0;
     int queriedTrue=0;
     for(int i=0;i<objectCount;i++){
-        if(objects[objectLoadOrder[i]].clicked){
+        if(objects[i].clicked){
             clickQ++;
-            queriedTrue=objectLoadOrder[i];
+            queriedTrue=i;
         }
     }
 
@@ -153,8 +153,8 @@ void game::Lclick(){
             //selects top object
 
             for(int i=0;i<objectCount;i++){
-                if(objects[objectLoadOrder[i]].clicked){
-                    queriedTrue=objectLoadOrder[i];
+                if(objects[i].clicked){
+                    queriedTrue=i;
                 }
             }
             objects[queriedTrue].grabbed=true;
@@ -165,8 +165,8 @@ void game::Lclick(){
         }else{
             //finds top object
             for(int i=0;i<objectCount;i++){
-                if(objects[objectLoadOrder[i]].clicked){
-                    queriedTrue=objectLoadOrder[i];
+                if(objects[i].clicked){
+                    queriedTrue=i;
                 }
             }
             //checks if selected object isn't selected

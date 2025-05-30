@@ -45,8 +45,6 @@ float coefficientOfRestitution=0.6;
 std::vector<object> objects;
 std::vector<object> UI;
 
-std::vector<int> UILoadOrder;
-std::vector<int> objectLoadOrder;
 std::vector<cpy> copyArray;
 
 

@@ -23,7 +23,7 @@ void game::input(const sf::Keyboard::Scan key){
             for(int i=0; i<objectCount;i++){
                 if(objects[i].grabbed==true){
                     objects[i].objectType=1;
-                    if(objects[i].color==16711935||objects[i].color==0xff00ffff){
+                    if(objects[i].color==16711935||objects[i].color==0xffffffff){
                         objects[i].color=0xff00ffff;
                     }
                     objects[i].sides=4;
@@ -115,8 +115,19 @@ void game::input(const sf::Keyboard::Scan key){
         }else if(key==sf::Keyboard::Scancode::E){
             cursorMode="edit";
         }else if(key==sf::Keyboard::Scancode::B){
-            debug=true;
+            if(debug){
+                debug=false;
+            }else{
+                debug=true;
+            }
+        }else if(key==sf::Keyboard::Scancode::A){
+            for(int i=0;i<objects.size();i++){
+                if(objects[i].objectType!=-1||objects[i].objectType!=-2){
+                    objects[i].selected=true;
+                }
+            }
         }
         //}
     }
 }
+
