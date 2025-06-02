@@ -1,6 +1,6 @@
 #include "../headers/game.hpp"
-#include "../headers/global.hpp"
-#include "../headers/structs.hpp"
+
+
 //loads data into textExtra for UI elements
 void game::textSelected(){
     int count=0;
@@ -13,6 +13,8 @@ void game::textSelected(){
     }
     if(count==1){
         for(int i=0;i<UI.size();i++){
+            if(TextShapePoly(UI[i].objectType))
+                UI[i].color=0xffffffff;
             if(UI[i].txtLbl=="text label"){
                 UI[i].textExtra=objects[selected].txtLbl;
             }
@@ -29,6 +31,15 @@ void game::textSelected(){
 
                 UI[i].textExtra = std::to_string(objects[selected].sizeModifier);
             }
+            if(UI[i].txtLbl=="size"){
+
+                UI[i].textExtra = std::to_string(objects[selected].sides);
+            }
+        }
+    }else{
+        for(int i=0;i<UI.size();i++){
+            if(TextShapePoly(UI[i].objectType)&&UI[i].txtLbl!="notEdit")
+                UI[i].color=0xffffff77;
         }
     }
 }
@@ -101,6 +112,18 @@ void game::textCh(char txt){
                     std::stringstream ss;
                     ss << UI[selected].textExtra;
                     ss >> objects[i].sizeModifier;
+                    LayerObjects();
+                }else if(UI[selected].txtLbl=="sides"){
+                    if(txt==0x08){
+                        if(UI[selected].textExtra.size()!=0){
+                            UI[selected].textExtra.pop_back();
+                        }
+                    }else{
+                        UI[selected].textExtra+=txt;
+                    }
+                    std::stringstream ss;
+                    ss << UI[selected].textExtra;
+                    ss >> objects[i].sides;
                     LayerObjects();
                 }
             }

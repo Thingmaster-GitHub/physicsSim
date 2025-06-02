@@ -1,6 +1,4 @@
 #include "../headers/game.hpp"
-#include "../headers/global.hpp"
-#include "../headers/structs.hpp"
 //get normal between two points, just kidding it's rotated 90 degrees and I'm not fixing is cause it's already used too much in my code :/
 returnXY game::getNormal(returnXY point1,returnXY point2){
     returnXY output;

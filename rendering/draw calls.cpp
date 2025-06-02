@@ -1,5 +1,3 @@
-#include "../headers/structs.hpp"
-#include "../headers/global.hpp"
 #include "../headers/game.hpp"
 //draws points
 void game::drawPoints(sf::RenderTarget& window,int o){
@@ -123,97 +121,97 @@ void game::drawUI(sf::RenderTarget& window,int i,std::vector<object>& scene){
 }
 //draws shapes
 void game::drawShape(sf::RenderTarget& window,int i,std::vector<object>& scene){
-    /*if(!(getMinX(i)/zoomAMT > -camOffsetX/zoomAMT+W/2||getMaxX(i)/zoomAMT < -camOffsetX / zoomAMT-W/2)||getMinY(i)/zoomAMT > -camOffsetY/zoomAMT+H/2||getMaxY(i)/zoomAMT < -camOffsetY / zoomAMT-H/2){*/
-    if(circleShapePoly(scene[i].objectType)){
+    if(!(getMinX(i)/zoomAMT > -camOffsetX/zoomAMT+W/2||getMaxX(i)/zoomAMT < -camOffsetX / zoomAMT-W/2)||getMinY(i)/zoomAMT > -camOffsetY/zoomAMT+H/2||getMaxY(i)/zoomAMT < -camOffsetY / zoomAMT-H/2){
+        if(circleShapePoly(scene[i].objectType)){
 
 
-        sf::CircleShape shape((baseUnit*scene[i].sizeModifier*2)/zoomAMT,scene[i].sides);
+            sf::CircleShape shape((baseUnit*scene[i].sizeModifier*2)/zoomAMT,scene[i].sides);
 
-        shape.setOrigin({(baseUnit*scene[i].sizeModifier*2)/zoomAMT, (baseUnit*scene[i].sizeModifier*2)/zoomAMT});
+            shape.setOrigin({(baseUnit*scene[i].sizeModifier*2)/zoomAMT, (baseUnit*scene[i].sizeModifier*2)/zoomAMT});
 
-        shape.setFillColor(sf::Color(scene[i].color));
+            shape.setFillColor(sf::Color(scene[i].color));
 
-        sf::Angle angle = sf::degrees(scene[i].rotation);
-        shape.setRotation(angle);
+            sf::Angle angle = sf::degrees(scene[i].rotation);
+            shape.setRotation(angle);
 
-        shape.setPosition({(baseUnit*scene[i].X+camOffsetX)/zoomAMT+mX*baseUnit, (baseUnit*scene[i].Y+camOffsetY)/zoomAMT+mY*baseUnit});
+            shape.setPosition({(baseUnit*scene[i].X+camOffsetX)/zoomAMT+mX*baseUnit, (baseUnit*scene[i].Y+camOffsetY)/zoomAMT+mY*baseUnit});
 
 
-        if(scene[i].collidedSAT==true&&debug==true){
-            shape.setFillColor(sf::Color(0xff0000ff));
-            scene[i].collidedSAT=false;
+            if(scene[i].collidedSAT==true&&debug==true){
+                shape.setFillColor(sf::Color(0xff0000ff));
+                scene[i].collidedSAT=false;
+            }
+            shape.setTexture(&scene[i].texture);
+
+            window.draw(shape);
+        }else if(TextShapePoly(scene[i].objectType)){
+            sf::Text shape(scene[i].font);
+
+
+            //shape.setPosition({(point.x+baseUnit*objects[i].X+camOffsetX)/zoomAMT+W/2, (point.y+baseUnit*objects[i].Y+camOffsetY)/zoomAMT+H/2});
+            returnXY point = angleOffset(i,4);
+
+            shape.setPosition({(point.x+baseUnit*scene[i].X+camOffsetX)/zoomAMT+mX*baseUnit, (point.y+baseUnit*scene[i].Y+camOffsetY)/zoomAMT+mY*baseUnit});
+            sf::Angle angle = sf::degrees(scene[i].rotation);
+            shape.setRotation(angle);
+
+            shape.setFillColor(sf::Color(scene[i].color));
+            shape.setCharacterSize(scene[i].sizeModifier/zoomAMT*baseUnit/12);
+            if((std::rand()%100)<20&&scene[i].txtBoxSelected){
+                shape.setString(scene[i].text+"|");
+            }else{
+                shape.setString(scene[i].text);
+            }
+            window.draw(shape);
+        }else if(rectShapePoly(scene[i].objectType)){
+            sf::RectangleShape shape(sf::Vector2f((scene[i].width*baseUnit)/zoomAMT, (scene[i].height*baseUnit)/zoomAMT));
+
+            shape.setOrigin({(scene[i].width*baseUnit/2)/zoomAMT, (scene[i].height*baseUnit/2)/zoomAMT});
+
+            shape.setFillColor(sf::Color(scene[i].color));
+
+            sf::Angle angle = sf::degrees(scene[i].rotation);
+            shape.setRotation(angle);
+
+            shape.setPosition({(baseUnit*scene[i].X+camOffsetX)/zoomAMT+mX*baseUnit, (baseUnit*scene[i].Y+camOffsetY)/zoomAMT+mY*baseUnit});
+
+            if(scene[i].collidedSAT==true&&debug==true){
+                shape.setFillColor(sf::Color(0xff0000ff));
+                scene[i].collidedSAT=false;
+            }
+            shape.setTexture(&scene[i].texture);
+
+            window.draw(shape);
+        }else if(convexShapePoly(scene[i].objectType)){
+            sf::ConvexShape shape;
+            shape.setPointCount(scene[i].points);
+
+            for(int iP = 0; iP<scene[i].points;iP++){
+                shape.setPoint(iP, sf::Vector2f((scene[i].pointList[iP*2]*baseUnit*scene[i].sizeModifier)/zoomAMT, (scene[i].pointList[iP*2+1]*baseUnit*scene[i].sizeModifier)/zoomAMT));
+
+            }
+
+
+            shape.setPosition({(baseUnit*scene[i].X+camOffsetX)/zoomAMT+mX*baseUnit, (baseUnit*scene[i].Y+camOffsetY)/zoomAMT+mY*baseUnit});
+
+            sf::Angle angle = sf::degrees(scene[i].rotation);
+            shape.setRotation(angle);
+
+            shape.setFillColor(sf::Color(scene[i].color));
+
+            if(scene[i].collidedSAT==true&&debug==true){
+                shape.setFillColor(sf::Color(0xff0000ff));
+                scene[i].collidedSAT=false;
+            }
+            shape.setTexture(&scene[i].texture);
+
+            window.draw(shape);
+
         }
-        shape.setTexture(&scene[i].texture);
-
-        window.draw(shape);
-    }else if(TextShapePoly(scene[i].objectType)){
-        sf::Text shape(scene[i].font);
-
-
-        //shape.setPosition({(point.x+baseUnit*objects[i].X+camOffsetX)/zoomAMT+W/2, (point.y+baseUnit*objects[i].Y+camOffsetY)/zoomAMT+H/2});
-        returnXY point = angleOffset(i,4);
-
-        shape.setPosition({(point.x+baseUnit*scene[i].X+camOffsetX)/zoomAMT+mX*baseUnit, (point.y+baseUnit*scene[i].Y+camOffsetY)/zoomAMT+mY*baseUnit});
-        sf::Angle angle = sf::degrees(scene[i].rotation);
-        shape.setRotation(angle);
-
-        shape.setFillColor(sf::Color(scene[i].color));
-        shape.setCharacterSize(scene[i].sizeModifier/zoomAMT*baseUnit/12);
-        if((std::rand()%100)<20&&scene[i].txtBoxSelected){
-            shape.setString(scene[i].text+"|");
-        }else{
-            shape.setString(scene[i].text);
+        if(debug==true){
+            std::cout<<"DRAWN!: "<<i<<"\n";
         }
-        window.draw(shape);
-    }else if(rectShapePoly(scene[i].objectType)){
-        sf::RectangleShape shape(sf::Vector2f((scene[i].width*baseUnit)/zoomAMT, (scene[i].height*baseUnit)/zoomAMT));
-
-        shape.setOrigin({(scene[i].width*baseUnit/2)/zoomAMT, (scene[i].height*baseUnit/2)/zoomAMT});
-
-        shape.setFillColor(sf::Color(scene[i].color));
-
-        sf::Angle angle = sf::degrees(scene[i].rotation);
-        shape.setRotation(angle);
-
-        shape.setPosition({(baseUnit*scene[i].X+camOffsetX)/zoomAMT+mX*baseUnit, (baseUnit*scene[i].Y+camOffsetY)/zoomAMT+mY*baseUnit});
-
-        if(scene[i].collidedSAT==true&&debug==true){
-            shape.setFillColor(sf::Color(0xff0000ff));
-            scene[i].collidedSAT=false;
-        }
-        shape.setTexture(&scene[i].texture);
-
-        window.draw(shape);
-    }else if(convexShapePoly(scene[i].objectType)){
-        sf::ConvexShape shape;
-        shape.setPointCount(scene[i].points);
-
-        for(int iP = 0; iP<scene[i].points;iP++){
-            shape.setPoint(iP, sf::Vector2f((scene[i].pointList[iP*2]*baseUnit*scene[i].sizeModifier)/zoomAMT, (scene[i].pointList[iP*2+1]*baseUnit*scene[i].sizeModifier)/zoomAMT));
-
-        }
-
-
-        shape.setPosition({(baseUnit*scene[i].X+camOffsetX)/zoomAMT+mX*baseUnit, (baseUnit*scene[i].Y+camOffsetY)/zoomAMT+mY*baseUnit});
-
-        sf::Angle angle = sf::degrees(scene[i].rotation);
-        shape.setRotation(angle);
-
-        shape.setFillColor(sf::Color(scene[i].color));
-
-        if(scene[i].collidedSAT==true&&debug==true){
-            shape.setFillColor(sf::Color(0xff0000ff));
-            scene[i].collidedSAT=false;
-        }
-        shape.setTexture(&scene[i].texture);
-
-        window.draw(shape);
-
     }
-    if(debug==true){
-        std::cout<<"DRAWN!: "<<i<<"\n";
-    }
-    //}
 
 }
 //draws outline

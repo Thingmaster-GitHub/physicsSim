@@ -1,6 +1,4 @@
 #include "../headers/game.hpp"
-#include "../headers/global.hpp"
-#include "../headers/structs.hpp"
 //probably need to change how draw calls are handled, like specifing layers somehow, I'll do that later
 //checks bounding box collisions and runs SAT if intersects
 void game::baseCollision(){

@@ -1,6 +1,4 @@
 #include "../headers/game.hpp"
-#include "../headers/global.hpp"
-#include "../headers/structs.hpp"
 //pastes
 void game::paste(){
     for(int i=0;i<copyArray.size();i++){

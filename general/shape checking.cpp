@@ -1,6 +1,4 @@
 #include "../headers/game.hpp"
-#include "../headers/global.hpp"
-#include "../headers/structs.hpp"
 //returns if object is of type regular polygon(sf::circleShape)
 bool game::circleShapePoly(int type){
     if(type==0||type==1){

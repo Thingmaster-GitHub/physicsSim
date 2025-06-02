@@ -1,6 +1,4 @@
 #include "../headers/game.hpp"
-#include "../headers/global.hpp"
-#include "../headers/structs.hpp"
 
 //SAT calculations
 SATout game::SATUI(int o1,int o2){

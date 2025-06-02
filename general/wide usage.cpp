@@ -1,6 +1,4 @@
 #include "../headers/game.hpp"
-#include "../headers/global.hpp"
-#include "../headers/structs.hpp"
 //returns the distance to nearest corner of specified shape
 pointDist game::cornerDistCheck(int o){
     pointDist check= {std::numeric_limits<float>::infinity(),0};

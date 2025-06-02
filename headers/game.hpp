@@ -1,5 +1,6 @@
 #pragma once
-#include "structs.hpp"
+
+#include "global.hpp"
 class game{
 public:
     //runs program :3

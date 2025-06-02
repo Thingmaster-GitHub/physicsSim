@@ -1,6 +1,5 @@
 #include "../headers/game.hpp"
-#include "../headers/global.hpp"
-#include "../headers/structs.hpp"
+
 //rotates selected objects
 void game::rotateObj(float ammount){
     for(int i=0;i<objectCount;i++){

@@ -6,6 +6,7 @@
 #include <limits>
 #include <SFML/Graphics.hpp>
 #pragma once
+
 struct returnXY{
     float x;
     float y;

@@ -1,13 +1,4 @@
 
-#include <nlohmann/json.hpp>
-#include <fstream>
-#include <iostream>
-#include <chrono>
-#include <cmath>
-#include <limits>
-#include <SFML/Graphics.hpp>
-#include "headers/structs.hpp"
-#include "headers/global.hpp"
 #include "headers/game.hpp"
 
 const int mX=48;
@@ -36,7 +27,7 @@ float initMX;
 float initMY;
 
 const bool wrap = false;//don't enable with centered camera.
-
+aaaaaa
 std::string cursorMode = "select";
 
 int mouseObject;

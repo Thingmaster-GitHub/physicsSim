@@ -1,6 +1,5 @@
 #include "../headers/game.hpp"
-#include "../headers/global.hpp"
-#include "../headers/structs.hpp"
+
 //checks bounding box collisions and runs SAT if intersects
 void game::baseCollisionUI(){
     float XMax;

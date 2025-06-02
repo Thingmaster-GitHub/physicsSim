@@ -1,6 +1,4 @@
 #include "../headers/game.hpp"
-#include "../headers/global.hpp"
-#include "../headers/structs.hpp"
 //handles keyboard inputs
 void game::input(const sf::Keyboard::Scan key){
     if(key==sf::Keyboard::Scancode::Equal){

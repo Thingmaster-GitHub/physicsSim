@@ -5,6 +5,7 @@
 #include <cmath>
 #include <limits>
 #include <SFML/Graphics.hpp>
+
 #include "structs.hpp"
 #pragma once
 

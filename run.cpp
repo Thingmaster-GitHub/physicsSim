@@ -1,6 +1,4 @@
 #include "headers/game.hpp"
-#include "headers/structs.hpp"
-#include "headers/global.hpp"
 
 void game::run(){
     loadObjectsJSON(UI,"UI.json");

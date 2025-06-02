@@ -1,6 +1,4 @@
 #include "../headers/game.hpp"
-#include "../headers/global.hpp"
-#include "../headers/structs.hpp"
 //controls zoom
 void game::zoom(float ammount){
     if(ammount<0){

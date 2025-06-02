@@ -1,6 +1,4 @@
 #include "../headers/game.hpp"
-#include "../headers/global.hpp"
-#include "../headers/structs.hpp"
 void game::debuger(sf::RenderTarget& window,int i){
     sf::CircleShape pointNotButter(4,20);
     pointNotButter.setOrigin({4, 1});

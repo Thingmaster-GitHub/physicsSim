@@ -1,6 +1,4 @@
 #include "../headers/game.hpp"
-#include "../headers/global.hpp"
-#include "../headers/structs.hpp"
 //used for bounding box
 //gets minimum X
 float game::getMinX(int object){
