@@ -1,5 +1,11 @@
 #include "headers/game.hpp"
-
+#include <nlohmann/json.hpp>
+#include <fstream>
+#include <iostream>
+#include <chrono>
+#include <cmath>
+#include <limits>
+#include <SFML/Graphics.hpp>
 void game::run(){
     loadObjectsJSON(UI,"UI.json");
     for(int i=0;i<UI.size();i++){
@@ -197,7 +203,7 @@ void game::saveObjectsJSON(const std::vector<object>& objects, const std::string
             {"rotation", obj.rotation}, {"sides", obj.sides}, {"sizeModifier", obj.sizeModifier},
             {"objectType", obj.objectType}, {"gravity", obj.gravity},{"airRes", obj.airRes},{"solid",obj.solid}, {"mass", obj.mass},
             {"color", obj.color}, {"width", obj.width}, {"height", obj.height},
-            {"points", obj.points}, {"pointList", std::vector<float>(obj.pointList, obj.pointList + 30)},{"coefficentOfFriction",obj.coefficentOfFriction},{"layer",obj.layer},{"text",obj.text},{"txtLbl",obj.txtLbl},
+            {"points", obj.points}, {"pointList", std::vector<float>(obj.pointList, obj.pointList + 30)},{"coefficentOfFriction",obj.coefficentOfFriction},{"layer",obj.layer},{"text",obj.text},{"txtLbl",obj.txtLbl},{"bgDist",obj.bgDist},
                     {"loc", obj.loc},
                     {"trigger", {
                         {"id", obj.trigger.id},

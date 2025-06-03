@@ -1,5 +1,11 @@
 #pragma once
-
+#include <nlohmann/json.hpp>
+#include <fstream>
+#include <iostream>
+#include <chrono>
+#include <cmath>
+#include <limits>
+#include <SFML/Graphics.hpp>
 #include "global.hpp"
 class game{
 public:
@@ -7,7 +13,22 @@ public:
     void run();
 
 private:
+    std::vector<int> typeCheckSingle(int);
+    //checks object types and returns array of appropriate values
+    std::vector<int> typeCheckMulti(std::vector<int>& obj);
+    //toggles visibility
+    void toggleVisable(object& obj);
+    //checks if object is visable
+    bool isVisableQ(object& obj);
+    //multi object grey out logic
+    void multiObjNoEdit(std::vector<int>& obj);
+    //single object grey out logic
+    void singleObjNoEdit(int obj);
+    //makes text inputs unusable if they cant be used in this context (ex. sides on a rectangle)
+    void NoEdit();
+    //scales object
     void scaleObj(float amt);
+    //outlines window
     void winOutline(sf::RenderTarget& window);
     //loads data into textExtra for UI elements
     void textSelected();

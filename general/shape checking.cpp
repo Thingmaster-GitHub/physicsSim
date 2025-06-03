@@ -7,7 +7,7 @@ bool game::circleShapePoly(int type){
         return false;
     }
 }
-//returns if object is type rectangle
+//returns if object is type rectangle(or text for collision purpouses, just call the other function first for text logic)
 bool game::rectShapePoly(int type){
     if(type==2||type==-3||type==4){
         return true;

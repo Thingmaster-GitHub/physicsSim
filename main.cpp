@@ -27,7 +27,7 @@ float initMX;
 float initMY;
 
 const bool wrap = false;//don't enable with centered camera.
-aaaaaa
+
 std::string cursorMode = "select";
 
 int mouseObject;

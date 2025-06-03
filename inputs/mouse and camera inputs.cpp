@@ -58,7 +58,6 @@ void game::Lclick(){
     //point selection
     if(cursorMode=="edit"){
         pointDist check = {};
-        int queriedObjectSelected = 0;
         bool pointSelected = false;
 
         int Ochecked=0;
@@ -69,7 +68,6 @@ void game::Lclick(){
                 if(check.distance<10){
                     pointSelected=true;
 
-                    queriedObjectSelected=i;
                     Ochecked=i;
                 }
             }
@@ -83,6 +81,7 @@ void game::Lclick(){
             for(int i=0;i<objectCount;i++){
                 objects[i].clicked=false;
             }
+            NoEdit();
             return;
         }
     }
@@ -127,6 +126,7 @@ void game::Lclick(){
                     objects[i].selected=false;
                 }
                 objects[queriedTrue].selected=true;
+
                 if(cursorMode=="select"){
                     objects[queriedTrue].grabbed=true;
                 }
@@ -144,7 +144,6 @@ void game::Lclick(){
                 }
 
             }
-
         }
     }else if(clickQ>1){
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LShift)){
@@ -201,7 +200,7 @@ void game::Lclick(){
     if(count==0){
         textSelected();
     }
-
+    NoEdit();
 
 }
 //controls camera

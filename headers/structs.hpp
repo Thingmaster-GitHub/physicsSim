@@ -90,7 +90,7 @@ struct object{
     std::string txtLbl = "default";
     std::string textExtra="";//UI element, please ignore
     bool txtBoxSelected = false;
-    bool editable = false; //does't do anything yet
+    bool editable = true; //does't do anything yet
     float bgDist =1;//unimplimented
 };
 struct cpy{

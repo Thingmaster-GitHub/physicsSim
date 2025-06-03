@@ -11,7 +11,7 @@ void game::paste(){
         objectCount++;
     }
     initialize();
-
+    NoEdit();
 }
 //copies
 void game::copy(){
