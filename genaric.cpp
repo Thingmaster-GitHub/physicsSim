@@ -28,11 +28,15 @@ void game::singleObjNoEdit(int obj){
                     if(out[iP]==0){
                         if(isVisableQ(UI[i])){
                             toggleVisable(UI[i]);
-                            UI[i].editable=false;
                         }
+                        UI[i].editable=false;
                     }else if(out[iP]==1){
                         if(!isVisableQ(UI[i])){
                             toggleVisable(UI[i]);
+
+                        }
+                        if(UI[i].color==0xaaaaaaff){
+                            UI[i].color=0xffffffff;
                         }
                         UI[i].editable=true;
                     }else{

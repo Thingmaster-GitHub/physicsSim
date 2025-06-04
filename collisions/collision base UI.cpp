@@ -57,9 +57,13 @@ void game::collisionResponseUI(int o1,int o2){
     if(UI[o1].objectType==-1||UI[o2].objectType==-1){
         if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
             if(UI[o1].objectType==-1){
-                UI[o2].clicked=true;
+                if(UI[o2].editable){
+                    UI[o2].clicked=true;
+                }
             }else{
-                UI[o1].clicked=true;
+                if(UI[o1].editable){
+                    UI[o1].clicked=true;
+                }
             }
         }
     }
