@@ -5,8 +5,8 @@
 #include <cmath>
 #include <limits>
 #include <SFML/Graphics.hpp>
-#include "game.hpp"
-#include "global.hpp"
+#include "headers/game.hpp"
+#include "headers/global.hpp"
     //sets object load order for drawing
     void game::LayerObjects(){
         objectLoadOrder.clear();

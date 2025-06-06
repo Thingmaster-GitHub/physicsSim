@@ -1,6 +1,6 @@
 
-#include "global.hpp"
-#include "game.hpp"
+#include "headers/global.hpp"
+#include "headers/game.hpp"
 
 int W = 1366;
 int H = 768;
