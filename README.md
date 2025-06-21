@@ -26,5 +26,7 @@ this progam is used to edit levels, they are currently saved upon progam exit.
 
 # features
 
+-config file for UI element properties so it isn't hard coded & it's easier to edit
+
 -object groups in editor
 
