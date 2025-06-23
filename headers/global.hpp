@@ -3,7 +3,7 @@
 //just a normal header file, nothing to see here
 extern int W;
 extern int H;
-extern int objectCount;
+
 extern float baseUnit;
 
 extern bool debug;
@@ -23,4 +23,4 @@ extern int mouseObject;
 extern float coefficientOfRestitution;
 
 extern std::vector<object> objects;
-extern std::vector<int> objectLoadOrder;
+

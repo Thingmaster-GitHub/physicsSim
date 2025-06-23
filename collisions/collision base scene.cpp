@@ -12,12 +12,12 @@ void game::baseCollision(float timediff){
     float YMaxCh;
     float YMinCh;
     SATout output;
-    for(int i = 0;i<objectCount;i++){
+    for(int i = 0;i<objects.size();i++){
         XMax = getMaxX(i);
         XMin = getMinX(i);
         YMax = getMaxY(i);
         YMin = getMinY(i);
-        for(int iP=i+1;iP<objectCount;iP++){
+        for(int iP=i+1;iP<objects.size();iP++){
 
             if(i!=iP){
                 XMaxCh = getMaxX(iP);

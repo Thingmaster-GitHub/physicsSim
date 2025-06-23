@@ -4,7 +4,7 @@
 
 int W = 1366;
 int H = 768;
-int objectCount = 0;
+
 float baseUnit = (W/128+H/72)/2;
 
 bool debug =    false;
@@ -24,7 +24,6 @@ int mouseObject;
 float coefficientOfRestitution=0.6;
 
 std::vector<object> objects;
-std::vector<int> objectLoadOrder;
 
 
 int main()

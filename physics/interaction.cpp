@@ -131,3 +131,90 @@ void game::collisionResponse(int o1,int o2,SATout input,float timediff){
 
 
 }
+//don't input an obect besides ones for this calculated SAT input
+//calculated projected offset of shape for rotation
+float game::VelRotCalc(int o1,int o2,SATout input){
+    //choses point
+    float Xaverage = (objects[o1].X+objects[o2].X)/2;
+    float Yaverage = (objects[o1].Y+objects[o2].Y)/2;
+    returnXY pointAverage = {Xaverage,Yaverage};
+    returnXY inPoint;
+    if(distance(input.point1,pointAverage)<distance(input.point2,pointAverage)){
+        inPoint = input.point1;
+    }else{
+        inPoint = input.point2;
+
+    }
+    if(debug==true){
+        objects[o1].pointProjected2=input.point2;
+        objects[o1].pointProjected=input.point1;
+    }
+    returnXY normal = invertNormal(input.normal);
+
+    float projectedOffset = projectPointOntoNormal(inPoint,normal);
+
+    returnXY center;
+    center.x=objects[o1].X;
+    center.y=objects[o1].Y;
+
+    float projectedCenter = projectPointOntoNormal(center,normal);
+
+    float polarityOffset = projectPointOntoNormal(inPoint,input.normal);
+    float polarityCenter = projectPointOntoNormal(center,input.normal);
+
+    float output = projectedCenter-projectedOffset;
+    //
+    if(polarityCenter-polarityOffset>0){
+        output*=-1;
+    }
+
+
+    //if(objects[o2].mass==std::numeric_limits<float>::infinity()&&objects[o1].mass!=std::numeric_limits<float>::infinity()){
+
+    //output*=-1;
+    //std::cout<<"polarityOffset: "<<polarityOffset<<"\npolarityCenter: "<<polarityCenter<<"\n";
+    /*if(objects[o1].sides%2==0&&objects[o1].sides!=0){
+     *                    output*=-1;
+}*/
+    //}
+    if(output<0){
+        //std::cout<<pol<<"\n";
+        output=-1*sqrt(fabs(output));
+    }else{
+        output=sqrt(fabs(output));
+    }
+
+    return output;
+
+
+}
+
+
+
+void game::friction(int o1,int o2,returnXY normal,float timediff){
+    returnXY inverted = invertNormal(normal);
+    returnXY vel = {objects[o1].velX,objects[o1].velY};
+    returnXY velNormal = vel;
+
+    float len = sqrt(square(velNormal.x)+square(velNormal.y));
+    if(len!=0&&objects[o1].objectType!=-1&&objects[o2].objectType!=-1){
+
+
+
+
+        velNormal.x/=len;
+        velNormal.y/=len;
+
+        float frictDist = projectPointOntoNormal(vel,inverted);
+        frictDist = frictDist*(objects[o1].coefficentOfFriction+objects[o2].coefficentOfFriction)/2/timediff;
+        if(frictDist!=std::numeric_limits<float>::infinity()&&frictDist!=-std::numeric_limits<float>::infinity()){
+            objects[o1].velX-=frictDist*inverted.x;
+            objects[o1].velY-=frictDist*inverted.y;
+
+            objects[o1].velRot*=objects[o1].coefficentOfFriction;
+
+        }
+    }
+
+
+}

@@ -6,10 +6,11 @@
 #include <limits>
 #include <SFML/Graphics.hpp>
 #include "headers/headers.cpp"
+//runs the program :3
 void game::run(){
 
     returnXY p;
-    objectCount = loadObjectsJSON(objects,"save.json");
+    loadObjectsJSON(objects,"save.json");
 
     LayerObjects();
 
@@ -26,7 +27,7 @@ void game::run(){
     sf::RenderWindow window(sf::VideoMode({static_cast<unsigned int>(W), static_cast<unsigned int>(H)}), "game"/*, sf::Style::Close, settings*/);
 
     //recenters convex polygons
-    for(int i = 0;i<objectCount;i++){
+    for(int i = 0;i<objects.size();i++){
         float X=0;
         float Y=0;
         if(objects[i].mass<=0){
@@ -73,8 +74,8 @@ void game::run(){
         p = Camera(p.x,p.y,timediff);
 
         //draws all shapes+transformations
-        for(int i = 0; i<objectCount;i++){
-            drawShape(window,objectLoadOrder[i]);
+        for(int i = 0; i<objects.size();i++){
+            drawShape(window,i);
 
             if(debug==true){
                 debuger(window,i);
@@ -165,4 +166,59 @@ void game::run(){
         jumpDown(timediff);
 
     }
+}
+//loads in objects
+int game::loadObjectsJSON(std::vector<object>& objectsVect, const std::string& filename) {
+    std::ifstream file(filename);
+    if (!file) {
+        std::cerr << "Error opening JSON file!\n";
+        return 0;
+    }
+
+    nlohmann::json j;
+    file >> j;
+    file.close();
+
+    objectsVect.clear();
+    for (const auto& item : j) {
+        object obj;
+        obj.X = item["X"];
+        obj.Y = item["Y"];
+        obj.velX = item["velX"];
+        obj.velY = item["velY"];
+        obj.velRot = item["velRot"];
+        obj.rotation = item["rotation"];
+        obj.sides = item["sides"];
+        obj.sizeModifier = item["sizeModifier"];
+        obj.objectType = item["objectType"];
+        obj.gravity = item["gravity"];
+        obj.airRes = item["airRes"];
+        obj.solid = item["solid"];
+        obj.mass = item["mass"];
+        obj.color = item["color"];
+        obj.width = item["width"];
+        obj.height = item["height"];
+        obj.points = item["points"];
+        obj.coefficentOfFriction = item["coefficentOfFriction"];
+        obj.loc = item["loc"];
+        obj.layer = item["layer"];
+        auto pointList = item["pointList"].get<std::vector<float>>();
+        std::copy(pointList.begin(), pointList.end(), obj.pointList);
+
+        obj.trigger.id = item["trigger"]["id"];
+        obj.trigger.event = item["trigger"]["event"];
+        obj.trigger.destroyO2 = item["trigger"]["destroyO2"];
+        obj.trigger.typeReq = item["trigger"]["typeReq"];
+        obj.text=item["text"];
+        obj.layer = item["layer"];
+
+        if (!obj.texture.loadFromFile(obj.loc)) {
+            std::cerr << "Failed to load texture: " << obj.loc << '\n';
+        }
+        obj.X*=baseUnit;
+        obj.Y*=baseUnit;
+        objectsVect.push_back(obj);
+    }
+    return objectsVect.size();
+
 }
