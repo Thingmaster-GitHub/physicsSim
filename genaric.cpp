@@ -85,33 +85,7 @@
         return objectsVect.size();
 
     }
-    //trigger logic
-    void game::trigger(int o1,int o2){
 
-        /*if(objects[o1].trigger.event=="destroy"){
-            if(objects[o1].trigger.typeReq==objects[o2].objectType && (objects[o1].trigger.isIDReq==false || objects[o1].trigger.IDReq==objects[o2].trigger) ){
-                for(int i=0;i<objectCount;i++){
-                    if(objects[o1].trigger.id==objects[i].trigger.id){
-                        objects[i].objectType=-4;
-                        objects[i].mass=0;
-                        objects[i].gravity=false;
-                        objects[i].airRes=false;
-                        objects[i].solid=false;
-                    }
-                }
-            }
-        }*/
-
-    }
-    //jump countdown
-    void game::jumpDown(float timediff){
-        if(jumpCountDown>=0){
-            jumpCountDown-=1/timediff/20;
-        }
-        if(jumpCountDown<0){
-            canJump=0;
-        }
-    }
     //controls inputs
     void game::inputs(int Object,float timediff){
         float mal=1;
@@ -295,302 +269,8 @@
         //std::cout<<objects[i].velY<<"\n";
 
     }
-    //checks bounding box collisions and runs SAT if intersects
-    void game::baseCollision(float timediff){
-        float XMax;
-        float XMin;
-        float YMax;
-        float YMin;
-
-        float XMaxCh;
-        float XMinCh;
-        float YMaxCh;
-        float YMinCh;
-        SATout output;
-        for(int i = 0;i<objectCount;i++){
-            XMax = getMaxX(i);
-            XMin = getMinX(i);
-            YMax = getMaxY(i);
-            YMin = getMinY(i);
-            for(int iP=i+1;iP<objectCount;iP++){
-
-                if(i!=iP){
-                    XMaxCh = getMaxX(iP);
-                    XMinCh = getMinX(iP);
-                    YMaxCh = getMaxY(iP);
-                    YMinCh = getMinY(iP);
-                    //std::cout<<"top Y 1: "<<YMin<<"\ntop Y 2: "<<YMinCh<<"\nbottom Y 1: "<<YMax<<"\nbottom Y 2: "<<YMaxCh<<"\n\n";
-                    if(!(XMin>XMaxCh||XMax<XMinCh||YMin>YMaxCh||YMax<YMinCh)){
-                        if(objects[i].solid&&objects[iP].solid){
-                            if(debug==true){
-                                //std::cout<<i<<" ("<<objects[i].X<<", "<<objects[i].Y<<") intersects with "<<iP<<" ("<<objects[iP].X<<", "<<objects[iP].Y<<") !(bounding box)\n";
-                            }
-
-                            objects[i].collidedbox=true;
-                            objects[iP].collidedbox=true;
-                            output = SAT(i,iP);//unfinished
-                            if(output.difference<0-1){
-                                objects[i].collidedSAT=true;
-                                objects[iP].collidedSAT=true;
-                                collisionResponse(i,iP,output,timediff);
-                                if(debug==true){
-                                    std::cout<<i<<" ("<<objects[i].X<<", "<<objects[i].Y<<") intersects with "<<iP<<" ("<<objects[iP].X<<", "<<objects[iP].Y<<") !(SAT)\n";
-                                }
-                            }
-
-                        }else if(objects[i].objectType==-3){
-                            trigger(i,iP);
-                        }if(objects[iP].objectType==-3){
-                            trigger(iP,i);
-                        }
-                    }
-                }
-
-            }
-
-        }
-    }
-    //SAT calculations
-    SATout game::SAT(int o1,int o2){
-        SATout output;
-        returnXY normal;
-        float max1;
-        float min1;
-        float max2;
-        float min2;
-        if(objects[o1].sides>10&&objects[o2].sides>10&&sqrt(square(objects[o1].X-objects[o2].X)+square(objects[o1].Y-objects[o2].Y))>(baseUnit*objects[o1].sizeModifier*2+baseUnit*objects[o2].sizeModifier*2)){
-            output.difference=1;
-            return output;
-        }else if(objects[o1].sides>10&&objects[o2].sides>10){
-            returnXY point1;
-            returnXY point2;
-            point1.x=objects[o1].X;
-            point1.y=objects[o1].Y;
-            point2.x=objects[o2].X;
-            point2.y=objects[o2].Y;
-            output.normal = getNormal(point1,point2);
-            float tmpX = output.normal.x;
-            float tmpY = output.normal.y;
-            output.normal.x=tmpY;
-            output.normal.y=-tmpX;
-            output.difference=sqrt(square(objects[o1].X-objects[o2].X)+square(objects[o1].Y-objects[o2].Y))-(baseUnit*objects[o1].sizeModifier*2+baseUnit*objects[o2].sizeModifier*2);
-            output.point1.x=objects[o1].X;
-            output.point1.y=objects[o1].Y;
-            output.point2.x=objects[o2].X;
-            output.point2.y=objects[o2].Y;
-            return output;
-        }else if((objects[o1].sides>10||objects[o2].sides>10)&&((objects[o1].objectType==-1)||(objects[o2].objectType==-1))){
-
-            returnXY point1;
-            returnXY point2;
-            point1.x=objects[o1].X;
-            point1.y=objects[o1].Y;
-            point2.x=objects[o2].X;
-            point2.y=objects[o2].Y;
-            output.normal = getNormal(point1,point2);
-            float tmpX = output.normal.x;
-            float tmpY = output.normal.y;
-            output.normal.x=tmpY;
-            output.normal.y=-tmpX;
-            if(objects[o1].objectType==-1){
-                if(sqrt(square(objects[o1].X-objects[o2].X)+square(objects[o1].Y-objects[o2].Y)) > (baseUnit*objects[o2].sizeModifier*2)){
-                    output.difference=1;
-                    return output;
-                }
-                output.difference=sqrt(square(objects[o1].X-objects[o2].X)+square(objects[o1].Y-objects[o2].Y))-(baseUnit*objects[o2].sizeModifier*2);
-            }else{
-                if(sqrt(square(objects[o1].X-objects[o2].X)+square(objects[o1].Y-objects[o2].Y)) > (baseUnit*objects[o1].sizeModifier*2)){
-                    output.difference=1;
-                    return output;
-                }
-                output.difference=sqrt(square(objects[o1].X-objects[o2].X)+square(objects[o1].Y-objects[o2].Y))-(baseUnit*objects[o1].sizeModifier*2);
-            }
 
 
-        }
-        if(objects[o1].sides>10||objects[o2].sides>10){
-            if(objects[o2].sides>10){
-                if(circleShapePoly(o1)){
-                    output = SATLoopCirclePoly(o1,o2,objects[o1].sides,output);
-                    if(output.difference>0){
-                        return output;
-                    }
-
-
-                }else if(rectShapePoly(o1)){
-                    output = SATLoopCirclePoly(o1,o2,4,output);
-                    if(output.difference>0){
-                        return output;
-                    }
-                }else if(convexShapePoly(o1)){
-                    output = SATLoopCirclePoly(o1,o2,objects[o1].points,output);
-                    if(output.difference>0){
-                        return output;
-                    }
-                }
-            }else{
-                if(circleShapePoly(o2)){
-
-                    output = SATLoopCirclePoly(o2,o1,objects[o2].sides,output);
-                    if(output.difference>0){
-                        return output;
-                    }
-
-                }else if(rectShapePoly(o2)){
-                    output = SATLoopCirclePoly(o2,o1,4,output);
-                    if(output.difference>0){
-                        return output;
-                    }
-                }else if(convexShapePoly(o2)){
-                    output = SATLoopCirclePoly(o2,o1,objects[o2].points,output);
-                    if(output.difference>0){
-                        return output;
-                    }
-                }
-            }
-
-
-        }
-        if(circleShapePoly(o1)){
-            if(objects[o1].sides<=10){
-                output = SATLoop(o1,o2,objects[o2].sides,output);
-                if(output.difference>0){
-                    return output;
-                }
-            }
-
-        }else if(rectShapePoly(o1)){
-            output = SATLoop(o1,o2,4,output);
-            if(output.difference>0){
-                return output;
-            }
-        }else if(convexShapePoly(o1)){
-            output = SATLoop(o1,o2,objects[o1].points,output);
-            if(output.difference>0){
-                return output;
-            }
-        }
-
-        if(circleShapePoly(o2)){
-            if(objects[o2].sides<=10){
-                output = SATLoop(o2,o1,objects[o2].sides,output);
-            }
-            if(output.difference>0){
-                return output;
-            }
-
-        }else if(rectShapePoly(o2)){
-            output = SATLoop(o2,o1,4,output);
-            if(output.difference>0){
-                return output;
-            }
-        }else if(convexShapePoly(o2)){
-            output = SATLoop(o2,o1,objects[o2].points,output);
-            if(output.difference>0){
-                return output;
-            }
-        }
-
-
-
-
-
-
-
-        return output;
-    }
-    //polygon on ponlygon collisions
-    SATout game::SATLoop(int o1,int o2,int times,SATout output){
-        returnXY normal;
-        maxMin max1;
-        maxMin min1;
-        maxMin max2;
-        maxMin min2;
-        for(int i = 0;i<times;i++){
-            returnXY point1 = angleOffset(o1,i);
-            returnXY point2;
-            if(i+1<times){
-                point2 = angleOffset(o1, i+1);
-            }else{
-                point2 = angleOffset(o1, 0);
-            }
-            normal = getNormal(point1,point2);
-
-            max1 = getMaxNormal(o1,normal);
-            min1 = getMinNormal(o1,normal);
-            max2 = getMaxNormal(o2,normal);
-            min2 = getMinNormal(o2,normal);
-
-            if(min2.maxMin-max1.maxMin>output.difference){
-                output.difference=min2.maxMin-max1.maxMin;
-                output.normal=normal;
-                output.point2=min2.point;
-                output.point1=max1.point;
-                //output.point2=min2.point;
-            }
-            if(min1.maxMin-max2.maxMin>output.difference){
-                output.difference=min1.maxMin-max2.maxMin;
-                output.normal=normal;
-                output.point1=min1.point;
-                output.point2=max2.point;
-                //output.point2=min1.point;
-            }
-
-
-            if(max1.maxMin < min2.maxMin || min1.maxMin > max2.maxMin){
-                return output;
-            }
-        }
-
-        return output;
-    }
-    //SAT calculation for circle on polygon colisions
-    SATout game::SATLoopCirclePoly(int o1, int o2, int times,SATout output){
-        returnXY normal;
-        maxMin max1;
-        maxMin min1;
-        maxMin max2;
-        maxMin min2;
-        for(int i = 0;i<times;i++){
-            returnXY point1 = angleOffset(o1,i);
-            point1.x+=objects[o1].X;
-            point1.y+=objects[o1].Y;
-            returnXY point2;
-
-            point2.x = objects[o2].X;
-            point2.y = objects[o2].Y;
-
-            normal = invertNormal(getNormal(point1,point2));
-
-            max1 = getMaxNormal(o1,normal);
-            min1 = getMinNormal(o1,normal);
-            max2 = getMaxNormal(o2,normal);
-            min2 = getMinNormal(o2,normal);
-            if(min2.maxMin-max1.maxMin>output.difference){
-                output.difference=min2.maxMin-max1.maxMin;
-                output.normal=normal;
-                output.point1=max1.point;
-                output.point2=min2.point;
-                //output.point2=min2.point;
-            }
-            if(min1.maxMin-max2.maxMin>output.difference){
-                output.difference=min1.maxMin-max2.maxMin;
-                output.normal=normal;
-                output.point2=max2.point;
-                output.point1=min1.point;
-                //not needed as normals are from object one
-                //output.point2=min1.point;
-            }
-            if(max1.maxMin < min2.maxMin || min1.maxMin > max2.maxMin){
-
-                return output;
-
-            }
-
-        }
-
-        return output;
-    }
     //graphs points that are baseUnit appart in spacing
     void game::testingLayoutInf(sf::RenderTarget& window){
         sf::CircleShape pointNotButter(1,20);
@@ -607,7 +287,9 @@
     }
     //degrees to radians
     float game::degToRad(float deg){
-        for(int i = 0;deg>360;deg-=360){}
+        while(deg>360){
+            deg-=360;
+        }
         return deg*(3.14/180);
     }
     //radians to degrees
@@ -616,7 +298,7 @@
     }
     //returns offset of specified point from shape center
     returnXY game::angleOffset(int i,int point){//should return the point as an offset from the center of the shape with X and Y values
-        int butterSize = 5;
+
         returnXY output = {0,0};
         if(circleShapePoly(i))/*circleShape*/{
             if(objects[i].sides%2!=0){
@@ -640,14 +322,16 @@
 
             //std::cout<<"point: "<<point<<"\ndeg: " << radToDeg(rad)<<"\ndist: "<< dist <<"\nbaseUnit: "<<baseUnit<<"\n";
         }else if(convexShapePoly(i)){
-            float dist = sqrt(square(objects[i].pointList[point*2])+square(objects[i].pointList[point*2+1]))*baseUnit*objects[i].sizeModifier;
-            float rad =asin(objects[i].pointList[point*2+1]*baseUnit*objects[i].sizeModifier/dist);
-
             float x=objects[i].pointList[point*2];
             float y=objects[i].pointList[point*2+1];
+
+            float dist = sqrt(square(x)+square(y))*baseUnit*objects[i].sizeModifier;
+            float rad =asin(y*baseUnit*objects[i].sizeModifier/dist);
+
+
             //std::cout<<"\n\npoint: "<<point<<"\n\nXch: "<<X<<"\nYch: "<<Y<<"\n\nXpoint: "<<objects[i].pointList[point*2]<<"\nYpoint: "<<objects[i].pointList[point*2+1]<<"\n\nx: "<<x<<"\ny: "<<y<<"\n";
 
-            if(congruent(objects[i].pointList[point*2],objects[i].pointList[point*2+1])){
+            if(congruent(x,y)){
                 if(x<0){
                     output.x=dist*sin(-degToRad(objects[i].rotation+90)+rad);
                     output.y=dist*cos(-degToRad(objects[i].rotation+90)+rad);
@@ -692,282 +376,7 @@
             return false;
         }
     }
-    //used for bounding box
-    //gets minimum X
-    float game::getMinX(int object){
 
-        float pointOutput = angleOffset(object,0).x;
-        if(objects[object].sides<=10){
-            if(circleShapePoly(object)){
-
-
-                for(int iS=1;iS<objects[object].sides;iS++){
-                    returnXY pointValue = angleOffset(object,iS);
-                    if(pointValue.x<pointOutput){
-                        pointOutput=pointValue.x;
-                    }
-                }
-
-            }else if(rectShapePoly(object)){
-
-                for(int iS=1;iS<4;iS++){
-                    returnXY pointValue = angleOffset(object,iS);
-                    if(pointValue.x<pointOutput){
-                        pointOutput=pointValue.x;
-                    }
-                }
-            }else if(convexShapePoly(object)){
-
-
-                for(int iS=1;iS<objects[object].points;iS++){
-                    returnXY pointValue = angleOffset(object,iS);
-                    if(pointValue.x<pointOutput){
-                        pointOutput=pointValue.x;
-                    }
-
-                }
-            }
-
-        }else{
-            pointOutput = -objects[object].sizeModifier*baseUnit*2;
-        }
-        return pointOutput+objects[object].X;
-    }
-    //gets minimum Y
-    float game::getMinY(int object){
-
-        float pointOutput = angleOffset(object,0).y;
-        if(objects[object].sides<=10){
-            if(circleShapePoly(object)){
-
-                for(int iS=1;iS<objects[object].sides;iS++){
-                    returnXY pointValue = angleOffset(object,iS);
-                    if(pointValue.y<pointOutput){
-                        pointOutput=pointValue.y;
-                    }
-                }
-
-            }else if(rectShapePoly(object)){
-
-                for(int iS=1;iS<4;iS++){
-                    returnXY pointValue = angleOffset(object,iS);
-                    if(pointValue.y<pointOutput){
-                        pointOutput=pointValue.y;
-                    }
-                }
-            }else if(convexShapePoly(object)){
-
-                for(int iS=1;iS<objects[object].points;iS++){
-                    returnXY pointValue = angleOffset(object,iS);
-                    if(pointValue.y<pointOutput){
-                        pointOutput=pointValue.y;
-                    }
-
-                }
-            }
-        }else{
-            pointOutput = -objects[object].sizeModifier*baseUnit*2;
-        }
-
-
-        return pointOutput+objects[object].Y;
-    }
-    //gets maximum X
-    float game::getMaxX(int object){
-
-        float pointOutput = angleOffset(object,0).x;
-        if(objects[object].sides<=10){
-            if(circleShapePoly(object)){
-
-                for(int iS=1;iS<objects[object].sides;iS++){
-                    returnXY pointValue = angleOffset(object,iS);
-                    if(pointValue.x>pointOutput){
-                        pointOutput=pointValue.x;
-                    }
-                }
-
-            }else if(rectShapePoly(object)){
-
-                for(int iS=1;iS<4;iS++){
-                    returnXY pointValue = angleOffset(object,iS);
-                    if(pointValue.x>pointOutput){
-                        pointOutput=pointValue.x;
-                    }
-                }
-            }else if(convexShapePoly(object)){
-
-                for(int iS=1;iS<objects[object].points;iS++){
-                    returnXY pointValue = angleOffset(object,iS);
-                    if(pointValue.x>pointOutput){
-                        pointOutput=pointValue.x;
-                    }
-
-                }
-            }
-        }else{
-            pointOutput = objects[object].sizeModifier*baseUnit*2;
-        }
-        return pointOutput+objects[object].X;
-    }
-    //gets maximum y
-    float game::getMaxY(int object){
-
-        float pointOutput = angleOffset(object,0).y;
-        if(objects[object].sides<=10){
-            if(circleShapePoly(object)){
-
-                for(int iS=1;iS<objects[object].sides;iS++){
-                    returnXY pointValue = angleOffset(object,iS);
-                    if(pointValue.y>pointOutput){
-                        pointOutput=pointValue.y;
-                    }
-                }
-
-            }else if(rectShapePoly(object)){
-
-                for(int iS=1;iS<4;iS++){
-                    returnXY pointValue = angleOffset(object,iS);
-                    if(pointValue.y>pointOutput){
-                        pointOutput=pointValue.y;
-                    }
-                }
-            }else if(convexShapePoly(object)){
-
-                for(int iS=1;iS<objects[object].points;iS++){
-                    returnXY pointValue = angleOffset(object,iS);
-                    if(pointValue.y>pointOutput){
-                        pointOutput=pointValue.y;
-                    }
-
-                }
-            }
-        }else{
-            pointOutput = objects[object].sizeModifier*baseUnit*2;
-        }
-        return pointOutput+objects[object].Y;
-    }
-    //gets maximum normal of shape
-    maxMin game::getMaxNormal(int object,returnXY normal){
-        maxMin output;
-        output.maxMin=-std::numeric_limits<float>::infinity();
-        float test;
-        returnXY testPoint;
-        //circle
-        if(objects[object].sides>10){
-            output.maxMin = objects[object].X*normal.x+objects[object].Y*normal.y+baseUnit*objects[object].sizeModifier*2;
-            output.point.x=objects[object].X;
-            output.point.y=objects[object].Y;
-            return output;
-        }
-
-        if(circleShapePoly(object)){
-            for(int i = 0;i<objects[object].sides;i++){
-                testPoint = angleOffset(object,i);
-
-                testPoint.x+=objects[object].X;
-                testPoint.y+=objects[object].Y;
-                test = projectPointOntoNormal(testPoint,normal);
-
-                if(test>output.maxMin){
-                    output.maxMin=test;
-                    output.point = testPoint;
-                }
-            }
-        }else if(rectShapePoly(object)){
-            for(int i = 0;i<4;i++){
-                testPoint = angleOffset(object,i);
-
-                testPoint.x+=objects[object].X;
-                testPoint.y+=objects[object].Y;
-                test = projectPointOntoNormal(testPoint,normal);
-
-                if(test>output.maxMin){
-                    output.maxMin=test;
-                    output.point = testPoint;
-                }
-            }
-        }else if(convexShapePoly(object)){
-            for(int i = 0;i<objects[object].points;i++){
-                testPoint = angleOffset(object,i);
-
-                testPoint.x+=objects[object].X;
-                testPoint.y+=objects[object].Y;
-                test = projectPointOntoNormal(testPoint,normal);
-
-                if(test>output.maxMin){
-                    output.maxMin=test;
-                    output.point = testPoint;
-                }
-            }
-        }else{
-            output.point.x=objects[object].X;
-            output.point.y=objects[object].Y;
-
-            output.maxMin = projectPointOntoNormal(output.point,normal);
-        }
-        return output;
-    }
-    //gets minimum normal of shape
-    maxMin game::getMinNormal(int object,returnXY normal){
-        maxMin output;
-        output.maxMin=std::numeric_limits<float>::infinity();
-        float test;
-        returnXY testPoint;
-        //circle
-        if(objects[object].sides>10){
-            output.maxMin = objects[object].X*normal.x+objects[object].Y*normal.y-baseUnit*objects[object].sizeModifier*2;
-            output.point.x=objects[object].X;
-            output.point.y=objects[object].Y;
-            return output;
-        }
-
-        if(circleShapePoly(object)){
-            for(int i = 0;i<objects[object].sides;i++){
-                testPoint = angleOffset(object,i);
-
-                testPoint.x+=objects[object].X;
-                testPoint.y+=objects[object].Y;
-                test = projectPointOntoNormal(testPoint,normal);
-
-                if(test<output.maxMin){
-                    output.maxMin=test;
-                    output.point = testPoint;
-                }
-            }
-        }else if(rectShapePoly(object)){
-            for(int i = 0;i<4;i++){
-                testPoint = angleOffset(object,i);
-
-                testPoint.x+=objects[object].X;
-                testPoint.y+=objects[object].Y;
-                test = projectPointOntoNormal(testPoint,normal);
-
-                if(test<output.maxMin){
-                    output.maxMin=test;
-                    output.point = testPoint;
-                }
-            }
-        }else if(convexShapePoly(object)){
-            for(int i = 0;i<objects[object].points;i++){
-                testPoint = angleOffset(object,i);
-
-                testPoint.x+=objects[object].X;
-                testPoint.y+=objects[object].Y;
-                test = projectPointOntoNormal(testPoint,normal);
-
-                if(test<output.maxMin){
-                    output.maxMin=test;
-                    output.point = testPoint;
-                }
-            }
-        }else{
-            output.point.x=objects[object].X;
-            output.point.y=objects[object].Y;
-
-            output.maxMin = projectPointOntoNormal(output.point,normal);
-        }
-        return output;
-    }
     //get normal between two points, just kidding it's rotated 90 degrees and I'm not fixing is cause it's already used too much in my code :/
     returnXY game::getNormal(returnXY point1,returnXY point2){
         returnXY output;
@@ -988,138 +397,7 @@
         // Calculate the dot product of the point and the normal
         return point.x * normal.x + point.y * normal.y;
     }
-    //respone to collision
-    void game::collisionResponse(int o1,int o2,SATout input,float timediff){
 
-        float massDiff1=1,massDiff2=1;
-        //if(objects[o1].sides>10&&objects[o2].sides>10){
-        //object 1
-        if(objects[o1].mass!=std::numeric_limits<float>::infinity()&&objects[o2].mass!=std::numeric_limits<float>::infinity()){
-            float massTotal = objects[o1].mass+objects[o2].mass;
-
-            massDiff1=((massTotal-objects[o1].mass)/massTotal);
-            massDiff2=((massTotal-objects[o2].mass)/massTotal);
-        }else if(objects[o1].mass==std::numeric_limits<float>::infinity()&&objects[o2].mass!=std::numeric_limits<float>::infinity()){
-            massDiff1=0;
-            massDiff2=1;
-        }else if(objects[o2].mass==std::numeric_limits<float>::infinity()&&objects[o1].mass!=std::numeric_limits<float>::infinity()){
-            massDiff1=1;
-            massDiff2=0;
-        }else{
-            massDiff1=0;
-            massDiff2=0;
-        }
-
-        if((objects[o1].X - objects[o2].X)*input.normal.x+(objects[o1].Y - objects[o2].Y)*input.normal.y<0){
-            input.normal.x=-input.normal.x;
-            input.normal.y=-input.normal.y;
-        }
-
-        //mouse pointer
-        if(objects[o1].objectType==-1||objects[o2].objectType==-1){
-            if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
-                if(objects[o1].objectType==-1){
-                    objects[o2].grabbed=true;
-                    objects[o2].velX+=objects[mouseObject].velX;
-                    objects[o2].velY+=objects[mouseObject].velY;
-                }else{
-                    objects[o1].grabbed=true;
-                    objects[o1].velX+=objects[mouseObject].velX;
-                    objects[o1].velY+=objects[mouseObject].velY;
-                }
-            }
-        }else/*literally everything else*/{
-
-
-            //removes intersection.
-            objects[o1].X+=(-input.difference*input.normal.x)*massDiff1;
-
-            objects[o1].Y+=(-input.difference*input.normal.y)*massDiff1;
-
-
-
-            objects[o2].X-=(-input.difference*input.normal.x)*massDiff2;
-
-            objects[o2].Y-=(-input.difference*input.normal.y)*massDiff2;
-
-
-            if(objects[o1].objectType==1&&(-input.difference*input.normal.y)<0){
-                canJump=1;
-                jumpCountDown=1;
-            }else if(objects[o2].objectType==1&&-(-input.difference*input.normal.y)<0){
-                canJump=1;
-                jumpCountDown=1;
-            }
-            float direction =(-input.difference)/abs(input.difference);
-
-
-
-
-            float Vel;
-            float velX1;
-            float velY1;
-            float velX2;
-            float velY2;
-            float rot1;
-            float rot2;
-
-
-            //really need to redo this
-            //violates laws of thermodynamics
-            if(massDiff1!=0&&massDiff2!=0){
-                Vel= abs(((objects[o1].velX)*objects[o1].mass+abs(objects[o2].velX)*objects[o2].mass)*input.normal.x+((objects[o1].velY)*objects[o1].mass+(objects[o2].velY)*objects[o2].mass)*input.normal.y);
-                velX1=Vel*input.normal.x;
-                velY1=Vel*input.normal.y;
-
-                velX2=Vel*input.normal.x;
-                velY2=Vel*input.normal.y;
-
-                rot1=VelRotCalc(o1,o2,input,direction);
-                rot2=VelRotCalc(o2,o1,input,direction);
-            }else if(massDiff2!=0){
-                Vel= abs(((objects[o2].velX)*objects[o2].mass)*input.normal.x+((objects[o2].velY)*objects[o2].mass)*input.normal.y);
-                velX2=Vel*input.normal.x;
-                velY2=Vel*input.normal.y;
-
-                rot2=VelRotCalc(o2,o1,input,direction);
-            }else if(massDiff1!=0){
-                Vel= abs(((objects[o1].velX)*objects[o1].mass)*input.normal.x+((objects[o1].velY)*objects[o1].mass)*input.normal.y);
-                velX1=Vel*input.normal.x;
-                velY1=Vel*input.normal.y;
-
-                rot1=VelRotCalc(o1,o2,input,direction);
-            }
-
-            if(massDiff1!=0){
-                if(debug==true){
-                    std::cout<<"rotation: "<<o1<<" "<<rot1<<"\n";
-
-                }
-                //Vel-=abs(rot1*Vel/objects[o2].mass*500);
-                objects[o1].velRot+=rot1*coefficientOfRestitution*Vel/objects[o1].mass*massDiff1;
-                objects[o1].velX+=direction*velX1/objects[o1].mass*coefficientOfRestitution/baseUnit*massDiff1;
-
-                objects[o1].velY+=direction*velY1/objects[o1].mass*coefficientOfRestitution/baseUnit*massDiff1;
-
-            }
-            if(massDiff2!=0){
-                if(debug==true){
-
-                    std::cout<<"rotation: "<<o2<<" "<<rot2<<"\n";
-                }
-                //Vel-=abs(rot2*Vel/objects[o2].mass*500);
-                objects[o2].velRot+=rot2*coefficientOfRestitution*Vel/objects[o2].mass*massDiff2;
-                objects[o2].velX+=-direction*velX2/objects[o2].mass*coefficientOfRestitution/baseUnit*massDiff2;
-
-                objects[o2].velY+=-direction*velY2/objects[o2].mass*coefficientOfRestitution/baseUnit*massDiff2;
-            }
-
-        }
-        friction(o1,o2,input.normal,timediff);
-        friction(o2,o1,input.normal,timediff);
-
-
-    }
     //returns if object is of type regular polygon(sf::circleShape)
     bool game::circleShapePoly(int object){
         if(objects[object].objectType==0||objects[object].objectType==1){
@@ -1161,7 +439,7 @@
     }
     //don't input an obect besides ones for this calculated SAT input
     //calculated projected offset of shape for rotation
-    float game::VelRotCalc(int o1,int o2,SATout input,int direction){
+    float game::VelRotCalc(int o1,int o2,SATout input){
         //choses point
         float Xaverage = (objects[o1].X+objects[o2].X)/2;
         float Yaverage = (objects[o1].Y+objects[o2].Y)/2;
@@ -1207,9 +485,9 @@
         //}
         if(output<0){
             //std::cout<<pol<<"\n";
-            output=-1*sqrt(abs(output));
+            output=-1*sqrt(fabs(output));
         }else{
-            output=sqrt(abs(output));
+            output=sqrt(fabs(output));
         }
 
         return output;
@@ -1317,19 +595,19 @@
 
             window.draw(pointNotButter);
 
-            pointNotButter.setPosition({W/2,H/2});
+            pointNotButter.setPosition({static_cast<float>(W/2),static_cast<float>(H/2)});
 
             window.draw(pointNotButter);
 
-            pointNotButter.setPosition({-W/2,H/2});
+            pointNotButter.setPosition({static_cast<float>(-W/2),static_cast<float>(H/2)});
 
             window.draw(pointNotButter);
 
-            pointNotButter.setPosition({-W/2,-H/2});
+            pointNotButter.setPosition({static_cast<float>(-W/2),static_cast<float>(-H/2)});
 
             window.draw(pointNotButter);
 
-            pointNotButter.setPosition({W/2,-H/2});
+            pointNotButter.setPosition({static_cast<float>(W/2),static_cast<float>(-H/2)});
 
             window.draw(pointNotButter);
         }

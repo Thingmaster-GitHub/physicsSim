@@ -5,8 +5,7 @@
 #include <cmath>
 #include <limits>
 #include <SFML/Graphics.hpp>
-#include "headers/game.hpp"
-#include "headers/global.hpp"
+#include "headers/headers.cpp"
 void game::run(){
 
     returnXY p;
@@ -24,7 +23,7 @@ void game::run(){
 
     sf::ContextSettings settings;
     settings.antiAliasingLevel = 8.0;
-    sf::RenderWindow window(sf::VideoMode({W, H}), "game"/*, sf::Style::Close, settings*/);
+    sf::RenderWindow window(sf::VideoMode({static_cast<unsigned int>(W), static_cast<unsigned int>(H)}), "game"/*, sf::Style::Close, settings*/);
 
     //recenters convex polygons
     for(int i = 0;i<objectCount;i++){

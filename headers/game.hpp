@@ -81,7 +81,7 @@ private:
     returnXY invertNormal(returnXY normal);
     //don't input an obect besides ones for this calculated SAT input
     //calculated projected offset of shape for rotation
-    float VelRotCalc(int o1,int o2,SATout input,int direction);
+    float VelRotCalc(int o1,int o2,SATout input);
 
     float distance(returnXY point1,returnXY point2);
 

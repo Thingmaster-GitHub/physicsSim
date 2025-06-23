@@ -1,3 +1,4 @@
+#pragma once
 #include "game.hpp"
 //just a normal header file, nothing to see here
 extern int W;

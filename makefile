@@ -1,8 +1,9 @@
 CFLAGS = -std=c++17 -O2
 LDFLAGS = -lsfml-graphics -lsfml-window -lsfml-audio -lsfml-network -lsfml-system
-
+FILES = -o testproject main.cpp genaric.cpp run.cpp
+DIRECORIES = collisions/*.cpp general/*.cpp inputs/*.cpp rendering/*.cpp headers/*.cpp physics/*.cpp
 testproject: main.cpp
-	g++ $(CFLAGS) -o testproject main.cpp game.hpp genaric.cpp run.cpp collisions/*.cpp general/*.cpp headers/*.cpp inputs/*.cpp rendering/*.cpp $(LDFLAGS)
+	g++ $(CFLAGS) $(FILES) $(DIRECORIES) $(LDFLAGS)
 
 .PHONY: test clean
 
